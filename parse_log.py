@@ -5,10 +5,8 @@ from itertools import ifilter, imap
 from json import dumps
 from pygeoip import GeoIP
 import re
-import time
 from vector_dict.VectorDict import VectorDict as krut, convert_tree as kruter
 
-gi = GeoIP("data/GeoIP.dat")
 
 LOG_LINE_REGEXP = re.compile(
 '''^(?P<ip>\S+?)\s # ip
@@ -23,23 +21,32 @@ HTTP/1.\d"\            # whole scheme (catching FTP ... would be nicer)
 "(?P<referer>[^"]+)"\  # where people come from
 "(?P<agent>[^"]+)"$    # well ugly chain''', re.VERBOSE)
 
-cache = {}
-def memoize_detect(user_agent):
+def memoize(cache):
+    """A simple memoization decorator.
+    Only functions with positional arguments are supported."""
+    def decorator(fn):
+        def wrapped(*args):
+            cache.setdefault(args, fn(*args))
+            return cache[args]
+        return wrapped
+    return decorator
+
+_CACHE = {}
+
+@memoize(_CACHE)
+def normalize_user_agent(user_agent):
     default = {
         'os': {'name': "unknown", "version": 'unknown'},
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
         }
-        
-    if user_agent not in cache:
-        iam = httpagentparser.detect(user_agent)
-        cache[user_agent] = iam if len(iam) else default
-        if "dist" not in iam:
-            iam['dist'] = default["dist"]
-    
-    return cache[user_agent]
+    iam = httpagentparser.detect(user_agent)
+    if not iam:
+        return default
+    iam.setdefault("dist", default["dist"])
+    return iam
 
-def parse_line(line):
+def parse_log_line(line):
     """Produce a dict of the data found in the line.
     If the line is not recognized, return None.
     
@@ -52,12 +59,13 @@ def parse_line(line):
     data.update({
         "date": fdate.strftime('%Y-%m-%d'),
         "time": fdate.strftime('%H:%M:%S.%f'),
-        "agent_class": memoize_detect(data["agent"])
+        "agent_class": normalize_user_agent(data["agent"])
     })
     return data
 
 if __name__ == '__main__':
     import fileinput
+    gi = GeoIP("data/GeoIP.dat")
     
     def krutify(data):
         return krut(int, {
@@ -82,7 +90,7 @@ if __name__ == '__main__':
         krut.__add__,
         imap(krutify, ifilter(
                 lambda x: not is_local(x['ip']),
-                ifilter(None, imap(parse_line, fileinput.input()))
+                ifilter(None, imap(parse_log_line, fileinput.input()))
             )
         )
     ).tprint()
