@@ -36,7 +36,7 @@ def parse(filename):
         "(?P<method>.*?)\  #GET/POST/....
         (?P<uri>.*?)\ #add query it would be nice
         HTTP/1.\d"\ # whole scheme (catching FTP ... would be nicer)
-        (?P<status_code>\d+)\ #404 ...
+        (?P<status>\d+)\ #404 ...
         (?P<bytes>\d+)\ #bytes really bite me if you can
         "(?P<referer>.*?)"\ #where people come from 
         "(?P<agent>.*?)"$#well ugly chain''' 
@@ -70,6 +70,7 @@ reduce(
             "by_dist" : krut(int, { x["agent_class"]['dist']['name'] : 1 }),
             "by_browser" : krut(int,{ x["agent_class"]['browser']['name'] : 1 }),
             'by_ip' : krut(int, { x['ip'] : 1 }),
+            'by_status' : krut(int, { x['status'] : 1 }),
             'by_url': krut(int,{x['uri']  : 1}),
             'by_agent': krut(int,{x['agent']  : 1}),
             'ip_by_url' : krut( int, {x['uri']  : krut ( int, {x['ip'] : 1 })}),
