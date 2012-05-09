@@ -11,7 +11,7 @@ gi = GeoIP("data/GeoIP.dat")
 
 country = gi.country_code_by_addr
 cache = {}
-def mnemoize_detect(user_agent):
+def memoize_detect(user_agent):
     default = {
         'os': {'name': "unknown", "version": 'unknown'},
         'browser': {'name': "unknown", "version": 'unknown'},
@@ -52,7 +52,7 @@ def parse(filename):
                 ).isoformat()
                 res["date"] = res["fdate"][:11]
                 res["time"] = res["fdate"][11:]
-                res["agent_class"] = mnemoize_detect(res["agent"])
+                res["agent_class"] = memoize_detect(res["agent"])
                 yield res
 
 if __name__ == '__main__':
