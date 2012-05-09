@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from datetime import datetime as dt
+from datetime import datetime
 import httpagentparser
 from itertools import ifilter, imap
 from json import dumps
@@ -9,17 +9,18 @@ from vector_dict.VectorDict import VectorDict as krut, convert_tree as kruter
 
 
 LOG_LINE_REGEXP = re.compile(
-'''^(?P<ip>\S+?)\s # ip
--\s                    # dunno
-(?P<user>[^ ]+)\s      # if authentified
-\[(?P<time>[^\]]+)\]\s # apache format
-"(?P<method>[A-Z]+)\   # GET/POST/....
-(?P<uri>[^ ]+)\        # add query it would be nice
-HTTP/1.\d"\            # whole scheme (catching FTP ... would be nicer)
-(?P<status>\d+)\       # 404 ...
-(?P<bytes>\d+)\        # bytes really bite me if you can
-"(?P<referer>[^"]+)"\  # where people come from
-"(?P<agent>[^"]+)"$    # well ugly chain''', re.VERBOSE)
+'''^(?P<ip>\S+?)\s            # ip
+-\s                           # dunno
+(?P<user>[^ ]+)\s             # if authentified
+\[(?P<datetime>[^\]]+)\s      # apache format
+(?P<tz_offset>[+-]\d{4})\]\s  #
+"(?P<method>[A-Z]+)\          # GET/POST/....
+(?P<uri>[^ ]+)\               # add query it would be nice
+HTTP/1.\d"\                   # whole scheme (catching FTP ... would be nicer)
+(?P<status>\d+)\              # 404 ...
+(?P<bytes>\d+)\               # bytes really bite me if you can
+"(?P<referer>[^"]+)"\         # where people come from
+"(?P<agent>[^"]+)"$           # well ugly chain''', re.VERBOSE)
 
 def memoize(cache):
     """A simple memoization decorator.
@@ -55,7 +56,7 @@ def parse_log_line(line):
     if not match:
         return None
     data = match.groupdict()
-    fdate = dt.strptime(data["time"][:-6], "%d/%b/%Y:%H:%M:%S")
+    fdate = datetime.strptime(data["datetime"], "%d/%b/%Y:%H:%M:%S")
     data.update({
         "date": fdate.strftime('%Y-%m-%d'),
         "time": fdate.strftime('%H:%M:%S.%f'),
