@@ -103,10 +103,7 @@ if __name__ == '__main__':
             return False
         if not args.exclude_ip:
             return True
-        for glob in args.exclude_ip:
-            if fnmatch(data["ip"], glob):
-                return False
-        return True
+        return not(any(fnmatch(data["ip"], glob) for glob in args.exclude_ip))
     
     reduce(
         krut.__add__,
