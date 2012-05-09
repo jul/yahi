@@ -2,6 +2,7 @@
 import argparse
 from datetime import datetime
 import fileinput
+from fnmatch import fnmatch
 import httpagentparser
 from itertools import ifilter, imap
 from json import dumps
@@ -69,7 +70,8 @@ def parse_log_line(line):
 
 def get_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--geoip", help="specify a path to a geoip.dat file", default=HARDCODED_GEOIP_FILE)
+    parser.add_argument("-g", "--geoip", help="specify a path to a geoip.dat file", metavar="FILE", default=HARDCODED_GEOIP_FILE)
+    parser.add_argument("-x", "--exclude-ip", help="exclude an IP address (wildcards accepted)", action="append")
     parser.add_argument('files', nargs=argparse.REMAINDER)
     
     return parser
@@ -96,13 +98,20 @@ if __name__ == '__main__':
             "bytes_by_ip": krut(int, {data['ip']: int(data["bytes"])})
         })
     
-    def is_local(ip):
-        return ip.startswith('192.168')
+    def filter_ip(data):
+        if not data:
+            return False
+        if not args.exclude_ip:
+            return True
+        for glob in args.exclude_ip:
+            if fnmatch(data["ip"], glob):
+                return False
+        return True
     
     reduce(
         krut.__add__,
         imap(krutify, ifilter(
-                lambda x: x and not is_local(x['ip']),
+                filter_ip,
                 imap(parse_log_line, fileinput.input(args.files))
             )
         )
