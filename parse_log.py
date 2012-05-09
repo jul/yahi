@@ -8,7 +8,7 @@ from itertools import ifilter, imap
 from json import dumps
 from pygeoip import GeoIP
 import re
-from vector_dict.VectorDict import VectorDict as krut, convert_tree as kruter
+from vector_dict.VectorDict import VectorDict as krut
 
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
 
@@ -105,11 +105,14 @@ if __name__ == '__main__':
             return True
         return not(any(fnmatch(data["ip"], glob) for glob in args.exclude_ip))
     
-    reduce(
-        krut.__add__,
-        imap(krutify, ifilter(
-                filter_ip,
-                imap(parse_log_line, fileinput.input(args.files))
+    print dumps( 
+        reduce(
+            krut.__add__,
+            imap(krutify, ifilter(
+                    filter_ip,
+                    imap(parse_log_line, fileinput.input(args.files))
+                )
             )
-        )
-    ).tprint()
+        ),
+        indent=4
+    )
