@@ -102,8 +102,8 @@ if __name__ == '__main__':
     reduce(
         krut.__add__,
         imap(krutify, ifilter(
-                lambda x: not is_local(x['ip']),
-                ifilter(None, imap(parse_log_line, fileinput.input(args.files)))
+                lambda x: x and not is_local(x['ip']),
+                imap(parse_log_line, fileinput.input(args.files))
             )
         )
     ).tprint()
