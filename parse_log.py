@@ -2,6 +2,8 @@
 import re
 from vector_dict.VectorDict import VectorDict as krut, convert_tree as kruter
 from pygeoip import GeoIP
+from datetime import datetime as dt 
+import time
 gi=GeoIP("data/GeoIP.dat")
 
 country = gi.country_code_by_addr
@@ -14,7 +16,16 @@ def parse(filename):
         for line in f:
             match = search(line)
             if match:
-                yield match.groupdict()
+                res=match.groupdict()
+                res["fdate"] = dt.strptime(
+                     res["time"][:-6], 
+                    "%d/%b/%Y:%H:%M:%S"
+                ).isoformat()
+                res["date"]=res["fdate"][:11]
+                res["time"]=res["fdate"][11:]
+
+
+                yield res
 
 from json import dumps
 from sys import argv
@@ -24,8 +35,10 @@ reduce(
     krut.__add__,
     map( 
         lambda x : krut( int, { 
-            "country" : krut( int, { country(x['ip']) : 1}),
-            'byip"' : krut(int, { x['ip'] : 1 }),
+            "by_country" : krut( int, { country(x['ip']) : 1}),
+            "by_date" : krut(int, { x["date"] : 1 }),
+            "by_hour" : krut(int, { x["time"][0:2] : 1 }),
+            'by_ip' : krut(int, { x['ip'] : 1 }),
             'by_url': krut(int,{x['uri']  : 1}),
             'ip_by_url' : krut( int, {x['uri']  : krut ( int, {x['ip'] : 1 })}),
             "bytes_by_ip"  : krut ( int, {x['ip'] : int(x["bytes"]) })
