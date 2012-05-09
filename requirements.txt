@@ -1,0 +1,3 @@
+VectorDict==1.0.0
+httpagentparser==1.0.5
+pygeoip==0.2.3
