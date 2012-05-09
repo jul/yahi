@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+import argparse
 from datetime import datetime
+import fileinput
 import httpagentparser
 from itertools import ifilter, imap
 from json import dumps
@@ -7,6 +9,7 @@ from pygeoip import GeoIP
 import re
 from vector_dict.VectorDict import VectorDict as krut, convert_tree as kruter
 
+HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
 
 LOG_LINE_REGEXP = re.compile(
 '''^(?P<ip>\S+?)\s            # ip
@@ -64,9 +67,18 @@ def parse_log_line(line):
     })
     return data
 
+def get_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-g", "--geoip", help="specify a path to a geoip.dat file", default=HARDCODED_GEOIP_FILE)
+    parser.add_argument('files', nargs=argparse.REMAINDER)
+    
+    return parser
+
 if __name__ == '__main__':
-    import fileinput
-    gi = GeoIP("data/GeoIP.dat")
+    parser = get_parser()
+    args = parser.parse_args()
+    
+    gi = GeoIP(args.geoip)
     
     def krutify(data):
         return krut(int, {
@@ -91,7 +103,7 @@ if __name__ == '__main__':
         krut.__add__,
         imap(krutify, ifilter(
                 lambda x: not is_local(x['ip']),
-                ifilter(None, imap(parse_log_line, fileinput.input()))
+                ifilter(None, imap(parse_log_line, fileinput.input(args.files)))
             )
         )
     ).tprint()
