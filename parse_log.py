@@ -1,10 +1,13 @@
 #!/usr/bin/env python
-import re
-from vector_dict.VectorDict import VectorDict as krut, convert_tree as kruter
-from pygeoip import GeoIP
 from datetime import datetime as dt
 import httpagentparser
+from json import dumps
+from pygeoip import GeoIP
+import re
 import time
+from vector_dict.VectorDict import VectorDict as krut, convert_tree as kruter
+from sys import argv
+
 gi = GeoIP("data/GeoIP.dat")
 
 country = gi.country_code_by_addr
@@ -23,8 +26,6 @@ def mnemoize_detect(user_agent):
             iam['dist'] = default["dist"]
     
     return cache[user_agent]
-    
-
 
 
 def parse(filename):
@@ -54,9 +55,6 @@ def parse(filename):
                 res["time"] = res["fdate"][11:]
                 res["agent_class"] = mnemoize_detect(res["agent"])
                 yield res
-
-from json import dumps
-from sys import argv
 
 
 reduce(
