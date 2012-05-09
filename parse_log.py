@@ -19,6 +19,8 @@ def mnemoize_detect(user_agent):
     if user_agent not in cache:
         iam = httpagentparser.detect(user_agent)
         cache[user_agent] = iam if len(iam) else default
+        if "dist" not in  iam:
+            iam['dist'] = default["dist"]
     
     return cache[user_agent]
     
@@ -65,6 +67,7 @@ reduce(
             "by_date" : krut(int, { x["date"] : 1 }),
             "by_hour" : krut(int, { x["time"][0:2] : 1 }),
             "by_os" : krut(int, { x["agent_class"]['os']['name'] : 1 }),
+            "by_dist" : krut(int, { x["agent_class"]['dist']['name'] : 1 }),
             "by_browser" : krut(int,{ x["agent_class"]['browser']['name'] : 1 }),
             'by_ip' : krut(int, { x['ip'] : 1 }),
             'by_url': krut(int,{x['uri']  : 1}),
