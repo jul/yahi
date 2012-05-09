@@ -6,7 +6,7 @@ from pygeoip import GeoIP
 import re
 import time
 from vector_dict.VectorDict import VectorDict as krut, convert_tree as kruter
-from sys import argv
+
 
 gi = GeoIP("data/GeoIP.dat")
 
@@ -56,28 +56,30 @@ def parse(filename):
                 res["agent_class"] = mnemoize_detect(res["agent"])
                 yield res
 
-
-reduce(
-    krut.__add__,
-    map(
-        lambda x : krut(int, {
-            "by_country": krut(int, {country(x['ip']): 1}),
-            "by_date": krut(int, {x["date"]: 1 }),
-            "by_hour": krut(int, {x["time"][0:2]: 1 }),
-            "by_os": krut(int, {x["agent_class"]['os']['name']: 1 }),
-            "by_dist": krut(int, {x["agent_class"]['dist']['name']: 1 }),
-            "by_browser": krut(int, {x["agent_class"]['browser']['name']: 1 }),
-            'by_ip': krut(int, {x['ip']: 1 }),
-            'by_status': krut(int, {x['status']: 1 }),
-            'by_url': krut(int, {x['uri']: 1}),
-            'by_agent': krut(int, {x['agent']: 1}),
-            'ip_by_url': krut(int, {x['uri']: krut (int, {x['ip']: 1 })}),
-            "bytes_by_ip": krut(int, {x['ip']: int(x["bytes"])})
-            }
-            ),
-        filter(
-            lambda x: not x['ip'].startswith('192.168'),
-            parse(argv[1])
+if __name__ == '__main__':
+    from sys import argv
+    
+    reduce(
+        krut.__add__,
+        map(
+            lambda x : krut(int, {
+                "by_country": krut(int, {country(x['ip']): 1}),
+                "by_date": krut(int, {x["date"]: 1 }),
+                "by_hour": krut(int, {x["time"][0:2]: 1 }),
+                "by_os": krut(int, {x["agent_class"]['os']['name']: 1 }),
+                "by_dist": krut(int, {x["agent_class"]['dist']['name']: 1 }),
+                "by_browser": krut(int, {x["agent_class"]['browser']['name']: 1 }),
+                'by_ip': krut(int, {x['ip']: 1 }),
+                'by_status': krut(int, {x['status']: 1 }),
+                'by_url': krut(int, {x['uri']: 1}),
+                'by_agent': krut(int, {x['agent']: 1}),
+                'ip_by_url': krut(int, {x['uri']: krut (int, {x['ip']: 1 })}),
+                "bytes_by_ip": krut(int, {x['ip']: int(x["bytes"])})
+                }
+                ),
+            filter(
+                lambda x: not x['ip'].startswith('192.168'),
+                parse(argv[1])
+            )
         )
-    )
-).tprint()
+    ).tprint()
