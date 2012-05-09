@@ -29,17 +29,17 @@ def memoize_detect(user_agent):
 
 def parse(filename):
     """Return tuple of dictionaries containing file data."""
-    log_re= '''^(?P<ip>\S+?)\s# ip
-        -\s# dunno
-        (?P<user>[^ ]+)\s# if authentified
-        \[(?P<time>[^\]]+)\]\s#apache format
-        "(?P<method>[A-Z]+)\  #GET/POST/....
-        (?P<uri>[^ ]+)\ #add query it would be nice
-        HTTP/1.\d"\ # whole scheme (catching FTP ... would be nicer)
-        (?P<status>\d+)\ #404 ...
-        (?P<bytes>\d+)\ #bytes really bite me if you can
-        "(?P<referer>[^"]+)"\ #where people come from
-        "(?P<agent>[^"]+)"$#well ugly chain'''
+    log_re= '''^(?P<ip>\S+?)\s # ip
+        -\s                    # dunno
+        (?P<user>[^ ]+)\s      # if authentified
+        \[(?P<time>[^\]]+)\]\s # apache format
+        "(?P<method>[A-Z]+)\   # GET/POST/....
+        (?P<uri>[^ ]+)\        # add query it would be nice
+        HTTP/1.\d"\            # whole scheme (catching FTP ... would be nicer)
+        (?P<status>\d+)\       # 404 ...
+        (?P<bytes>\d+)\        # bytes really bite me if you can
+        "(?P<referer>[^"]+)"\  # where people come from
+        "(?P<agent>[^"]+)"$    # well ugly chain'''
     search = re.compile(log_re, re.X).search
     with open(filename) as f:
         for line in f:
