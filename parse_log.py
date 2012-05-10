@@ -37,10 +37,10 @@ def memoize(cache):
         return wrapped
     return decorator
 
-_CACHE = {}
+_CACHE_UA = {}
 _CACHE_GEOIP = {}
 
-@memoize(_CACHE)
+@memoize(_CACHE_UA)
 def normalize_user_agent(user_agent):
     default = {
         'os': {'name': "unknown", "version": 'unknown'},
