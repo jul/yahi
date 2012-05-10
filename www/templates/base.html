@@ -1,7 +1,7 @@
 <!doctype html>
 <head>
-    {% block head %}
     <link rel="stylesheet" href={{ url_for('static', filename='style.css')}} />
+    {% block head %}
     <title>{% block title %}{% endblock %} - WebStatParser</title>
 	<script language="javascript" type="text/javascript" 
 	src="{{url_for('static',filename="js/jquery.js")}}"></script>
@@ -17,6 +17,20 @@
 <br/>
 <a href={{url_for("index")}}>Home</a> 
 </div>
+<div class=desc>
+Making Joujou with stats<br/>
+
+</div>
+
+<h1>Available stats</h1>
+<ul id=geo>
+</ul>
+<ul>
+<li><a href={{url_for("index")}} >geolocalisation</a><li>
+<li><a href={{url_for("status")}} >Pie Charts</a><li>
+<li>ipsum</li>
+</ul>
+
 
     <div id="content">{% block content %}{% endblock %}</div>
     <div id="footer">

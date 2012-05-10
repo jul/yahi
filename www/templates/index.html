@@ -1,28 +1,22 @@
 {% extends "base.html" %}
 <title>www stat for geoloc</title>
 {% block head %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">
-    </script>
-    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
 
+    <script type='text/javascript' src='./static/data.js' ></script>
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
 <script type='text/javascript'>
 google.load('visualization', '1', {'packages' : ["geochart"]});
-$(document).ready(function(){
-/// TRICK BECAUSE FUCKING GOOGLE VISUALIZATION IS TOO SLOW TO INIT
-    $.getScript("./static/data.js", function() { 
-        var items = [["Country","popularity"]];
-        $.each(data["by_country"], function(key, val) {
-            items.push( [key, val ] )
-            //$('#geo').append('<li style=""><span style="float:left;width:50px">' +  key + "</span>:" + val + "</li>");
-        });
-        data2 = google.visualization.arrayToDataTable(items);
         function fucking_google_callbak() {
+        var items = [["Country","popularity"]];
+        for( key in data["by_country"]){
+            val = data["by_country"][key] * 1 ;
+            items.push( [key, val ] )
+        };
+        data2 = google.visualization.arrayToDataTable(items);
             var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
             chart.draw(data2, {});
         };
         google.setOnLoadCallback( fucking_google_callbak);
-    });
-});
 
 </script>
 {% endblock %}
@@ -30,8 +24,14 @@ $(document).ready(function(){
 
 
 {% block content %}
+<div class=warning style="width:30%">
+WARNING: Google scripts are pretty randomly working use <br/>
+CTRL + MAJ + R to refresh (maybe a header with no cache could help on my side)
+<br/>
+</div>
+<br/>
 
-     <div id="chart_div" style="position:absolute; top:100px;margin:auto;width: 70%;right:0;height:600px"></div>
+     <div id="chart_div" style="position:fixed; top:100px;margin:auto;width: 70%;right:0;height:600px"></div>
 
 {% endblock %}
 
