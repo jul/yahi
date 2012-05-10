@@ -50,7 +50,7 @@ def normalize_user_agent(user_agent):
         return default
     ## httpagentparser is a random generator
     if not iam.get('os') and iam.get("flavor"):
-        iam["os"]=iam["flavor"]
+        iam["os"] = iam["flavor"]
     iam.setdefault("dist", default["dist"])
     return iam
 
@@ -112,12 +112,16 @@ Hence a usefull trick to merge your old stats with your new one
          )
          
     parser.add_argument("-g",
-        "--geoip", 
+        "--geoip",
         help="specify a path to a geoip.dat file",
         metavar="FILE",
         default=HARDCODED_GEOIP_FILE
     )
-    parser.add_argument("-x", "--exclude-ip", help="exclude an IP address (wildcards accepted)", action="append")
+    parser.add_argument("-x",
+        "--exclude-ip",
+        help="exclude an IP address (wildcards accepted)",
+        action="append"
+    )
     parser.add_argument('files', nargs=argparse.REMAINDER)
     
     return parser
