@@ -73,9 +73,9 @@ def get_parser():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""\
 Utility for parsing logs in the apache/nginx combined log format
-and output a json of various aggregatted metrics of frequentation : 
+and output a json of various aggregatted metrics of frequentation :
      * by Geolocation (quite fuzzy but still);
-     * by user agent; 
+     * by user agent;
      * by hour;
      * by day;
      * by browser;
@@ -83,13 +83,13 @@ and output a json of various aggregatted metrics of frequentation :
      * of url by ip;
      * by ip;
      * by url;
-     * and bandwidth by ip; 
+     * and bandwidth by ip;
 
 Ok, it is pretty much a golfing contest between bmispelon and jul, and also
 a proof of concept of what supporting addition in defaultdict may bring.
 
-Example : 
-==========
+Example :
+=========
 
 from stdin (useful for using zcat)
 **********************************
@@ -108,10 +108,10 @@ Hence a usefull trick to merge your old stats with your new one
         """
          )
          
-    parser.add_argument("-g", 
+    parser.add_argument("-g",
         "--geoip", 
-        help="specify a path to a geoip.dat file", 
-        metavar="FILE", 
+        help="specify a path to a geoip.dat file",
+        metavar="FILE",
         default=HARDCODED_GEOIP_FILE
     )
     parser.add_argument("-x", "--exclude-ip", help="exclude an IP address (wildcards accepted)", action="append")
@@ -148,7 +148,7 @@ if __name__ == '__main__':
             return True
         return not any(fnmatch(data["ip"], glob) for glob in args.exclude_ip)
     
-    print dumps( 
+    print dumps(
         reduce(
             krut.__add__,
             imap(krutify, ifilter(
