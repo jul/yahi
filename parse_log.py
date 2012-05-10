@@ -48,6 +48,9 @@ def normalize_user_agent(user_agent):
     iam = httpagentparser.detect(user_agent)
     if not iam:
         return default
+    ## httpagentparser is a random generator
+    if not iam.get('os') and iam.get("flavor"):
+        iam["os"]=iam["flavor"]
     iam.setdefault("dist", default["dist"])
     return iam
 
@@ -73,9 +76,9 @@ def get_parser():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""\
 Utility for parsing logs in the apache/nginx combined log format
-and output a json of various aggregatted metrics of frequentation : 
+and output a json of various aggregatted metrics of frequentation :
      * by Geolocation (quite fuzzy but still);
-     * by user agent; 
+     * by user agent;
      * by hour;
      * by day;
      * by browser;
@@ -83,13 +86,13 @@ and output a json of various aggregatted metrics of frequentation :
      * of url by ip;
      * by ip;
      * by url;
-     * and bandwidth by ip; 
+     * and bandwidth by ip;
 
 Ok, it is pretty much a golfing contest between bmispelon and jul, and also
 a proof of concept of what supporting addition in defaultdict may bring.
 
-Example : 
-==========
+Example :
+=========
 
 from stdin (useful for using zcat)
 **********************************
@@ -108,10 +111,10 @@ Hence a usefull trick to merge your old stats with your new one
         """
          )
          
-    parser.add_argument("-g", 
+    parser.add_argument("-g",
         "--geoip", 
-        help="specify a path to a geoip.dat file", 
-        metavar="FILE", 
+        help="specify a path to a geoip.dat file",
+        metavar="FILE",
         default=HARDCODED_GEOIP_FILE
     )
     parser.add_argument("-x", "--exclude-ip", help="exclude an IP address (wildcards accepted)", action="append")
@@ -138,7 +141,8 @@ if __name__ == '__main__':
             "by_url": krut(int, {data['uri']: 1}),
             "by_agent": krut(int, {data['agent']: 1}),
             "ip_by_url": krut(int, {data['uri']: krut (int, {data['ip']: 1 })}),
-            "bytes_by_ip": krut(int, {data['ip']: int(data["bytes"])})
+            "bytes_by_ip": krut(int, {data['ip']: int(data["bytes"])}),
+            "total_line" : 1,
         })
     
     def filter_ip(data):
@@ -146,9 +150,9 @@ if __name__ == '__main__':
             return False
         if not args.exclude_ip:
             return True
-        return not(any(fnmatch(data["ip"], glob) for glob in args.exclude_ip))
+        return not any(fnmatch(data["ip"], glob) for glob in args.exclude_ip)
     
-    print dumps( 
+    print dumps(
         reduce(
             krut.__add__,
             imap(krutify, ifilter(
