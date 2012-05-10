@@ -69,8 +69,51 @@ def parse_log_line(line):
     return data
 
 def get_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--geoip", help="specify a path to a geoip.dat file", metavar="FILE", default=HARDCODED_GEOIP_FILE)
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="""\
+Utility for parsing logs in the apache/nginx combined log format
+and output a json of various aggregatted metrics of frequentation : 
+     * by Geolocation (quite fuzzy but still);
+     * by user agent; 
+     * by hour;
+     * by day;
+     * by browser;
+     * by status code
+     * of url by ip;
+     * by ip;
+     * by url;
+     * and bandwidth by ip; 
+
+Ok, it is pretty much a golfing contest between bmispelon and jul, and also
+a proof of concept of what supporting addition in defaultdict may bring.
+
+Example : 
+==========
+
+from stdin (useful for using zcat)
+**********************************
+zcat /var/log/apache.log.1.gz | parse_log.py  > dat1.json
+
+excluding IPs (10/8 and 192.168/16)
+***********************************
+parse_log -x "10.*" -x "192.168.*"  /var/log/apache.log  > dat2.json
+
+Since VectorDict is cool here is a tip for aggregating data
+>>> from vector_dict.VectorDict import convert_tree as kruter
+>>> from json import load, dumps
+>>> dumps(kruter(load(file("dat1.json"))) + kruter(load(file("dat2.json"))))
+
+Hence a usefull trick to merge your old stats with your new one
+        """
+         )
+         
+    parser.add_argument("-g", 
+        "--geoip", 
+        help="specify a path to a geoip.dat file", 
+        metavar="FILE", 
+        default=HARDCODED_GEOIP_FILE
+    )
     parser.add_argument("-x", "--exclude-ip", help="exclude an IP address (wildcards accepted)", action="append")
     parser.add_argument('files', nargs=argparse.REMAINDER)
     
