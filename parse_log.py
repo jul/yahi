@@ -46,13 +46,8 @@ def normalize_user_agent(user_agent):
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
         }
-    iam = httpagentparser.detect(user_agent)
-    if not iam:
-        return default
-    ## httpagentparser is a random generator
-    if not iam.get('os') and iam.get("flavor"):
-        iam["os"] = iam["flavor"]
-    iam.setdefault("dist", default["dist"])
+    iam = default.copy()
+    iam.update(httpagentparser.detect(user_agent))
     return iam
 
 def parse_date(s):
