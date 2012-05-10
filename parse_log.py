@@ -38,6 +38,7 @@ def memoize(cache):
     return decorator
 
 _CACHE = {}
+_CACHE_GEOIP = {}
 
 @memoize(_CACHE)
 def normalize_user_agent(user_agent):
@@ -138,10 +139,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     gi = GeoIP(args.geoip)
+    country_by_ip = memoize(_CACHE_GEOIP)(gi.country_code_by_addr)
+    
     
     def krutify(data):
         return krut(int, {
-            "by_country": krut(int, {gi.country_code_by_addr(data['ip']): 1}),
+            "by_country": krut(int, {country_by_ip(data['ip']): 1}),
             "by_date": krut(int, {data["date"]: 1 }),
             "by_hour": krut(int, {data["time"][0:2]: 1 }),
             "by_os": krut(int, {data["agent_class"]['os']['name']: 1 }),
