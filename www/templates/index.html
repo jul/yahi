@@ -8,7 +8,7 @@
 
 
 <script type='text/javascript'>
-google.load('visualization', '1', {'packages' : ["geochart"]});
+google.load('visualization', '1', {'packages' : ["geochart","table"]});
 $(document).ready(function(){
 /// TRICK BECAUSE FUCKING GOOGLE VISUALIZATION IS TOO SLOW TO INIT
     $.getScript("./static/data.js", function() { 
@@ -20,6 +20,8 @@ $(document).ready(function(){
         function fucking_google_callbak() {
             var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
             chart.draw(data2, {});
+            var table = new google.visualization.Table(document.getElementById('table_div'));
+            table.draw(data2, {});
         };
         google.setOnLoadCallback( fucking_google_callbak);
     });
@@ -39,8 +41,8 @@ Making Joujou with stats<br/>
 <h1>Available stats</h1>
 
 
-     <div id="chart_div" style="width: 100%; min-height: 400px;height:600px"></div>
-     <div id="table_div" ></div>
+     <span id="table_div"style="left:0;width:19%" ></span>
+     <span id="chart_div" style="position:absolute;right:10%;top:100px;width: 60%; min-height: 400px;height:600px"></span>
 
 {% endblock %}
 
