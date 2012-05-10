@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+<title>www stat for geoloc</title>
+{% block head %}
+    <link rel="stylesheet" href={{ url_for('static', filename='style.css')}} />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">
+    </script>
+    <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+
+
+<script type='text/javascript'>
+google.load('visualization', '1', {'packages' : ["geochart"]});
+$(document).ready(function(){
+/// TRICK BECAUSE FUCKING GOOGLE VISUALIZATION IS TOO SLOW TO INIT
+    $.getScript("./static/data.js", function() { 
+        var items = [["Country","popularity"]];
+        $.each(data["by_country"], function(key, val) {
+            items.push( [key, val ] )
+        });
+        data2 = google.visualization.arrayToDataTable(items);
+        function fucking_google_callbak() {
+            var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
+            chart.draw(data2, {});
+        };
+        google.setOnLoadCallback( fucking_google_callbak);
+    });
+});
+
+</script>
+{% endblock %}
+
+
+
+{% block content %}
+<div class=desc>
+Making Joujou with stats<br/>
+
+</div>
+
+<h1>Available stats</h1>
+
+
+     <div id="chart_div" style="width: 100%; min-height: 400px;height:600px"></div>
+     <div id="table_div" ></div>
+
+{% endblock %}
+

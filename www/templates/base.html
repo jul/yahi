@@ -1,0 +1,32 @@
+<!doctype html>
+<head>
+    {% block head %}
+    <link rel="stylesheet" href={{ url_for('static', filename='style.css')}} />
+    <title>{% block title %}{% endblock %} - WebStatParser</title>
+	<script language="javascript" type="text/javascript" 
+	src="{{url_for('static',filename="js/jquery.js")}}"></script>
+	<script language="javascript" type="text/javascript" 
+	src="{{url_for('static',filename="js/jquery.flot.js")}}"></script>
+
+
+    {% endblock %}
+</head>
+<body>
+
+<div class=centered>
+<br/>
+<a href={{url_for("index")}}>Home</a> 
+</div>
+
+    <div id="content">{% block content %}{% endblock %}</div>
+    <div id="footer">
+        {% block footer %}
+    Made with <a href=http://github.com/jul/parseweblog>parseweblog</a> &amp;<a href=http://vectordict.readthedocs.org>VectorDict</a><br/>
+        &copy; Copyright 2012 by <a href="http://github.com/jul">jul</a> &amp;
+        <a href=https://github.com/bmispelon/ >bmispelon</a>
+        {% endblock %}
+    </div>
+    <script>
+                                              
+                                              </script>
+</body>
