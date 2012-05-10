@@ -42,13 +42,11 @@ _CACHE_GEOIP = {}
 
 @memoize(_CACHE_UA)
 def normalize_user_agent(user_agent):
-    default = {
+    iam= {
         'os': {'name': "unknown", "version": 'unknown'},
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
-        }
-    iam = default.copy()
-    iam.update(httpagentparser.detect(user_agent))
+        }.update(httpagentparser.detect(user_agent))
     return iam
 
 def parse_date(s):
