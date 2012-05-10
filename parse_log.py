@@ -153,6 +153,7 @@ if __name__ == '__main__':
             "by_status": krut(int, {data['status']: 1 }),
             "by_url": krut(int, {data['uri']: 1}),
             "by_agent": krut(int, {data['agent']: 1}),
+            "by_referer": krut(int, {data['referer']: 1}),
             "ip_by_url": krut(int, {data['uri']: krut (int, {data['ip']: 1 })}),
             "bytes_by_ip": krut(int, {data['ip']: int(data["bytes"])}),
             "total_line" : 1,
