@@ -42,12 +42,13 @@ _CACHE_GEOIP = {}
 
 @memoize(_CACHE_UA)
 def normalize_user_agent(user_agent):
-    iam= {
+    deft= {
         'os': {'name': "unknown", "version": 'unknown'},
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
-        }.update(httpagentparser.detect(user_agent))
-    return iam
+        }
+    deft.update(httpagentparser.detect(user_agent) )
+    return deft 
 
 def parse_date(s):
     """Transform the datetime string from the log into an actual datetime object."""
