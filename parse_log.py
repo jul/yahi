@@ -8,6 +8,7 @@ from itertools import ifilter, imap
 from json import dumps
 from pygeoip import GeoIP
 import re
+import sys
 from vector_dict.VectorDict import VectorDict as krut
 
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
@@ -54,6 +55,10 @@ def normalize_user_agent(user_agent):
     iam.setdefault("dist", default["dist"])
     return iam
 
+def parse_date(s):
+    """Transform the datetime string from the log into an actual datetime object."""
+    return datetime.strptime(s, "%d/%b/%Y:%H:%M:%S")
+
 def parse_log_line(line):
     """Produce a dict of the data found in the line.
     If the line is not recognized, return None.
@@ -63,7 +68,7 @@ def parse_log_line(line):
     if not match:
         return None
     data = match.groupdict()
-    fdate = datetime.strptime(data["datetime"], "%d/%b/%Y:%H:%M:%S")
+    fdate = parse_date(data["datetime"])
     data.update({
         "date": fdate.strftime('%Y-%m-%d'),
         "time": fdate.strftime('%H:%M:%S.%f'),
@@ -122,6 +127,13 @@ Hence a usefull trick to merge your old stats with your new one
         help="exclude an IP address (wildcards accepted)",
         action="append"
     )
+    parser.add_argument("-O",
+        "--output-file",
+        help="output file",
+        nargs='?',
+        type=argparse.FileType('w'),
+        default=sys.stdout
+    )
     parser.add_argument('files', nargs=argparse.REMAINDER)
     
     return parser
@@ -156,7 +168,7 @@ if __name__ == '__main__':
             return True
         return not any(fnmatch(data["ip"], glob) for glob in args.exclude_ip)
     
-    print dumps(
+    args.output_file.write(dumps(
         reduce(
             krut.__add__,
             imap(krutify, ifilter(
@@ -166,4 +178,4 @@ if __name__ == '__main__':
             )
         ),
         indent=4
-    )
+    ))
