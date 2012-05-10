@@ -23,6 +23,10 @@ def key(package):
 def data():
     return redirect(url_for('static', filename="data.json"))
 
+@app.route("/status/", methods=['GET'])
+def status():
+    return render_template("status.html")
+
 if __name__ == "__main__":
     app.run(host='192.168.0.5', port = 5001, debug=True)
 

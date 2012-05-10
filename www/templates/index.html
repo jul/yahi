@@ -1,27 +1,24 @@
 {% extends "base.html" %}
 <title>www stat for geoloc</title>
 {% block head %}
-    <link rel="stylesheet" href={{ url_for('static', filename='style.css')}} />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">
     </script>
     <script type='text/javascript' src='https://www.google.com/jsapi'></script>
 
-
 <script type='text/javascript'>
-google.load('visualization', '1', {'packages' : ["geochart","table"]});
+google.load('visualization', '1', {'packages' : ["geochart"]});
 $(document).ready(function(){
 /// TRICK BECAUSE FUCKING GOOGLE VISUALIZATION IS TOO SLOW TO INIT
     $.getScript("./static/data.js", function() { 
         var items = [["Country","popularity"]];
         $.each(data["by_country"], function(key, val) {
             items.push( [key, val ] )
+            //$('#geo').append('<li style=""><span style="float:left;width:50px">' +  key + "</span>:" + val + "</li>");
         });
         data2 = google.visualization.arrayToDataTable(items);
         function fucking_google_callbak() {
             var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
             chart.draw(data2, {});
-            var table = new google.visualization.Table(document.getElementById('table_div'));
-            table.draw(data2, {});
         };
         google.setOnLoadCallback( fucking_google_callbak);
     });
@@ -33,16 +30,8 @@ $(document).ready(function(){
 
 
 {% block content %}
-<div class=desc>
-Making Joujou with stats<br/>
 
-</div>
-
-<h1>Available stats</h1>
-
-
-     <span id="table_div"style="left:0;width:19%" ></span>
-     <span id="chart_div" style="position:absolute;right:10%;top:100px;width: 60%; min-height: 400px;height:600px"></span>
+     <div id="chart_div" style="position:absolute; top:100px;margin:auto;width: 70%;right:0;height:600px"></div>
 
 {% endblock %}
 
