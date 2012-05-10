@@ -48,6 +48,9 @@ def normalize_user_agent(user_agent):
     iam = httpagentparser.detect(user_agent)
     if not iam:
         return default
+    ## httpagentparser is a random generator
+    if not iam.get('os') and iam.get("flavor"):
+        iam["os"]=iam["flavor"]
     iam.setdefault("dist", default["dist"])
     return iam
 
@@ -138,7 +141,8 @@ if __name__ == '__main__':
             "by_url": krut(int, {data['uri']: 1}),
             "by_agent": krut(int, {data['agent']: 1}),
             "ip_by_url": krut(int, {data['uri']: krut (int, {data['ip']: 1 })}),
-            "bytes_by_ip": krut(int, {data['ip']: int(data["bytes"])})
+            "bytes_by_ip": krut(int, {data['ip']: int(data["bytes"])}),
+            "total_line" : 1,
         })
     
     def filter_ip(data):
