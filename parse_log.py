@@ -122,7 +122,7 @@ Hence a usefull trick to merge your old stats with your new one
         help="exclude an IP address (wildcards accepted)",
         action="append"
     )
-    parser.add_argument("-O",
+    parser.add_argument("-o",
         "--output-file",
         help="output file",
         nargs='?',
