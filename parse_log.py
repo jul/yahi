@@ -6,6 +6,7 @@ from fnmatch import fnmatch
 import httpagentparser
 from itertools import ifilter, imap
 from json import dumps
+from performance import memoize
 from pygeoip import GeoIP
 import re
 import sys
@@ -27,28 +28,18 @@ HTTP/1.\d"\                   # whole scheme (catching FTP ... would be nicer)
 "(?P<referer>[^"]+)"\         # where people come from
 "(?P<agent>[^"]+)"$           # well ugly chain''', re.VERBOSE)
 
-def memoize(cache):
-    """A simple memoization decorator.
-    Only functions with positional arguments are supported."""
-    def decorator(fn):
-        def wrapped(*args):
-            cache.setdefault(args, fn(*args))
-            return cache[args]
-        return wrapped
-    return decorator
-
 _CACHE_UA = {}
 _CACHE_GEOIP = {}
 
 @memoize(_CACHE_UA)
 def normalize_user_agent(user_agent):
-    deft= {
+    deft = {
         'os': {'name': "unknown", "version": 'unknown'},
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
         }
-    deft.update(httpagentparser.detect(user_agent) )
-    return deft 
+    deft.update(httpagentparser.detect(user_agent))
+    return deft
 
 def parse_date(s):
     """Transform the datetime string from the log into an actual datetime object."""
