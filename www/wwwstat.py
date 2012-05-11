@@ -13,7 +13,6 @@ from os import path
 
 @app.route("/")
 def index():
-    res.headers['Cache-Control']="no-cache"
     return render_template("index.html")
 
 @app.route("/key/<package>", methods=['GET', 'POST'])
@@ -29,5 +28,5 @@ def status():
     return render_template("status.html")
 
 if __name__ == "__main__":
-    app.run(host='192.168.0.5', port = 5001, debug=False)
+    app.run(host='192.168.0.5', port = 5001 )
 
