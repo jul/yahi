@@ -24,14 +24,14 @@ google.load('visualization', '1', {'packages' : ["geochart"]});
 
 
 {% block content %}
-<div class=warning style="width:30%">
+<div class=warning style="display:none;width:30%">
 WARNING: Google scripts are pretty randomly working use <br/>
 CTRL + MAJ + R to refresh (maybe a header with no cache could help on my side)
 <br/>
 </div>
 <br/>
 
-     <div id="chart_div" style="position:fixed; top:100px;margin:auto;width: 70%;right:0;height:600px"></div>
+     <div id="chart_div" style="position:fixed;zindex:1000; top:100px;margin:auto;width: 70%;right:0;height:600px"></div>
 
 {% endblock %}
 

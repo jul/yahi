@@ -19,24 +19,61 @@
             return arrr;
             
         }
+<<<<<<< HEAD
 function get_data(category) {
+=======
+function get_data(category, for_pie) {
+>>>>>>> c8947933a0db81ad5e83c625c2118e735946e1aa
     var here_data=[];
         var top_ten=0;
         sorted= _values(data[category]).sort(function(a,b) { return(  a - b) }).reverse();
         top_ten = _values(data[category]).length > 10 ? sorted[10] : 0;
+<<<<<<< HEAD
         console.log("tt" + top_ten);
         $.each( data[category], function(key,value) { 
             if( value > top_ten ){ 
                 here_data.push( { "label" : key + "(" + value  + ")" , "data" : 1 * value } ); 
                 here_data = here_data.sort();
+=======
+            i=0;
+        $.each( data[category], function(key,value) { 
+            if( value > top_ten ){ 
+                if (for_pie){
+                    here_data.push( { "label" : key.slice(0,30) + ( key.length > 30 ? "..." : "" )    + "(" + value  + ")" , "data" : 1 * value } ); 
+                } else { 
+                    i++;
+                    here_data.push( { "label" : key.slice(0,30) + ( key.length > 30 ? "..." : "" )    , "data" : [ [ i,  1 * value ]] } ); 
+                    
+                }
+>>>>>>> c8947933a0db81ad5e83c625c2118e735946e1aa
             }
         });
         return( here_data);
         };
 $(document).ready(function() { 
+<<<<<<< HEAD
     function update_for(category){ 
         var serie=get_data(category);
         $.plot("#plot",serie, { 'series' : { 'pie' : { 'show' : true } } }); 
+=======
+   
+    function update_for(category){ 
+        want_pie=$("#wp").is(":checked")? true:false;
+        var serie=get_data(category,want_pie);
+        serie=serie.sort(function(a, b) {
+            a = a['data'];
+            b = b['data'];
+            if (! want_pie) { 
+                a=a[0][1];
+                b=b[0][1];
+            }
+            
+            return a < b ? -1 : (a > b ? 1 : 0);
+        }).reverse();
+        opt = want_pie ?  { 'series' : { 'pie' : {  'show' : true } }, 'legend': { 'show' : true } }  : { "legend" : { 'position' : "ne"} ,"series" :{  "bars" : { "show" : true },  "label" : { "show" : true }}} ;
+        
+        $.plot("#plot",serie,opt);
+>>>>>>> c8947933a0db81ad5e83c625c2118e735946e1aa
     }
     $(".selector").click(function() { 
        update_for( ($(this).attr("href")));
@@ -52,6 +89,10 @@ $(document).ready(function() {
 
 
 {% block content %}
+<<<<<<< HEAD
+=======
+<input id=wp type=checkbox checked=true >Pie ? </input>
+>>>>>>> c8947933a0db81ad5e83c625c2118e735946e1aa
 <h1>Click a category to see its pie chart</h1>
 <ul>
 <li ><a class=selector href=by_status>by status</a></li>
@@ -60,7 +101,13 @@ $(document).ready(function() {
 <li ><a class=selector href=by_os >by os</a></li>
 <li ><a class=selector href=by_country >by country</a></li>
 <li ><a class=selector href=by_url >by url</a></li>
+<<<<<<< HEAD
 
+=======
+<li ><a class=selector href=by_agent >by agent</a></li>
+
+<li ><a class=selector href=by_referer >by referer</a></li>
+>>>>>>> c8947933a0db81ad5e83c625c2118e735946e1aa
 <li ><a class=selector href=bytes_by_ip >bandwidth</a></li>
 
 </ul>
