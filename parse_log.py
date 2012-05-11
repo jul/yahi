@@ -8,6 +8,7 @@ from itertools import ifilter, imap
 from json import dumps
 from pygeoip import GeoIP
 import re
+import sys
 from vector_dict.VectorDict import VectorDict as krut
 
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
@@ -36,23 +37,22 @@ def memoize(cache):
         return wrapped
     return decorator
 
-_CACHE = {}
+_CACHE_UA = {}
+_CACHE_GEOIP = {}
 
-@memoize(_CACHE)
+@memoize(_CACHE_UA)
 def normalize_user_agent(user_agent):
-    default = {
+    deft= {
         'os': {'name': "unknown", "version": 'unknown'},
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
         }
-    iam = httpagentparser.detect(user_agent)
-    if not iam:
-        return default
-    ## httpagentparser is a random generator
-    if not iam.get('os') and iam.get("flavor"):
-        iam["os"]=iam["flavor"]
-    iam.setdefault("dist", default["dist"])
-    return iam
+    deft.update(httpagentparser.detect(user_agent) )
+    return deft 
+
+def parse_date(s):
+    """Transform the datetime string from the log into an actual datetime object."""
+    return datetime.strptime(s, "%d/%b/%Y:%H:%M:%S")
 
 def parse_log_line(line):
     """Produce a dict of the data found in the line.
@@ -63,7 +63,7 @@ def parse_log_line(line):
     if not match:
         return None
     data = match.groupdict()
-    fdate = datetime.strptime(data["datetime"], "%d/%b/%Y:%H:%M:%S")
+    fdate = parse_date(data["datetime"])
     data.update({
         "date": fdate.strftime('%Y-%m-%d'),
         "time": fdate.strftime('%H:%M:%S.%f'),
@@ -112,12 +112,23 @@ Hence a usefull trick to merge your old stats with your new one
          )
          
     parser.add_argument("-g",
-        "--geoip", 
+        "--geoip",
         help="specify a path to a geoip.dat file",
         metavar="FILE",
         default=HARDCODED_GEOIP_FILE
     )
-    parser.add_argument("-x", "--exclude-ip", help="exclude an IP address (wildcards accepted)", action="append")
+    parser.add_argument("-x",
+        "--exclude-ip",
+        help="exclude an IP address (wildcards accepted)",
+        action="append"
+    )
+    parser.add_argument("-O",
+        "--output-file",
+        help="output file",
+        nargs='?',
+        type=argparse.FileType('w'),
+        default=sys.stdout
+    )
     parser.add_argument('files', nargs=argparse.REMAINDER)
     
     return parser
@@ -127,10 +138,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     gi = GeoIP(args.geoip)
+    country_by_ip = memoize(_CACHE_GEOIP)(gi.country_code_by_addr)
+    
     
     def krutify(data):
         return krut(int, {
-            "by_country": krut(int, {gi.country_code_by_addr(data['ip']): 1}),
+            "by_country": krut(int, {country_by_ip(data['ip']): 1}),
             "by_date": krut(int, {data["date"]: 1 }),
             "by_hour": krut(int, {data["time"][0:2]: 1 }),
             "by_os": krut(int, {data["agent_class"]['os']['name']: 1 }),
@@ -140,6 +153,7 @@ if __name__ == '__main__':
             "by_status": krut(int, {data['status']: 1 }),
             "by_url": krut(int, {data['uri']: 1}),
             "by_agent": krut(int, {data['agent']: 1}),
+            "by_referer": krut(int, {data['referer']: 1}),
             "ip_by_url": krut(int, {data['uri']: krut (int, {data['ip']: 1 })}),
             "bytes_by_ip": krut(int, {data['ip']: int(data["bytes"])}),
             "total_line" : 1,
@@ -152,7 +166,7 @@ if __name__ == '__main__':
             return True
         return not any(fnmatch(data["ip"], glob) for glob in args.exclude_ip)
     
-    print dumps(
+    args.output_file.write(dumps(
         reduce(
             krut.__add__,
             imap(krutify, ifilter(
@@ -162,4 +176,4 @@ if __name__ == '__main__':
             )
         ),
         indent=4
-    )
+    ))
