@@ -23,7 +23,7 @@ LOG_LINE_REGEXP = re.compile(
 (?P<tz_offset>[+-]\d{4})\]\s  #
 "(?P<method>[A-Z]+)\          # GET/POST/....
 (?P<uri>[^ ]+)\               # add query it would be nice
-HTTP/1.\d"\                   # whole scheme (catching FTP ... would be nicer)
+(?P<scheme>[A-Z]+(\/1)?).\d"\                   # whole scheme (catching FTP ... would be nicer)
 (?P<status>\d+)\              # 404 ...
 (?P<bytes>\d+)\               # bytes really bite me if you can
 "(?P<referer>[^"]+)"\         # where people come from
@@ -160,24 +160,21 @@ if __name__ == '__main__':
         try:
             matcher = load(open(str_or_file))
         except Exception as e:
+            ## errno 2 <=> file not found
             if e.errno == 2:
                 matcher =  loads(str_or_file)
             else:
                 raise Exception(
-                    "%r is not a valid file with a valid json or a valid json" 
-                    % str_or_file
+                  "%r is not a valid file with a valid json or a valid json (%r)" 
+                  % (str_or_file,e)
                  )
 
         if len(matcher):
             for field, regexp in matcher.items():
                 matcher[field] = re.compile(regexp).match
             
-            def _filter(data):
-                if not data:
-                    return False
-                return not any(matcher[k](data[k]) for k in matcher)
-   
-            _data_filter = _filter
+            _data_filter = lambda data : not(any(matcher[k](data[k]) for k in matcher)
+                ) if data else False
 
     args.output_file.write(dumps(
         reduce(
