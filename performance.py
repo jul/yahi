@@ -6,7 +6,8 @@ def memoize(cache):
     def decorator(fn):
         @wraps(fn)
         def wrapped(*args):
-            cache.setdefault(args, fn(*args))
+            if args not in cache:
+                cache[args] = fn(*args)
             return cache[args]
         return wrapped
     return decorator
