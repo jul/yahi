@@ -10,7 +10,7 @@ from pygeoip import GeoIP
 import re
 import sys
 from json import load, loads
-from performance import memoize
+from performance import memoize, print_res
 from vector_dict.VectorDict import VectorDict as krut
 
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
@@ -110,6 +110,17 @@ Hence a usefull trick to merge your old stats with your new one
         metavar="FILE",
         default=HARDCODED_GEOIP_FILE
     )
+    parser.add_argument("-d",
+        "--diagnose",
+        help="""diagnose 
+            list of comma separated stuff to diagnose :
+                * rejected : will print on STDERR rejected parsed line
+                * match :   will print on stderr rejected matched line
+        
+        """,
+        default=""
+        
+    )
     parser.add_argument("-x",
         "--exclude",
         help="""exclude from parsed line with
@@ -175,10 +186,15 @@ if __name__ == '__main__':
             
             _data_filter = lambda data : not(any(matcher[k](data[k]) for k in matcher)
                 ) if data else False
+    if "rejected" in args.diagnose:
+        _data_filter =  print_res("REJECTED",False,_data_filter)
+
+    if "match" in  args.diagnose:
+        parse_log_line = print_res("NOT MATCHED",None, parse_log_line) 
 
     args.output_file.write(dumps(
         reduce(
-            krut.__add__,
+            krut.__iadd__,
             imap(krutify, ifilter(
                     _data_filter,
                     imap(parse_log_line, fileinput.input(args.files))
