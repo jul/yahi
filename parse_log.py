@@ -2,13 +2,15 @@
 import argparse
 from datetime import datetime
 import fileinput
-from fnmatch import fnmatch
+from os import path
 import httpagentparser
 from itertools import ifilter, imap
 from json import dumps
 from pygeoip import GeoIP
 import re
 import sys
+from json import load, loads
+from performance import memoize
 from vector_dict.VectorDict import VectorDict as krut
 
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
@@ -21,33 +23,24 @@ LOG_LINE_REGEXP = re.compile(
 (?P<tz_offset>[+-]\d{4})\]\s  #
 "(?P<method>[A-Z]+)\          # GET/POST/....
 (?P<uri>[^ ]+)\               # add query it would be nice
-HTTP/1.\d"\                   # whole scheme (catching FTP ... would be nicer)
+(?P<scheme>[A-Z]+(\/1)?).\d"\                   # whole scheme (catching FTP ... would be nicer)
 (?P<status>\d+)\              # 404 ...
 (?P<bytes>\d+)\               # bytes really bite me if you can
 "(?P<referer>[^"]+)"\         # where people come from
 "(?P<agent>[^"]+)"$           # well ugly chain''', re.VERBOSE)
 
-def memoize(cache):
-    """A simple memoization decorator.
-    Only functions with positional arguments are supported."""
-    def decorator(fn):
-        def wrapped(*args):
-            cache.setdefault(args, fn(*args))
-            return cache[args]
-        return wrapped
-    return decorator
 
 _CACHE_UA = {}
 _CACHE_GEOIP = {}
 
 @memoize(_CACHE_UA)
 def normalize_user_agent(user_agent):
-    deft= {
+    deft = {
         'os': {'name': "unknown", "version": 'unknown'},
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
         }
-    deft.update(httpagentparser.detect(user_agent) )
+    deft.update( httpagentparser.detect(user_agent) )
     return deft 
 
 def parse_date(s):
@@ -98,9 +91,9 @@ from stdin (useful for using zcat)
 **********************************
 zcat /var/log/apache.log.1.gz | parse_log.py  > dat1.json
 
-excluding IPs (10/8 and 192.168/16)
-***********************************
-parse_log -x "10.*" -x "192.168.*"  /var/log/apache.log  > dat2.json
+excluding IPs 192.168/16 and user agent containing Mozilla
+**********************************************************
+parse_log -o dat2.json -x '{ "ip" : "^192.168", "agent": "Mozill" }'  /var/log/apache*.log 
 
 Since VectorDict is cool here is a tip for aggregating data
 >>> from vector_dict.VectorDict import convert_tree as kruter
@@ -118,11 +111,11 @@ Hence a usefull trick to merge your old stats with your new one
         default=HARDCODED_GEOIP_FILE
     )
     parser.add_argument("-x",
-        "--exclude-ip",
-        help="exclude an IP address (wildcards accepted)",
-        action="append"
+        "--exclude",
+        help="""exclude from parsed line with
+        a json (string or filename)""",
     )
-    parser.add_argument("-O",
+    parser.add_argument("-o",
         "--output-file",
         help="output file",
         nargs='?',
@@ -158,19 +151,36 @@ if __name__ == '__main__':
             "bytes_by_ip": krut(int, {data['ip']: int(data["bytes"])}),
             "total_line" : 1,
         })
-    
-    def filter_ip(data):
-        if not data:
-            return False
-        if not args.exclude_ip:
-            return True
-        return not any(fnmatch(data["ip"], glob) for glob in args.exclude_ip)
-    
+        
+    _data_filter = lambda data : True if data else False
+    if args.exclude:
+        str_or_file=args.exclude
+        
+        matcher = {}
+        try:
+            matcher = load(open(str_or_file))
+        except Exception as e:
+            ## errno 2 <=> file not found
+            if e.errno == 2:
+                matcher =  loads(str_or_file)
+            else:
+                raise Exception(
+                  "%r is not a valid file with a valid json or a valid json (%r)" 
+                  % (str_or_file,e)
+                 )
+
+        if len(matcher):
+            for field, regexp in matcher.items():
+                matcher[field] = re.compile(regexp).match
+            
+            _data_filter = lambda data : not(any(matcher[k](data[k]) for k in matcher)
+                ) if data else False
+
     args.output_file.write(dumps(
         reduce(
             krut.__add__,
             imap(krutify, ifilter(
-                    filter_ip,
+                    _data_filter,
                     imap(parse_log_line, fileinput.input(args.files))
                 )
             )
