@@ -2,6 +2,7 @@
 import argparse
 from datetime import datetime
 import fileinput
+import fnmatch
 from os import path
 import httpagentparser
 from itertools import ifilter, imap
@@ -103,7 +104,12 @@ Since VectorDict is cool here is a tip for aggregating data
 Hence a usefull trick to merge your old stats with your new one
         """
          )
-         
+    parser.add_argument("-c",
+        "--config",
+        help="""specify a config file in json format for the command line arguments
+        any command line arguments will disable values in the config""",
+        default=None
+        )
     parser.add_argument("-g",
         "--geoip",
         help="specify a path to a geoip.dat file",
@@ -139,8 +145,14 @@ Hence a usefull trick to merge your old stats with your new one
 
 if __name__ == '__main__':
     parser = get_parser()
-    args = parser.parse_args()
     
+    args = parser.parse_args()
+    if args.config:
+        config_args = load(open(args.config))
+        for k in config_args:
+            if not getattr(args,k):
+                setattr(args, k, config_args[k])
+
     gi = GeoIP(args.geoip)
     country_by_ip = memoize(_CACHE_GEOIP)(gi.country_code_by_addr)
     
@@ -166,19 +178,20 @@ if __name__ == '__main__':
     _data_filter = lambda data : True if data else False
     if args.exclude:
         str_or_file=args.exclude
-        
         matcher = {}
         try:
-            matcher = load(open(str_or_file))
-        except Exception as e:
-            ## errno 2 <=> file not found
-            if e.errno == 2:
+            matcher.update(str_or_file)
+        except TypeError: 
+            try:
+                matcher = load(open(str_or_file))
+            except Exception as e:
+                ## errno 2 <=> file not found
                 matcher =  loads(str_or_file)
-            else:
                 raise Exception(
-                  "%r is not a valid file with a valid json or a valid json (%r)" 
+                  "%r is not a valid file with a valid json or a valid json " 
                   % (str_or_file,e)
                  )
+        
 
         if len(matcher):
             for field, regexp in matcher.items():
