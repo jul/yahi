@@ -1,0 +1,9 @@
+{ 
+	"exclude" : {
+		"ip" : "^192.168", 
+		"uri" : ".*munin" 
+	},
+	"diagnose" : "rejected",
+	"output_file" : "here.json",
+	"files" : [ "/www/var/log/nginx-access.log" ]
+}
