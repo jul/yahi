@@ -3,6 +3,7 @@
 		"ip" : "^192.168", 
 		"uri" : ".*munin" 
 	},
+	"geoip" : '/usr/local/share/geoip/GeoIP.dat',
 	"diagnose" : "rejected",
 	"output_file" : "here.json",
 	"files" : [ "/www/var/log/nginx-access.log" ]
