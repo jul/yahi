@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %} 
+core data
+
+{% endblock %}
+{% block head %}
+
+    <script type='text/javascript' src='./static/data.js' ></script>
+    <script language="javascript" type="text/javascript" 
+    src="{{url_for('static',filename="js/jquery.js")}}"></script>
+{% endblock %}
+
+
+{% block content %}
+<pre id="core">
+</pre>
+
+<script>
+$(document).ready(function() {
+$('#core').load('/static/data.js');
+
+});
+</script>
+
+{% endblock %}
+

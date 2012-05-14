@@ -1,8 +1,9 @@
 <!doctype html>
 <head>
     <link rel="stylesheet" href={{ url_for('static', filename='style.css')}} />
+    <link href="data:image/x-icon;base64,AAABAAEAEBAAAAAAAABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAJ4YGAClFxcApRcXAKUWFgCkFRUApBQUAKQTEwCjEhIAoxESAKMREgCjAAAAnv///wAAAAAAAAAAAAAAAJ6zHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf8BAQCfAAAAAAAAAAAREQCjsx0Ju7MdCbuzHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQm7CwsAoQAAAAAAAAAAAAAARLMdCbuzHQm7sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQm7sx0J/wAAAD4AAAAAAAAAAP///wAkJACosx0JlbMdCbuzHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0J/wAAAJ7///8AAAAAAAAAAAD///8AnZ2dCbMdCZWzHQm7sx0Ju7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0JuzAvAqz///8A////AAAAAAAAAAAA////AP///wAAAABWsx0JlbMdCbuzHQm7sx0J/7MdCf+zHQn/sx0Ju7MdCf8AAAA/////AP///wAAAAAAAAAAAP///wD///8A////ACAgAKf8/6Bv/P+TXvz/AC/8/wAs/P8AKvz/llACAgCf////AP///wD///8AAAAAAAAAAAD///8A////AP///wCoqKgJaWsAiP3/oWj8/wAw/P8ALfz/i008PQCn/v7+AP///wD///8A////AAAAAAAAAAAA////AP///wD///8A////AAAAAFbW2ABB+/9rTfz/AC6PkQBRAAAAQP///wD///8A////AP///wAAAAAAAAAAAP///wD///8A////AP///wDt7e0EgYMAZ/v/ak9OTwCWP0AAr////wD///8A////AP///wD///8AAAAAAAAAAAD///8A////AP///wD///8AjY2NBoKEAGf9/2BP/P8AL2xtAGn///8A////AP///wD///8A////AAAAAAAAAAAA////AP///wD///8A////AI2NjQqEhQBn/P9JTfz/ADBpaQBz////AP///wD///8A////AP///wAAAAAAAAAAAP///wD///8A////AP///wCNjY0LhogAZ/z/REv8/wAxYGEAfv///wD///8A////AP///wD///8AAAAAAAAAAAD///8A////AP///wD///8AAAAAPMHEAE37/wA1/P8AMXd4AGLj4+MB////AP///wD///8A////AAAAAAAAAAAA////AP///wD///8A////AB8fAKcdHgCmHBwAphsbAKYaGgClBAUAoP///wD///8A////AP///wAAAAAAwAMAAIABAACAAQAAwAMAAMADAADgBwAA8A8AAPfvAAD73wAA//8AAP8/AAD//wAA//8AAP//AAD//wAA+B8AAA==" rel="icon" type="image/x-icon" />
+    <title>{% block title %}{% endblock %} - ParseWebLog</title>
     {% block head %}
-    <title>{% block title %}{% endblock %} - WebStatParser</title>
 	<script language="javascript" type="text/javascript" 
 	src="{{url_for('static',filename="js/jquery.js")}}"></script>
 	<script language="javascript" type="text/javascript" 
@@ -12,32 +13,28 @@
     {% endblock %}
 </head>
 <body>
-
 <div class=centered>
-<br/>
-<a href={{url_for("index")}}>Home</a> 
-</div>
-<div class=desc>
-Making Joujou with stats<br/>
-
-</div>
-
-<h1>Available stats</h1>
-<ul>
-<li><a href={{url_for("index")}} >geolocalisation</a><li>
-<li><a href={{url_for("status")}} >Histograms / Pie charts of top 10</a></li>
+<span style="line-height:1.4em">Demo for 
+<a href=http://github.com/jul/parseweblog>parseweblog</a> 
+&amp;<a href=http://vectordict.readthedocs.org>VectorDict</a>
+// &copy; Copyright <a href="http://github.com/jul">jul</a> &amp;
+        <a href=https://github.com/bmispelon/ >bmispelon</a>(2012)</span>
+<ul class=horizontal >
+<li id=top ><em>Type of presentation:</em></li>
+<li><a href={{url_for("index")}} >geo chart</a><li>
+<li><a href={{url_for("status")}} >Histograms / Pie chart</a></li>
+<li><a href={{url_for("time")}} >time series</a></li>
+<li><a href={{url_for("core")}} >raw data</a></li>
+{% block options %}
+{% endblock %}
 </ul>
+</div>
+
 
 
     <div id="content">{% block content %}{% endblock %}</div>
-    <div id="footer">
+    <div id='#footer' class="footer">
         {% block footer %}
-    Made with <a href=http://github.com/jul/parseweblog>parseweblog</a> &amp;<a href=http://vectordict.readthedocs.org>VectorDict</a><br/>
-        &copy; Copyright 2012 by <a href="http://github.com/jul">jul</a> &amp;
-        <a href=https://github.com/bmispelon/ >bmispelon</a>
         {% endblock %}
     </div>
-    <script>
-                                              
-                                              </script>
 </body>

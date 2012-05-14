@@ -1,5 +1,8 @@
 {% extends "base.html" %}
-<title>www stat for geoloc</title>
+{% block title %} 
+Frequentation by country
+
+{% endblock %}
 {% block head %}
 
     <script type='text/javascript' src='./static/data.js' ></script>
@@ -24,14 +27,8 @@ google.load('visualization', '1', {'packages' : ["geochart"]});
 
 
 {% block content %}
-<div class=warning style="display:none;width:30%">
-WARNING: Google scripts are pretty randomly working use <br/>
-CTRL + MAJ + R to refresh (maybe a header with no cache could help on my side)
-<br/>
-</div>
-<br/>
 
-     <div id="chart_div" style="position:fixed;zindex:1000; top:100px;margin:auto;width: 70%;right:0;height:600px"></div>
+     <div id="chart_div" class="centered" style="left:7%;right:7%;position:absolute;width: 80%;top:5em;bottom:2em;border:1px solid lightgrey"></div>
 
 {% endblock %}
 

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}
+Frequentation by country
+{% endblock %}
+{% block head %}
+    <script language="javascript" type="text/javascript" 
+    src="{{url_for('static',filename="data.js")}}"></script>
+    <script language="javascript" type="text/javascript" 
+    src="{{url_for('static',filename="js/jquery.js")}}"></script>
+
+        <script language="javascript" type="text/javascript" 
+    src="{{url_for('static',filename="js/jquery.flot.js")}}"></script>
+        <script language="javascript" type="text/javascript" 
+    src="{{url_for('static',filename="js/jquery.flot.pie.js")}}"></script>
+
+<script>
+        function obj_to_arr(an_obj, js_ts_conv) { 
+            var arr=[];
+            $.each( an_obj, function(k,v) { arr.push( [js_ts_conv == true ? k * 1000.0 : k, 1* v ] )});
+            return arr.sort();
+        }
+        function plot_date(){ 
+            opt = { 
+                xaxis : { mode : "time" },
+                grid: { hoverable: true, clickable: true },
+                series : { 
+                    lines : { show : true},
+                    points : { show : true } 
+                       } }  
+            $.plot($("#plot"),[ obj_to_arr(data.by_date_as_ts, true)],opt);
+            $('#ctitle').text("Frequentation by date");
+       };
+       function plot_by_hour(){
+            opt = {
+                    yaxis: { min: 0 },
+                    xaxis: { tickDecimals: 0 },
+            }
+            $.plot($("#plot"),  [ obj_to_arr(data.by_hour, false)],opt);
+            $('#ctitle').text("Frequentation by time of the day (UTC)");
+            
+        
+       }
+$(document).ready(function() { 
+    $('#bd').click( function() { 
+        plot_date();
+        return false;
+    });
+    $('#bh').click( function() { 
+        plot_by_hour();
+        return false;
+    });
+
+    plot_date();
+});
+</script>
+{% endblock %}
+
+
+{%block options %}
+<li>// <a href=#option ><em>(options)</em></a></li>
+{% endblock %}
+
+{% block content %}
+<div id=plotbox class="centered" >
+<h2><span id=ctitle > </span></h2>
+    <div id=plot class=centered ></div>
+    </div>
+    </div>
+
+{% endblock %}
+{% block footer %}
+<ul id=option class=horizontal>
+<li><em>Chronological series available  :</em> </li>
+<li ><a id=bh href=by_hour>by hour</a></li>
+<li ><a id=bd href=by_date >by date</a></li>
+<li>// <a href=#top style="80%"><em>(got to top)</em></a></li>
+
+</ul>
+{% endblock %}
+

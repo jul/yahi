@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-<title>www stat for geoloc</title>
+{% block title %}Charts &amp; Histograms {% endblock %} 
 {% block head %}
-    <title>{% block title %}{% endblock %} - PypiStat</title>
+    
     <script language="javascript" type="text/javascript" 
     src="{{url_for('static',filename="data.js")}}"></script>
     <script language="javascript" type="text/javascript" 
@@ -19,66 +19,76 @@
             return arrr;
             
         }
-<<<<<<< HEAD
-function get_data(category) {
-=======
 function get_data(category, for_pie) {
->>>>>>> c8947933a0db81ad5e83c625c2118e735946e1aa
     var here_data=[];
         var top_ten=0;
-        sorted= _values(data[category]).sort(function(a,b) { return(  a - b) }).reverse();
+        sortme=function(){};
+        
+        sorted = _values(data[category]).sort(function(a,b) { return(  a - b) }).reverse();
         top_ten = _values(data[category]).length > 10 ? sorted[10] : 0;
-<<<<<<< HEAD
-        console.log("tt" + top_ten);
         $.each( data[category], function(key,value) { 
             if( value > top_ten ){ 
-                here_data.push( { "label" : key + "(" + value  + ")" , "data" : 1 * value } ); 
-                here_data = here_data.sort();
-=======
-            i=0;
-        $.each( data[category], function(key,value) { 
-            if( value > top_ten ){ 
-                if (for_pie){
-                    here_data.push( { "label" : key.slice(0,30) + ( key.length > 30 ? "..." : "" )    + "(" + value  + ")" , "data" : 1 * value } ); 
-                } else { 
-                    i++;
-                    here_data.push( { "label" : key.slice(0,30) + ( key.length > 30 ? "..." : "" )    , "data" : [ [ i,  1 * value ]] } ); 
-                    
-                }
->>>>>>> c8947933a0db81ad5e83c625c2118e735946e1aa
+                here_data.push( { "label" : key.slice(0,40) + ( key.length > 40 ? "..." : "" )    + "(" + value  + ")" , "data" : 1 * value } ); 
             }
         });
         return( here_data);
         };
 $(document).ready(function() { 
-<<<<<<< HEAD
+
+
+if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.platform == 'iPod') {
+     $(".footer").css("position", "static");
+     };
+
+    $('#pie').click( function() {
+        $('#wp').val(1);
+        $('#ctitle').text("by_status");
+        update_for("by_status");
+        return false;
+    });
+    $('#nopie').click( function(){
+        $('#wp').val(false);
+        $('#ctitle').text("by_status");
+        update_for("by_status");
+        return false;
+    });
     function update_for(category){ 
-        var serie=get_data(category);
-        $.plot("#plot",serie, { 'series' : { 'pie' : { 'show' : true } } }); 
-=======
-   
-    function update_for(category){ 
-        want_pie=$("#wp").is(":checked")? true:false;
-        var serie=get_data(category,want_pie);
+
+        want_pie = $('#wp').val();
+        var serie=get_data(category,want_pie==true);
         serie=serie.sort(function(a, b) {
             a = a['data'];
             b = b['data'];
-            if (! want_pie) { 
-                a=a[0][1];
-                b=b[0][1];
-            }
-            
             return a < b ? -1 : (a > b ? 1 : 0);
         }).reverse();
-        opt = want_pie ?  { 'series' : { 'pie' : {  'show' : true } }, 'legend': { 'show' : true } }  : { "legend" : { 'position' : "ne"} ,"series" :{  "bars" : { "show" : true },  "label" : { "show" : true }}} ;
-        
+        i=0;
+        if( want_pie != true){
+            for( k in serie){
+                serie[k]["data"]= [ [i++,serie[k]["data"]]] ;
+            };
+        };
+
+        var opt={};
+        if( want_pie==true){ 
+            opt ={  
+                'series' : 
+                    { 'pie' : {  'show' : true } }, 
+                'legend': { 'show' : true }
+            }
+        }  else {
+            opt= { 
+                "legend" : { 'position' : "ne"} ,
+                "series" :{  
+                    "bars" : { "show" : true },  
+                    "label" : { "show" : true }
+            } }
+        }
         $.plot("#plot",serie,opt);
->>>>>>> c8947933a0db81ad5e83c625c2118e735946e1aa
     }
     $(".selector").click(function() { 
        update_for( ($(this).attr("href")));
-       //$("#ctitle").text( "top ten for " . $(this).attr("href"));
-
+       $("#ctitle").text( $(this).text());
+        
        return false;
     });
     update_for("by_status");
@@ -87,31 +97,40 @@ $(document).ready(function() {
 {% endblock %}
 
 
+{%block options %}
+<li>// <a href=#option ><em>(options)</em></a></li>
+{% endblock %}
 
 {% block content %}
-<<<<<<< HEAD
-=======
-<input id=wp type=checkbox checked=true >Pie ? </input>
->>>>>>> c8947933a0db81ad5e83c625c2118e735946e1aa
-<h1>Click a category to see its pie chart</h1>
-<ul>
+<div id=plotbox class="centered" >
+<h2>Top ten web requests <span id=ctitle > by status</span></h2>
+    <div id=plot class=centered ></div>
+    </div>
+    </div>
+
+{% endblock %}
+{% block footer %}
+<input  id=wp type=hidden value=1 ></input>
+<ul id=option class=horizontal>
+<li><a href='#' id=pie >pie charts</a></li>
+<li><em>or</em>
+<li><a href='#' id=nopie>histogram </a></li>
+<li>// <a href=#top style="80%"><em>(got to top)</em></a></li>
+</ul>
+<div style="height:1px"></div>
+<ul class=horizontal>
+<li><em>Charts Availables (Top ten) </em> </li>
 <li ><a class=selector href=by_status>by status</a></li>
 <li ><a class=selector href=by_hour>by hour</a></li>
 <li ><a class=selector href=by_browser >by browser</a></li>
 <li ><a class=selector href=by_os >by os</a></li>
 <li ><a class=selector href=by_country >by country</a></li>
 <li ><a class=selector href=by_url >by url</a></li>
-<<<<<<< HEAD
-
-=======
 <li ><a class=selector href=by_agent >by agent</a></li>
-
+<li ><a class=selector href=by_date >by date</a></li>
 <li ><a class=selector href=by_referer >by referer</a></li>
->>>>>>> c8947933a0db81ad5e83c625c2118e735946e1aa
 <li ><a class=selector href=bytes_by_ip >bandwidth</a></li>
 
 </ul>
-     <div id="plot" style="position:absolute; top:100px;margin:auto;width: 70%;right:0;height:600px"></div>
-
 {% endblock %}
 
