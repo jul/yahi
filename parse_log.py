@@ -115,6 +115,13 @@ Hence a usefull trick to merge your old stats with your new one
         help="""exclude from parsed line with
         a json (string or filename)""",
     )
+        
+    parser.add_argument("-f",
+        "--output-format",
+        help="decide if output is in a specified formater",
+        default="json"
+    )
+
     parser.add_argument("-o",
         "--output-file",
         help="output file",
@@ -176,14 +183,20 @@ if __name__ == '__main__':
             _data_filter = lambda data : not(any(matcher[k](data[k]) for k in matcher)
                 ) if data else False
 
-    args.output_file.write(dumps(
+    if "csv" == args.output_format:
+        import csv
+        output = lambda out,aggreg : csv.writer(out).writerows(aggreg.as_row_iter())
+    else:
+        output = lambda out,aggreg : out.write(dumps(aggreg,indent=4))
+    
+    output(
+        args.output_file,
         reduce(
-            krut.__add__,
+            krut.__iadd__,
             imap(krutify, ifilter(
                     _data_filter,
                     imap(parse_log_line, fileinput.input(args.files))
                 )
             )
-        ),
-        indent=4
-    ))
+        )
+    )
