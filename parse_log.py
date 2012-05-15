@@ -2,6 +2,7 @@
 import argparse
 from datetime import datetime
 import fileinput
+import fnmatch
 from os import path
 import httpagentparser
 from itertools import ifilter, imap
@@ -10,7 +11,7 @@ from pygeoip import GeoIP
 import re
 import sys
 from json import load, loads
-from performance import memoize
+from performance import memoize, print_res
 from vector_dict.VectorDict import VectorDict as krut
 
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
@@ -103,12 +104,28 @@ Since VectorDict is cool here is a tip for aggregating data
 Hence a usefull trick to merge your old stats with your new one
         """
          )
-         
+    parser.add_argument("-c",
+        "--config",
+        help="""specify a config file in json format for the command line arguments
+        any command line arguments will disable values in the config""",
+        default=None
+        )
     parser.add_argument("-g",
         "--geoip",
         help="specify a path to a geoip.dat file",
         metavar="FILE",
         default=HARDCODED_GEOIP_FILE
+    )
+    parser.add_argument("-d",
+        "--diagnose",
+        help="""diagnose 
+            list of comma separated stuff to diagnose :
+                * rejected : will print on STDERR rejected parsed line
+                * match :   will print on stderr rejected matched line
+        
+        """,
+        default=""
+        
     )
     parser.add_argument("-x",
         "--exclude",
@@ -135,8 +152,14 @@ Hence a usefull trick to merge your old stats with your new one
 
 if __name__ == '__main__':
     parser = get_parser()
-    args = parser.parse_args()
     
+    args = parser.parse_args()
+    if args.config:
+        config_args = load(open(args.config))
+        for k in config_args:
+            if not getattr(args,k):
+                setattr(args, k, config_args[k])
+
     gi = GeoIP(args.geoip)
     country_by_ip = memoize(_CACHE_GEOIP)(gi.country_code_by_addr)
     
@@ -162,19 +185,20 @@ if __name__ == '__main__':
     _data_filter = lambda data : True if data else False
     if args.exclude:
         str_or_file=args.exclude
-        
         matcher = {}
         try:
-            matcher = load(open(str_or_file))
-        except Exception as e:
-            ## errno 2 <=> file not found
-            if e.errno == 2:
+            matcher.update(str_or_file)
+        except TypeError: 
+            try:
+                matcher = load(open(str_or_file))
+            except Exception as e:
+                ## errno 2 <=> file not found
                 matcher =  loads(str_or_file)
-            else:
                 raise Exception(
-                  "%r is not a valid file with a valid json or a valid json (%r)" 
+                  "%r is not a valid file with a valid json or a valid json " 
                   % (str_or_file,e)
                  )
+        
 
         if len(matcher):
             for field, regexp in matcher.items():
@@ -182,6 +206,11 @@ if __name__ == '__main__':
             
             _data_filter = lambda data : not(any(matcher[k](data[k]) for k in matcher)
                 ) if data else False
+    if "rejected" in args.diagnose:
+        _data_filter =  print_res("REJECTED",False,_data_filter)
+
+    if "match" in  args.diagnose:
+        parse_log_line = print_res("NOT MATCHED",None, parse_log_line) 
 
     if "csv" == args.output_format:
         import csv
