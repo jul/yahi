@@ -189,15 +189,10 @@ if __name__ == '__main__':
         try:
             matcher.update(str_or_file)
         except TypeError: 
-            try:
                 matcher = load(open(str_or_file))
-            except Exception as e:
-                ## errno 2 <=> file not found
-                matcher =  loads(str_or_file)
-                raise Exception(
-                  "%r is not a valid file with a valid json or a valid json " 
-                  % (str_or_file,e)
-                 )
+        except ValueError:
+            ## errno 2 <=> file not found
+            matcher =  loads(str_or_file)
         
 
         if len(matcher):
