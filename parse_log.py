@@ -98,9 +98,13 @@ excluding IPs 192.168/16 and user agent containing Mozilla
 parse_log -o dat2.json -x '{ "ip" : "^192.168", "agent": "Mozill" }'  /var/log/apache*.log 
 
 Since VectorDict is cool here is a tip for aggregating data
->>> from vector_dict.VectorDict import convert_tree as kruter
+>>> from archery.barrack import bowyer
+>>> from archery.bow import Hankyu
 >>> from json import load, dumps
->>> dumps(kruter(load(file("dat1.json"))) + kruter(load(file("dat2.json"))))
+>>> dumps(
+        bowyer(Hankyu,load(file("dat1.json"))) + 
+        bowyer(Hankyu,load(file("dat2.json")))
+    )
 
 Hence a usefull trick to merge your old stats with your new one
         """
@@ -165,7 +169,7 @@ if __name__ == '__main__':
     country_by_ip = memoize(_CACHE_GEOIP)(gi.country_code_by_addr)
     
     
-    def krutify(data):
+    def emit(data):
         return Hankyu({
             "by_country": Hankyu({country_by_ip(data['ip']): 1}),
             "by_date": Hankyu({data["date"]: 1 }),
@@ -219,7 +223,7 @@ if __name__ == '__main__':
         args.output_file,
         reduce(
             Hankyu.__iadd__,
-            imap(krutify, ifilter(
+            imap(emit, ifilter(
                     _data_filter,
                     imap(parse_log_line, fileinput.input(args.files))
                 )
