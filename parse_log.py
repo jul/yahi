@@ -9,12 +9,41 @@ from itertools import ifilter, imap
 from json import dumps
 from pygeoip import GeoIP
 import re
-import sys
 from json import load, loads
-from performance import memoize, print_res
 from archery.bow import Hankyu
 from archery.barrack import mapping_row_iter
 
+################## INLINED LIBRARY
+from functools import wraps
+import sys
+
+
+def memoize(cache):
+    """A simple memoization decorator.
+    Only functions with positional arguments are supported."""
+    def decorator(fn):
+        @wraps(fn)
+        def wrapped(*args):
+            if args not in cache:
+                cache[args] = fn(*args)
+            return cache[args]
+        return wrapped
+    return decorator
+
+def print_res(what, ok_or_ko,fn):
+    """prints rejected lines"""
+    @wraps(fn)
+    def wrapped(*a):
+        res = fn(*a)
+        if res == ok_or_ko:
+            sys.stderr.write( "\n%s:%s %s" % (res and "OK" or "KO",what,a))
+        return res
+    return wrapped
+
+####################### END OF INLINE LIBRARY ######################
+
+
+####################### STATIC DATA ################################
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
 
 LOG_LINE_REGEXP = re.compile(
@@ -34,6 +63,8 @@ LOG_LINE_REGEXP = re.compile(
 
 _CACHE_UA = {}
 _CACHE_GEOIP = {}
+
+####################### UTILITIES ################################
 
 @memoize(_CACHE_UA)
 def normalize_user_agent(user_agent):
@@ -65,6 +96,8 @@ def parse_log_line(line):
         "agent_class": normalize_user_agent(data["agent"])
     })
     return data
+
+#################### CLI and DOC #################################
 
 def get_parser():
     parser = argparse.ArgumentParser(
@@ -154,10 +187,11 @@ Hence a usefull trick to merge your old stats with your new one
     parser.add_argument('files', nargs=argparse.REMAINDER)
     
     return parser
-
+######################## MAIN LOGIC ##################################
 if __name__ == '__main__':
+######################## Setting UP ##################################
     parser = get_parser()
-    
+
     args = parser.parse_args()
     if args.config:
         config_args = load(open(args.config))
@@ -167,8 +201,42 @@ if __name__ == '__main__':
 
     gi = GeoIP(args.geoip)
     country_by_ip = memoize(_CACHE_GEOIP)(gi.country_code_by_addr)
-    
-    
+
+
+    _data_filter = lambda data : True if data else False
+    if args.exclude:
+        str_or_file=args.exclude
+        matcher = {}
+        try:
+            matcher.update(str_or_file)
+        except TypeError:
+                matcher = load(open(str_or_file))
+        except ValueError:
+            ## errno 2 <=> file not found
+            matcher =  loads(str_or_file)
+
+
+        if len(matcher):
+            for field, regexp in matcher.items():
+                matcher[field] = re.compile(regexp).match
+
+            _data_filter = lambda data : not(
+                any(matcher[k](data[k]) for k in matcher)
+            ) if data else False
+
+    if "rejected" in args.diagnose:
+        _data_filter =  print_res("REJECTED",False,_data_filter)
+
+    if "match" in  args.diagnose:
+        parse_log_line = print_res("NOT MATCHED",None, parse_log_line) 
+
+    if "csv" == args.output_format:
+        import csv
+        output = lambda out,aggreg : csv.writer(out).writerows(
+            mapping_row_iter(aggreg))
+    else:
+        output = lambda out,aggreg : out.write(dumps(aggreg,indent=4))
+##### OKAY, now we can do the job ########################################## 
     def emit(data):
         return Hankyu({
             "by_country": Hankyu({country_by_ip(data['ip']): 1}),
@@ -186,39 +254,6 @@ if __name__ == '__main__':
             "bytes_by_ip": Hankyu({data['ip']: int(data["bytes"])}),
             "total_line" : 1,
         })
-        
-    _data_filter = lambda data : True if data else False
-    if args.exclude:
-        str_or_file=args.exclude
-        matcher = {}
-        try:
-            matcher.update(str_or_file)
-        except TypeError: 
-                matcher = load(open(str_or_file))
-        except ValueError:
-            ## errno 2 <=> file not found
-            matcher =  loads(str_or_file)
-        
-
-        if len(matcher):
-            for field, regexp in matcher.items():
-                matcher[field] = re.compile(regexp).match
-            
-            _data_filter = lambda data : not(any(matcher[k](data[k]) for k in matcher)
-                ) if data else False
-    if "rejected" in args.diagnose:
-        _data_filter =  print_res("REJECTED",False,_data_filter)
-
-    if "match" in  args.diagnose:
-        parse_log_line = print_res("NOT MATCHED",None, parse_log_line) 
-
-    if "csv" == args.output_format:
-        import csv
-        output = lambda out,aggreg : csv.writer(out).writerows(
-            mapping_row_iter(aggreg))
-    else:
-        output = lambda out,aggreg : out.write(dumps(aggreg,indent=4))
-    
     output(
         args.output_file,
         reduce(
