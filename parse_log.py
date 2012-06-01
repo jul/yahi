@@ -12,7 +12,8 @@ import re
 import sys
 from json import load, loads
 from performance import memoize, print_res
-from vector_dict.VectorDict import VectorDict as krut
+from archery.bow import Hankyu
+from archery.barrack import mapping_row_iter
 
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
 
@@ -165,20 +166,20 @@ if __name__ == '__main__':
     
     
     def krutify(data):
-        return krut(int, {
-            "by_country": krut(int, {country_by_ip(data['ip']): 1}),
-            "by_date": krut(int, {data["date"]: 1 }),
-            "by_hour": krut(int, {data["time"][0:2]: 1 }),
-            "by_os": krut(int, {data["agent_class"]['os']['name']: 1 }),
-            "by_dist": krut(int, {data["agent_class"]['dist']['name']: 1 }),
-            "by_browser": krut(int, {data["agent_class"]['browser']['name']: 1 }),
-            "by_ip": krut(int, {data['ip']: 1 }),
-            "by_status": krut(int, {data['status']: 1 }),
-            "by_url": krut(int, {data['uri']: 1}),
-            "by_agent": krut(int, {data['agent']: 1}),
-            "by_referer": krut(int, {data['referer']: 1}),
-            "ip_by_url": krut(int, {data['uri']: krut (int, {data['ip']: 1 })}),
-            "bytes_by_ip": krut(int, {data['ip']: int(data["bytes"])}),
+        return Hankyu({
+            "by_country": Hankyu({country_by_ip(data['ip']): 1}),
+            "by_date": Hankyu({data["date"]: 1 }),
+            "by_hour": Hankyu({data["time"][0:2]: 1 }),
+            "by_os": Hankyu({data["agent_class"]['os']['name']: 1 }),
+            "by_dist": Hankyu({data["agent_class"]['dist']['name']: 1 }),
+            "by_browser": Hankyu({data["agent_class"]['browser']['name']: 1 }),
+            "by_ip": Hankyu({data['ip']: 1 }),
+            "by_status": Hankyu({data['status']: 1 }),
+            "by_url": Hankyu({data['uri']: 1}),
+            "by_agent": Hankyu({data['agent']: 1}),
+            "by_referer": Hankyu({data['referer']: 1}),
+            "ip_by_url": Hankyu({data['uri']: Hankyu( {data['ip']: 1 })}),
+            "bytes_by_ip": Hankyu({data['ip']: int(data["bytes"])}),
             "total_line" : 1,
         })
         
@@ -209,14 +210,15 @@ if __name__ == '__main__':
 
     if "csv" == args.output_format:
         import csv
-        output = lambda out,aggreg : csv.writer(out).writerows(aggreg.as_row_iter())
+        output = lambda out,aggreg : csv.writer(out).writerows(
+            mapping_row_iter(aggreg))
     else:
         output = lambda out,aggreg : out.write(dumps(aggreg,indent=4))
     
     output(
         args.output_file,
         reduce(
-            krut.__iadd__,
+            Hankyu.__iadd__,
             imap(krutify, ifilter(
                     _data_filter,
                     imap(parse_log_line, fileinput.input(args.files))
