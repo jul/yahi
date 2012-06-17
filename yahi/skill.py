@@ -4,6 +4,8 @@ import sys
 from os import path
 import re
 from datetime import datetime
+import pygeoip
+import httpagentparser
 import fileinput
 import csv
 from json import load, loads, dump, dumps
@@ -88,7 +90,7 @@ def cached_date_time_formater(date_format):
     _DATE_TIME_FORMATER={}
     def cdt_format(dt):
         if not dt in _DATE_TIME_FORMATER:
-            _DATE_TIME_FORMATER.update{ dt: datetime.strptime(dt,date_format)}
+            _DATE_TIME_FORMATER.update({ dt: datetime.strptime(dt,date_format)})
         return _DATE_TIME_FORMATER[dt]
     return cdt_format 
 
@@ -119,9 +121,9 @@ def normalize_user_agent(user_agent):
     return flatten_user_agent(default_user_agent )
 
 
-def aggregates(
+def grouped_shooting(
+        option,
         group_by,
-        option
         ):
     """Produce a dict of the data found in the line.
     If the line is not recognized, return None.
@@ -170,7 +172,7 @@ def aggregates(
 
 #################### CLI and DOC #################################
 
-def option_from_arg_parser():
+def notch_from_arg_parser(*a,**kw):
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""\
@@ -240,6 +242,12 @@ Hence a usefull trick to merge your old stats with your new one
         help="""include from extracted data with
         a json (string or filename) in the form { "field" : "pattern" } """,
     )
+    parser.add_argument(
+        "--off",
+        help="""turn off plugins : geo_ip to skip geoip, user_agent to
+        turn httpagentparser off""",
+        default=()
+    )
     parser.add_argument("-x",
         "--exclude",
         help="""exclude from extracted data with
@@ -263,7 +271,8 @@ Hence a usefull trick to merge your old stats with your new one
         default=sys.stdout
     )
     parser.add_argument('files', nargs=argparse.REMAINDER)
-    option=parser.parse_args()
+    option=parser.parse_args(*a,**kw)
+    option.skill=[]
 
     if option.config:
         config_args = load(open(option.config))
@@ -287,11 +296,18 @@ Hence a usefull trick to merge your old stats with your new one
 
     option.data_filter=_data_filter
     option.output=dict( 
-        csv = lambda out,aggreg : csv.writer(out).writerows( 
+        csv = lambda aggreg : csv.writer(option.output_file).writerows( 
             mapping_row_iter(aggreg)
         ),
-        indented_json = lambda out,aggreg : out.write(dumps(aggreg,indent=4)),
-        json = lambda out,aggreg : out.write(dumps(aggreg)),
+        json = lambda aggreg : option.output_file.write( dumps(aggreg)),
+        indented_json = lambda aggreg : option.output_file.write(
+            dumps(aggreg,indent=4
+         )),
     )[option.output_format or "indented_json"]
+    if "geo_ip" not in option.off:
+        option.skill+= [ "geo_ip" ]
+    if "user_agent" not in option.off:
+        option.skill+= [ "user_agent" ]
+    option.help = parser.format_help()
     return option
     

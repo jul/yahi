@@ -1,20 +1,18 @@
 #!/usr/bin/env python
 from archery.bow import Hankyu
-from yahi.barrack import option_from_arg_parser, memoize, aggregates
+from yahi.skill import notch_from_arg_parser, grouped_shooting
 
 ######################## Setting UP ##################################
 
-option = option_from_arg_parser()
+option = notch_from_arg_parser()
 
 
 ##### OKAY, now we can do the job ########################################## 
 
-option.skill=['user_agent', 'geo_ip'] 
-
 option.output(
-    option.output_file,
-    aggregates(
-            lambda data : Hankyu({
+    grouped_shooting(
+        option,
+        lambda data : Hankyu({
             'by_country': Hankyu({data['country']: 1}),
             'by_date': Hankyu({data['date']: 1 }),
             'by_hour': Hankyu({data['hour']: 1 }),
@@ -30,7 +28,6 @@ option.output(
             'bytes_by_ip': Hankyu({data['ip']: int(data['bytes'])}),
             'total_line' : 1,
         }),
-        option,
     )
 )
 
