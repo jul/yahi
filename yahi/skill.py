@@ -141,38 +141,43 @@ def grouped_shooting(
         from pygeoip import GeoIP
         gi = GeoIP(option.geoip)
         country_by_ip = memoize(_CACHE_GEOIP)(gi.country_code_by_addr)
+    _input = fileinput.input(option.files) 
+    try: 
+        for line in _input:
+            
+            match = look_for(line)
+            if match:
+                data = match.groupdict()
+                _datetime=date_log_formater(data["datetime"])
+                data.update( dict(
+                    date = date_formater(_datetime),
+                    hour = str(_datetime.hour)
+                ))
 
+                if 'geo_ip' in option.skill:
+                    data.update( {"country":country_by_ip(data["ip"])})
+                if 'user_agent' in option.skill:
+                    data.update(
+                        normalize_user_agent(data["agent"])
+                    )
+                if option.data_filter and not option.data_filter(data):
+                    if "rejected" in option.diagnose:
+                        sys.stderr.write("REJECTED:{0}\n".format(data))
+                else:
+                   aggregator+=group_by(data)
 
-    for line in fileinput.input(option.files):
-        
-        match = look_for(line)
-        if match:
-            data = match.groupdict()
-            _datetime=date_log_formater(data["datetime"])
-            data.update( dict(
-                date = date_formater(_datetime),
-                hour = str(_datetime.hour)
-            ))
-
-            if 'geo_ip' in option.skill:
-                data.update( {"country":country_by_ip(data["ip"])})
-            if 'user_agent' in option.skill:
-                data.update(
-                    normalize_user_agent(data["agent"])
-                )
-            if option.data_filter and not option.data_filter(data):
-                if "rejected" in option.diagnose:
-                    sys.stderr.write("REJECTED:{0}\n".format(data))
-            else:
-               aggregator+=group_by(data)
-
-        elif "match" in option.diagnose:
-            sys.stderr.write("NOT MATCHED:{0}\n".format(line))
+            elif "match" in option.diagnose:
+                sys.stderr.write("NOT MATCHED:{0}\n".format(line))
+    except Exception as e:
+        raise Exception(e)
+    finally:
+        _input.close()
+    
     return aggregator
 
 #################### CLI and DOC #################################
 
-def notch_from_arg_parser(*a,**kw):
+def notch(*a,**kw):
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""\
@@ -255,8 +260,9 @@ Hence a usefull trick to merge your old stats with your new one
     )
     parser.add_argument("-f",
         "--output-format",
-        help="decide if output is in a specified formater",
-        default="json"
+        help="""decide if output is in a specified formater amongst : csv, json,
+        indented_json""",
+        default="indented_json"
     )
     parser.add_argument("-lf",
         "--log-format",
