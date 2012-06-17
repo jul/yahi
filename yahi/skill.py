@@ -94,8 +94,8 @@ def cached_date_time_formater(date_format):
         return _DATE_TIME_FORMATER[dt]
     return cdt_format 
 
-_CACHE_DATE = {}
 def date_formater(date):
+    _CACHE_DATE = {}
     if not date in _CACHE_DATE:
         _CACHE_DATE.update( { date : date.strftime('%Y-%m-%d') } )
     return _CACHE_DATE[date]
@@ -309,7 +309,7 @@ Hence a usefull trick to merge your old stats with your new one
         indented_json = lambda aggreg : option.output_file.write(
             dumps(aggreg,indent=4
          )),
-    )[option.output_format or "indented_json"]
+    )[option.output_format]
     if "geo_ip" not in option.off:
         option.skill+= [ "geo_ip" ]
     if "user_agent" not in option.off:
