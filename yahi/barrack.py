@@ -1,15 +1,16 @@
 #!/usr/bin/env python
-from archery.bow import Hankyu
-import argparse
+# -*- coding: utf-8 -*-
+import sys
+from os import path
+import re
 from datetime import datetime
 import fileinput
-from os import path
-import httpagentparser
-from json import dumps
-import re
-from json import load, loads
+import csv
+from json import load, loads, dump, dumps
 from functools import wraps
-import sys
+from archery.bow import Hankyu
+from archery.barrack import mapping_row_iter
+import argparse
 
 
 ####################### STATIC DATA ################################
@@ -46,33 +47,80 @@ date_format = dict(
     apache_log_combined = "%d/%b/%Y:%H:%M:%S",
     lighttpd = "%d/%b/%Y:%H:%M:%S",
 )
-    
+def build_filter_from_json(str_or_file, positive_logic):
+    matcher = {}
+    try:
+        matcher.update(str_or_file)
+    except TypeError:
+            matcher = load(open(str_or_file))
+    except ValueError:
+        ## errno 2 <=> file not found
+        matcher =  loads(str_or_file)
 
 
+    if len(matcher):
+        for field, regexp in matcher.items():
+            matcher[field] = re.compile(regexp).match
+        if positive_logic:
+            return lambda data : all(
+                matcher[k](data[k]) for k in matcher
+            ) if data else False
+        else:
+            return lambda data : not(
+                any(matcher[k](data[k]) for k in matcher )
+            ) if data else False
+ 
+   
 ####################### UTILITIES ################################
+def memoize(cache):
+    """A simple memoization decorator.
+Only functions with positional arguments are supported."""
+    def decorator(fn):
+        @wraps(fn)
+        def wrapped(*args):
+            if args not in cache:
+                cache[args] = fn(*args)
+            return cache[args]
+        return wrapped
+    return decorator
+
+def cached_date_time_formater(date_format):
+    _DATE_TIME_FORMATER={}
+    def cdt_format(dt):
+        if not dt in _DATE_TIME_FORMATER:
+            _DATE_TIME_FORMATER.update{ dt: datetime.strptime(dt,date_format)}
+        return _DATE_TIME_FORMATER[dt]
+    return cdt_format 
 
 _CACHE_DATE = {}
 def date_formater(date):
     if not date in _CACHE_DATE:
-        _CACHE_DATE[date]=date.strftime('%Y-%m-%d')
+        _CACHE_DATE.update( { date : date.strftime('%Y-%m-%d') } )
     return _CACHE_DATE[date]
+
+
+def flatten_user_agent(user_agent):
+    flat=dict()
+    for k in user_agent:
+        for sub_key,v in user_agent[k].iteritems():
+            flat.update({ "_".join(["ua" , k, sub_key]) :v}) 
+    return flat
 
 _CACHE_UA = {}
 @memoize(_CACHE_UA)
 def normalize_user_agent(user_agent):
-    deft = {
+    default_user_agent = {
         'os': {'name': "unknown", "version": 'unknown'},
+
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
         }
-    deft.update( httpagentparser.detect(user_agent) )
-    return deft 
-
+    default_user_agent.update( httpagentparser.detect(user_agent) )
+    return flatten_user_agent(default_user_agent )
 
 
 def aggregates(
         group_by,
-        data_filter,
         option
         ):
     """Produce a dict of the data found in the line.
@@ -84,7 +132,8 @@ def aggregates(
         import httpagentparser
     look_for = log_pattern[option.log_format].search
     match = None
-    date_log_format = date_format[option.log_format]
+    date_log_formater= cached_date_time_formater(date_format[option.log_format])
+
     if "geo_ip" in option.skill:
         _CACHE_GEOIP = {}
         from pygeoip import GeoIP
@@ -97,49 +146,31 @@ def aggregates(
         match = look_for(line)
         if match:
             data = match.groupdict()
-            fdate = datetime.strptime( data["datetime"], date_log_format )
-            data.update({
-                "date": date_formater(fdate),
-                "time": fdate.strftime('%H:%M:%S.%f'),
-            })
+            _datetime=date_log_formater(data["datetime"])
+            data.update( dict(
+                date = date_formater(_datetime),
+                hour = str(_datetime.hour)
+            ))
+
+            if 'geo_ip' in option.skill:
+                data.update( {"country":country_by_ip(data["ip"])})
             if 'user_agent' in option.skill:
-                data.update({
-                    "agent_class": normalize_user_agent(data["agent"])
-                })
-            if data_filter and not data_filter(data):
+                data.update(
+                    normalize_user_agent(data["agent"])
+                )
+            if option.data_filter and not option.data_filter(data):
                 if "rejected" in option.diagnose:
-                    sys.stderr.write("REJECTED:{0}".format(data))
+                    sys.stderr.write("REJECTED:{0}\n".format(data))
             else:
-                if group_by:
-                   aggregator+=group_by(data)
-                else:
-                    aggregator+=Hankyu({
-                "by_country": Hankyu({country_by_ip(data['ip']): 1}),
-                "by_date": Hankyu({data["date"]: 1 }),
-                "by_hour": Hankyu({data["time"][0:2]: 1 }),
-                "by_os": Hankyu({data["agent_class"]['os']['name']: 1 }),
-                "by_dist": Hankyu({data["agent_class"]['dist']['name']: 1 }),
-                "by_browser": Hankyu({data["agent_class"]['browser']['name']: 1 }),
-                "by_ip": Hankyu({data['ip']: 1 }),
-                "by_status": Hankyu({data['status']: 1 }),
-                "by_url": Hankyu({data['uri']: 1}),
-                "by_agent": Hankyu({data['agent']: 1}),
-                "by_referer": Hankyu({data['referer']: 1}),
-                "ip_by_url": Hankyu({data['uri']: Hankyu( {data['ip']: 1 })}),
-                "bytes_by_ip": Hankyu({data['ip']: int(data["bytes"])}),
-                "total_line" : 1,
-            }) 
-
-
-
+               aggregator+=group_by(data)
 
         elif "match" in option.diagnose:
-            sys.stderr.write("NOT MATCHED:{0}".format(line))
-                       
+            sys.stderr.write("NOT MATCHED:{0}\n".format(line))
+    return aggregator
 
 #################### CLI and DOC #################################
 
-def get_arg_parser():
+def option_from_arg_parser():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""\
@@ -156,9 +187,6 @@ and output a json of various aggregatted metrics of frequentation :
      * by url;
      * and bandwidth by ip;
 
-Ok, it is pretty much a golfing contest between bmispelon and jul, and also
-a proof of concept of what supporting addition in defaultdict may bring.
-
 Example :
 =========
 
@@ -170,7 +198,7 @@ excluding IPs 192.168/16 and user agent containing Mozilla
 **********************************************************
 parse_log -o dat2.json -x '{ "ip" : "^192.168", "agent": "Mozill" }'  /var/log/apache*.log 
 
-Since VectorDict is cool here is a tip for aggregating data
+Since archery is cool here is a tip for aggregating data
 >>> from archery.barrack import bowyer
 >>> from archery.bow import Hankyu
 >>> from json import load, dumps
@@ -186,31 +214,37 @@ Hence a usefull trick to merge your old stats with your new one
         "--config",
         help="""specify a config file in json format for the command line arguments
         any command line arguments will disable values in the config""",
+        metavar="FILE",
         default=None
         )
     parser.add_argument("-g",
         "--geoip",
         help="specify a path to a geoip.dat file",
-        metavar="FILE",
         default=HARDCODED_GEOIP_FILE
     )
     parser.add_argument("-d",
         "--diagnose",
         help="""diagnose 
-            list of comma separated stuff to diagnose :\n
-                * rejected : will print on STDERR rejected parsed line\n
-                * match :   will print on stderr rejected matched line
+            list of space separated arguments :
+                **rejected** : will print on STDERR rejected parsed line,
+                **match** : will print on stderr data filtered out
         
         """,
-        default=""
+        default="",
+        nargs='+',
         
+    )
+        
+    parser.add_argument("-in",
+        "--include",
+        help="""include from extracted data with
+        a json (string or filename) in the form { "field" : "pattern" } """,
     )
     parser.add_argument("-x",
         "--exclude",
-        help="""exclude from parsed line with
-        a json (string or filename)""",
+        help="""exclude from extracted data with
+        a json (string or filename) in the form { "field" : "pattern" } """,
     )
-        
     parser.add_argument("-f",
         "--output-format",
         help="decide if output is in a specified formater",
@@ -225,10 +259,39 @@ Hence a usefull trick to merge your old stats with your new one
     parser.add_argument("-o",
         "--output-file",
         help="output file",
-        nargs='?',
         type=argparse.FileType('w'),
         default=sys.stdout
     )
     parser.add_argument('files', nargs=argparse.REMAINDER)
+    option=parser.parse_args()
+
+    if option.config:
+        config_args = load(open(option.config))
+        for k in config_args:
+            if not getattr(option,k):
+                setattr(option, k, config_args[k])
+            if "output_file" == k:
+                option.output_file=open(config_args[k],"w")
+
+    _data_filter = None
+    _exclusive_filter = _inclusive_filter = None
+    if option.include:
+        _data_filter= _inclusive_filter = build_filter_from_json(option.include,True)
+
+    if option.exclude:
+       _data_filter = _exclusive_filter = build_filter_from_json(option.exclude,False)
     
-    return parser
+    if _exclusive_filter and _inclusive_filter:
+        _data_filter = lambda data : _exclusive_filter(data) and \
+            _inclusive_filter(data)
+
+    option.data_filter=_data_filter
+    option.output=dict( 
+        csv = lambda out,aggreg : csv.writer(out).writerows( 
+            mapping_row_iter(aggreg)
+        ),
+        indented_json = lambda out,aggreg : out.write(dumps(aggreg,indent=4)),
+        json = lambda out,aggreg : out.write(dumps(aggreg)),
+    )[option.output_format or "indented_json"]
+    return option
+    
