@@ -12,43 +12,23 @@ from json import load, loads, dump, dumps
 from functools import wraps
 from archery.bow import Hankyu
 from archery.barrack import mapping_row_iter
+from .field import log_pattern, date_pattern
 import argparse
 
 
 ####################### STATIC DATA ################################
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
-log_pattern=dict( 
-    apache_log_combined = re.compile(
-'''^(?P<ip>\S+?)\s            # ip
--\s                           # dunno
-(?P<user>[^ ]+)\s             # if authentified
-\[(?P<datetime>[^\]]+)\s      # apache format
-(?P<tz_offset>[+-]\d{4})\]\s  #
-"(?P<method>[A-Z]+)\          # GET/POST/....
-(?P<uri>[^ ]+)\               # add query it would be nice
-(?P<scheme>[A-Z]+(\/1)?).\d"\                   # whole scheme (catching FTP ... would be nicer)
-(?P<status>\d+)\              # 404 ...
-(?P<bytes>\d+)\               # bytes really bite me if you can
-"(?P<referer>[^"]+)"\         # where people come from
-"(?P<agent>[^"]+)"$           # well ugly chain''', re.VERBOSE),
-    lighttpd = re.compile('''^(?P<ip>\S+?)\s            # ip
-(?P<domain>[^ ]+)\s
--\s                           # dunno
-\[(?P<datetime>[^\]]+)\s      # apache format
-(?P<tz_offset>[+-]\d{4})\]\s  #
-"(?P<method>[A-Z]+)\          # GET/POST/....
-(?P<uri>[^ ]+)\               # add query it would be nice
-HTTP/1.\d"\                   # whole scheme (catching FTP ... would be nicer)
-(?P<status>\d+)\              # 404 ...
-(?P<bytes>\d+)\               # bytes really bite me if you can
-"(?P<referer>[^"]+)"\         # where people come from
-"(?P<agent>[^"]+)"$           # well ugly chain''', re.VERBOSE),
-)
+### GLOBAL CACHE prettu multiprocessing unfirendly
 
-date_format = dict( 
-    apache_log_combined = "%d/%b/%Y:%H:%M:%S",
-    lighttpd = "%d/%b/%Y:%H:%M:%S",
-)
+_CACHE_GEOIP={}
+_CACHE_DATE={}
+_CACHE_DATE_TIME={}
+_CACHE_UA={}
+
+
+
+####################" 
+
 def build_filter_from_json(str_or_file, positive_logic):
     matcher = {}
     try:
@@ -86,19 +66,10 @@ Only functions with positional arguments are supported."""
         return wrapped
     return decorator
 
-def cached_date_time_formater(date_format):
-    _DATE_TIME_FORMATER={}
+def dt_formater_from_format(date_format):
     def cdt_format(dt):
-        if not dt in _DATE_TIME_FORMATER:
-            _DATE_TIME_FORMATER.update({ dt: datetime.strptime(dt,date_format)})
-        return _DATE_TIME_FORMATER[dt]
-    return cdt_format 
-
-def date_formater(date):
-    _CACHE_DATE = {}
-    if not date in _CACHE_DATE:
-        _CACHE_DATE.update( { date : date.strftime('%Y-%m-%d') } )
-    return _CACHE_DATE[date]
+        return datetime.strptime(dt,date_format)
+    return cdt_format
 
 
 def flatten_user_agent(user_agent):
@@ -108,12 +79,10 @@ def flatten_user_agent(user_agent):
             flat.update({ "_".join(["ua" , k, sub_key]) :v}) 
     return flat
 
-_CACHE_UA = {}
 @memoize(_CACHE_UA)
 def normalize_user_agent(user_agent):
     default_user_agent = {
         'os': {'name': "unknown", "version": 'unknown'},
-
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
         }
@@ -134,10 +103,14 @@ def grouped_shooting(
         import httpagentparser
     look_for = log_pattern[option.log_format].search
     match = None
-    date_log_formater= cached_date_time_formater(date_format[option.log_format])
+    date_log_formater= memoize(date_pattern[option.log_format])
+
+    dt_log_formater= memoize(_CACHE_DATE_TIME)(
+        dt_formater_from_format( date_pattern[option.log_format])
+    )
+    date_formater=memoize(_CACHE_DATE)(lambda dt : dt.strftime('%Y-%m-%d'))
 
     if "geo_ip" in option.skill:
-        _CACHE_GEOIP = {}
         from pygeoip import GeoIP
         gi = GeoIP(option.geoip)
         country_by_ip = memoize(_CACHE_GEOIP)(gi.country_code_by_addr)
@@ -148,7 +121,7 @@ def grouped_shooting(
             match = look_for(line)
             if match:
                 data = match.groupdict()
-                _datetime=date_log_formater(data["datetime"])
+                _datetime=dt_log_formater(data["datetime"])
                 data.update( dict(
                     date = date_formater(_datetime),
                     hour = str(_datetime.hour)
@@ -168,7 +141,7 @@ def grouped_shooting(
 
             elif "match" in option.diagnose:
                 sys.stderr.write("NOT MATCHED:{0}\n".format(line))
-    except Exception as e:
+    except KeyError as e:
         raise Exception(e)
     finally:
         _input.close()
@@ -269,6 +242,22 @@ Hence a usefull trick to merge your old stats with your new one
         help="log format amongst apache_log_combined, lighttpd",
         default="apache_log_combined"
     )
+    parser.add_argument("-lp",
+        "--log-pattern",
+        help="""add a custom regexp for parsing log lines""",
+    )
+    parser.add_argument("-lpn","--log-pattern-name",
+        help="""the name with witch you want to register the pattern""",
+        default="custom"
+    )
+
+    parser.add_argument("-dp",
+        "--date-pattern",
+        help="""add a custom date format, usefull if and only if using 
+        a custom log_pattern and date pattern differs from apache.""",
+        default=date_pattern["apache_log_combined"]
+    )
+
 
     parser.add_argument("-o",
         "--output-file",
@@ -280,6 +269,7 @@ Hence a usefull trick to merge your old stats with your new one
     option=parser.parse_args(*a,**kw)
     option.skill=[]
 
+
     if option.config:
         config_args = load(open(option.config))
         for k in config_args:
@@ -288,6 +278,15 @@ Hence a usefull trick to merge your old stats with your new one
             if "output_file" == k:
                 option.output_file=open(config_args[k],"w")
 
+
+    if option.log_pattern and option.log_format != option.log_pattern_name:
+        raise Exception("You want to register a new pattern and not use it?")
+
+    if option.log_pattern:
+        log_pattern[option.log_pattern_name]=re.compile(option.log_pattern)
+        if option.date_pattern:
+            date_pattern[option.log_pattern_name]=option.date_pattern
+    
     _data_filter = None
     _exclusive_filter = _inclusive_filter = None
     if option.include:
