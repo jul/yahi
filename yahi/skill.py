@@ -105,19 +105,18 @@ def grouped_shooting(
     match = None
     date_log_formater= memoize(date_pattern[option.log_format])
 
-    dt_log_formater= memoize(_CACHE_DATE_TIME)(
-        dt_formater_from_format( date_pattern[option.log_format])
+    dt_log_formater = memoize(_CACHE_DATE_TIME)(
+        dt_formater_from_format(date_pattern[option.log_format])
     )
-    date_formater=memoize(_CACHE_DATE)(lambda dt : dt.strftime('%Y-%m-%d'))
+    date_formater = memoize(_CACHE_DATE)(lambda dt: dt.strftime('%Y-%m-%d'))
 
     if "geo_ip" in option.skill:
         from pygeoip import GeoIP
         gi = GeoIP(option.geoip)
         country_by_ip = memoize(_CACHE_GEOIP)(gi.country_code_by_addr)
-    _input = fileinput.input(option.files) 
-    try: 
+    _input = fileinput.input(option.files)
+    try:
         for line in _input:
-            
             match = look_for(line)
             if match:
                 data = match.groupdict()
@@ -141,7 +140,7 @@ def grouped_shooting(
 
             elif "match" in option.diagnose:
                 sys.stderr.write("NOT MATCHED:{0}\n".format(line))
-    except KeyError as e:
+    except Exception as e:
         raise Exception(e)
     finally:
         _input.close()
