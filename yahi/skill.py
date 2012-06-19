@@ -103,7 +103,6 @@ def grouped_shooting(
         import httpagentparser
     look_for = log_pattern[option.log_format].search
     match = None
-    date_log_formater= memoize(date_pattern[option.log_format])
 
     dt_log_formater = memoize(_CACHE_DATE_TIME)(
         dt_formater_from_format(date_pattern[option.log_format])
@@ -120,7 +119,7 @@ def grouped_shooting(
             match = look_for(line)
             if match:
                 data = match.groupdict()
-                _datetime=dt_log_formater(data["datetime"])
+                _datetime=data['_datetime']=dt_log_formater(data["datetime"])
                 data.update( dict(
                     date = date_formater(_datetime),
                     hour = str(_datetime.hour)
@@ -141,6 +140,8 @@ def grouped_shooting(
             elif "match" in option.diagnose:
                 sys.stderr.write("NOT MATCHED:{0}\n".format(line))
     except Exception as e:
+        sys.stderr.write("ARRG:at %s:%s\n" % ( _input.lineno(),_input.filename()) )
+        
         raise Exception(e)
     finally:
         _input.close()

@@ -26,6 +26,8 @@ option.output(
             'by_referer': Hankyu({data['referer']: 1}),
             'ip_by_url': Hankyu({data['uri']: Hankyu( {data['ip']: 1 })}),
             'bytes_by_ip': Hankyu({data['ip']: int(data['bytes'])}),
+            'week_browser' : Hankyu({data['_datetime'].weekday():
+                Hankyu({data["ua_browser_name"] :1 })}),
             'total_line' : 1,
         }),
     )
