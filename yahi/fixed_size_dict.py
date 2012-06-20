@@ -10,13 +10,19 @@ class SafeGuard:
     def update(self,*a,**kw):
         raise Exception("Unsafe Method")
 
-    def 
+    def clear(self,*a,**kw):
+        raise Exception("Unsafe Method")
+
+    def setdefault(self,*a,**kw):
+        raise Exception("Unsafe Method")
+        
+
 
 class Sentinel:
     pass
 NULL = Sentinel()
 
-class FixedSizeDict(SafeGuard):
+class FixedLookupTable(SafeGuard):
     def __init__(self,size, factory=dict):
         self._key=[ NULL ] * size
         self._cursor=0
@@ -33,7 +39,7 @@ class FixedSizeDict(SafeGuard):
 
 
 from collections import deque
-class bmFixedSizeDict(SafeGuard):
+class bmFixedLookupTable(SafeGuard):
     def __init__(self, maxsize, factory =dict):
         self._keys = deque([SENTINEL] * maxsize)
         self.maxsize = maxsize
