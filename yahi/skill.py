@@ -9,22 +9,18 @@ import httpagentparser
 import fileinput
 import csv
 from json import load, loads, dump, dumps
-from functools import wraps
 from archery.bow import Hankyu
 from archery.barrack import mapping_row_iter
 from .field import log_pattern, date_pattern
+from .cache_provider import CacheProvider,MonotonalCache
 import argparse
+
+
 
 
 ####################### STATIC DATA ################################
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
 ### GLOBAL CACHE prettu multiprocessing unfirendly
-
-_CACHE_GEOIP={}
-_CACHE_DATE={}
-_CACHE_DATE_TIME={}
-_CACHE_UA={}
-
 
 
 ####################" 
@@ -54,18 +50,6 @@ def build_filter_from_json(str_or_file, positive_logic):
  
    
 ####################### UTILITIES ################################
-def memoize(cache):
-    """A simple memoization decorator.
-Only functions with positional arguments are supported."""
-    def decorator(fn):
-        @wraps(fn)
-        def wrapped(*args):
-            if args not in cache:
-                cache[args] = fn(*args)
-            return cache[args]
-        return wrapped
-    return decorator
-
 def dt_formater_from_format(date_format):
     def cdt_format(dt):
         return datetime.strptime(dt,date_format)
@@ -79,16 +63,14 @@ def flatten_user_agent(user_agent):
             flat.update({ "_".join(["ua" , k, sub_key]) :v}) 
     return flat
 
-@memoize(_CACHE_UA)
-def normalize_user_agent(user_agent):
+def _normalize_user_agent(user_agent):
     default_user_agent = {
         'os': {'name': "unknown", "version": 'unknown'},
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
         }
-    default_user_agent.update( httpagentparser.detect(user_agent) )
+    default_user_agent.update( httpagentparser.detect(user_agent))
     return flatten_user_agent(default_user_agent )
-
 
 def grouped_shooting(
         option,
@@ -98,32 +80,28 @@ def grouped_shooting(
     If the line is not recognized, return None.
     
     """
+    mono=MonotonalCache()
     aggregator=Hankyu()
     if 'user_agent' in option.skill:
         import httpagentparser
     look_for = log_pattern[option.log_format].search
     match = None
+    #dt_format = option.cache("date_time")(dt_formater_from_format(date_pattern[option.log_format]))
 
-    dt_log_formater = memoize(_CACHE_DATE_TIME)(
-        dt_formater_from_format(date_pattern[option.log_format])
-    )
-    date_formater = memoize(_CACHE_DATE)(lambda dt: dt.strftime('%Y-%m-%d'))
+    dt_format = mono.timed_monotonal_cache("date_time")(dt_formater_from_format(date_pattern[option.log_format]))
+    normalize_user_agent = option.cache("user_agent")(_normalize_user_agent) 
 
     if "geo_ip" in option.skill:
         from pygeoip import GeoIP
         gi = GeoIP(option.geoip)
-        country_by_ip = memoize(_CACHE_GEOIP)(gi.country_code_by_addr)
+        country_by_ip = option.cache("geoip")(gi.country_code_by_addr)
     _input = fileinput.input(option.files)
     try:
         for line in _input:
             match = look_for(line)
             if match:
                 data = match.groupdict()
-                _datetime=data['_datetime']=dt_log_formater(data["datetime"])
-                data.update( dict(
-                    date = date_formater(_datetime),
-                    hour = str(_datetime.hour)
-                ))
+                data['_datetime']=dt_format(data["datetime"])
 
                 if 'geo_ip' in option.skill:
                     data.update( {"country":country_by_ip(data["ip"])})
@@ -139,13 +117,14 @@ def grouped_shooting(
 
             elif "match" in option.diagnose:
                 sys.stderr.write("NOT MATCHED:{0}\n".format(line))
-    except Exception as e:
-        sys.stderr.write("ARRG:at %s:%s\n" % ( _input.lineno(),_input.filename()) )
-        
-        raise Exception(e)
+    #except Exception as e:
+    #"    sys.stderr.write("ARRG:at %s:%s\n" % ( _input.lineno(),_input.filename()) )
+       
+    #    raise Exception(e)
     finally:
         _input.close()
     
+    sys.stderr.write(mono.report())
     return aggregator
 
 #################### CLI and DOC #################################
@@ -202,6 +181,23 @@ Hence a usefull trick to merge your old stats with your new one
         help="specify a path to a geoip.dat file",
         default=HARDCODED_GEOIP_FILE
     )
+    parser.add_argument("-cp",
+        "--cache-provider",
+        help="fixed (fixed size cache), dict, nocache ... more to come",
+        default="dict"
+    )
+    parser.add_argument("-cv",
+        "--cache-variant",
+        help="timed_cache, named_cache => debugging purpose",
+        default="named_cache"
+    )
+    parser.add_argument("-cs",
+        "--cache-size",
+        help="in conjonction with cp=fixed chooses dict size",
+        default="1000"
+    )
+        
+    
     parser.add_argument("-d",
         "--diagnose",
         help="""diagnose 
@@ -291,7 +287,6 @@ Hence a usefull trick to merge your old stats with your new one
     _exclusive_filter = _inclusive_filter = None
     if option.include:
         _data_filter= _inclusive_filter = build_filter_from_json(option.include,True)
-
     if option.exclude:
        _data_filter = _exclusive_filter = build_filter_from_json(option.exclude,False)
     
@@ -313,6 +308,17 @@ Hence a usefull trick to merge your old stats with your new one
         option.skill+= [ "geo_ip" ]
     if "user_agent" not in option.off:
         option.skill+= [ "user_agent" ]
+    if option.cache_provider in [ "fixed", 'dict' ]:
+        option.cachemaker = dict(
+            dict = CacheProvider(0),
+            fixed = CacheProvider(int(option.cache_size)),
+        )[option.cache_provider]
+
+    if option.cache_provider != "no_cache" and\
+        option.cache_variant in ["named_cache", "timed_cache"]:
+        option.cache= getattr(option.cachemaker,option.cache_variant)
+    else:
+        option.cache = lambda a : lambda func : func
     option.help = parser.format_help()
     return option
     
