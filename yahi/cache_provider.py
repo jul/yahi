@@ -5,9 +5,15 @@ from functools import wraps
 NULL=object()
 from json import dumps
 from time import time
+"""Cache provider comes in two flavour : 
+* MonotonalCache for monotonic increasing or decreasing values that may repeat
+* CacheProvider for a more classic memoizer 
 
+TODO use something more intelligent for MonotonalCache __call__ maybe
+"""
 
 class MonotonalCache():
+    """a cache for monotonic values"""
     def __init__(self):
         self._cache_arg=NULL
         self._cache_result=NULL
@@ -19,13 +25,16 @@ class MonotonalCache():
         self._timer[name]["miss"]=dict(time=0.0,hit=0)
         self._timer[name]["hit"]=dict(time=0.0,hit=0)
         return self._timer[name]
-    def named_cache(self, name):
+
+    def _check(self, name):
         if self.used_once:
             raise Exception("Dont try to cache more than one fonction with an instance")
+        self.used_once=True
 
 
     def monotonal_cache(self,name):
         Hourra=1
+        self._check()
         def decorator(func):
             @wraps(func)
             def wrapped(*args):
@@ -39,10 +48,12 @@ class MonotonalCache():
         return decorator
 
     def timed_monotonal_cache(self,name):
+        self._check()
         _timer=self._set_realm_timer(name)
         self._cache_arg=NULL
         self._cache_value=NULL
         Hourra=1
+        self.used_once = True
         def decorator(func):
             @wraps(func)
             def wrapped(*args):
@@ -64,14 +75,25 @@ class MonotonalCache():
         return dumps(self._timer,indent=4)
 
 class CacheProvider:
-    def __init__(self, size=100):
+    """cache with a classic memoizer implementatation, but two possible memoizers
+    are possible : 
+        * fixed length lookup table (a dict that won't grow)
+        * dict
+    """
+    def __init__(self, size=10000):
+        """if size == 0 
+            => dict are used as a backend
+        else
+            => a fixed size dict of size elements
+        by default cache provider will make fixed  sized lookup table of 10000
+        """
         self._cache=dict()
         self._scalar=dict()
         self._timer=dict()
         self.size=size
 
         
-    def get(self, name,size=NULL):
+    def _get(self, name,size=NULL):
         if name not in self._cache:
             size = self.size if size is NULL else size
             if size:
@@ -92,7 +114,7 @@ class CacheProvider:
         rep= dumps(size,indent=4)
 
             
-        return rep+ dumps(self._timer,indent=4)
+        return rep + "\n"+ dumps(self._timer,indent=4)
 
     def _set_realm_timer(self,name):
         self._timer[name]={} 
@@ -101,10 +123,13 @@ class CacheProvider:
         return self._timer[name]
     
     def cache(self,func,size=NULL):
+        """a simple memoizer with an undebugable name for the cache,
+        if a size is given it will override the default one"""
         return self.named_cache(repr(func),size)(func)
 
     def named_cache(self,name,size=NULL):
-        _cache=self.get(name,size)
+        """a cache with a more user friendly name. """
+        _cache=self._get(name,size)
         def decorator(func):
             @wraps(func)
             def wrapped(*args):
@@ -121,6 +146,7 @@ class CacheProvider:
 
 
     def timed_cache(self,name,size=NULL):
+        """a cache with a name and hit/miss + cumulated execution time"""
         _timer=self._set_realm_timer(name)
         _cache=self.get(name,size)
         
