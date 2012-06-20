@@ -26,7 +26,7 @@ class MonotonalCache():
         self._timer[name]["hit"]=dict(time=0.0,hit=0)
         return self._timer[name]
 
-    def _check(self, name):
+    def _check(self):
         if self.used_once:
             raise Exception("Dont try to cache more than one fonction with an instance")
         self.used_once=True
