@@ -72,23 +72,35 @@ def _normalize_user_agent(user_agent):
     default_user_agent.update( httpagentparser.detect(user_agent))
     return flatten_user_agent(default_user_agent )
 
-def grouped_shooting(
+def shoot(
         option,
         group_by,
         ):
     """Produce a dict of the data found in the line.
-    If the line is not recognized, return None.
-    
+    and use group_by to  group according to option (that can contain 
+    a data_filter)
+    * group_by : a lambda returning a Hankyu (dict)
+        used to extract the valid informations
+    * option.cache : cache strategy (beaker, repoze, dict, fixed, no_cache)
+    * option.data_filter : f(data) => bool
+        applies to the data dict, 
+        if True extract the current data
+    * option.diagnose array of string : 
+      * match : tells on stderr wich line were rejected
+      * rejected : tells stderr wich data were filtered out
+    * option.skill : enable costly extraction of : 
+        * geo_ip : geoip informations
+        * user_agent : user_agent parsing
+    * option.log_format : apache_log_combined or lighttpd
+        tells the regexp to use to extract the fields from the line
+        also used to select the datetime parser
     """
-    mono=MonotonalCache()
     aggregator=Hankyu()
     if 'user_agent' in option.skill:
         import httpagentparser
     look_for = log_pattern[option.log_format].search
     match = None
-    #dt_format = option.cache("date_time")(dt_formater_from_format(date_pattern[option.log_format]))
-
-    dt_format = mono.timed_monotonal_cache("date_time")(dt_formater_from_format(date_pattern[option.log_format]))
+    dt_format = dt_formater_from_format(date_pattern[option.log_format])
     normalize_user_agent = option.cache("user_agent")(_normalize_user_agent) 
 
     if "geo_ip" in option.skill:
@@ -111,20 +123,22 @@ def grouped_shooting(
                     )
                 if option.data_filter and not option.data_filter(data):
                     if "rejected" in option.diagnose:
+                        sys.stderr.write("at %s:%s:" % (
+                            _input.lineno(),_input.filename()) )
                         sys.stderr.write("REJECTED:{0}\n".format(data))
                 else:
                    aggregator+=group_by(data)
 
             elif "match" in option.diagnose:
+                sys.stderr.write("at %s:%s:" % ( 
+                    _input.lineno(),_input.filename()) )
                 sys.stderr.write("NOT MATCHED:{0}\n".format(line))
-    #except Exception as e:
-    #"    sys.stderr.write("ARRG:at %s:%s\n" % ( _input.lineno(),_input.filename()) )
+    except Exception as e:
+        sys.stderr.write("ARRG:at %s:%s\n" % ( _input.lineno(),_input.filename()) )
        
-    #    raise Exception(e)
+        raise Exception(e)
     finally:
         _input.close()
-    
-    sys.stderr.write(mono.report())
     return aggregator
 
 #################### CLI and DOC #################################
@@ -308,17 +322,36 @@ Hence a usefull trick to merge your old stats with your new one
         option.skill+= [ "geo_ip" ]
     if "user_agent" not in option.off:
         option.skill+= [ "user_agent" ]
+    
+    ### A Battle took place here
+    ### red cross will come after the slaughter is really over
     if option.cache_provider in [ "fixed", 'dict' ]:
         option.cachemaker = dict(
             dict = CacheProvider(0),
             fixed = CacheProvider(int(option.cache_size)),
         )[option.cache_provider]
+        
 
-    if option.cache_provider != "no_cache" and\
-        option.cache_variant in ["named_cache", "timed_cache"]:
+    if option.cache_provider in [ 'fixed', 'dict' ]:
         option.cache= getattr(option.cachemaker,option.cache_variant)
-    else:
+    elif "no_cache"==option.cache_provider :
         option.cache = lambda a : lambda func : func
+    elif "repoze" == option.cache_provider:
+        from repoze.lru import lru_cache
+        option.cachemaker=lru_cache
+        option.cache=lambda name:lru_cache(int(option.cache_size))
+        
+    elif option.cache_provider == "beaker":
+        from beaker.cache import CacheManager
+        from beaker.util import parse_cache_config_options
+        _EXPIRE=3
+        cache_opts = {
+            'cache.type': 'memory',
+        }
+        option.cachemaker= CacheManager(**parse_cache_config_options(cache_opts))
+        option.cache=option.cachemaker.cache
+    else:
+        raise Exception("unknown cache provider")
     option.help = parser.format_help()
     return option
     
