@@ -1,0 +1,8 @@
+{ "exclude" : { 
+    "uri"  : ".*munin.*", 
+    "referer" : ".*(munin|php).*" 
+  },
+  "include" : { "datetime" : "04" },
+  "silent" : "False",
+  "files" : [ "yahi/test/biggersample.log" ]
+}

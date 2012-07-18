@@ -5,18 +5,9 @@ from datetime import datetime
 
 ######################## Setting UP ##################################
 # parsing command line & default settings. Return a not fully qualified object
-context=notch('biggersample.log',cache_size= 1000, silent=True, output_format='csv')#, exclude='{ "country" : "FR", "ip":"^192"}')
+context=notch()
 ##### OKAY, now we can do the job ########################################## 
 date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
-def include(data):
-    include=True
-    include&= not data["ip"].startswith("192.168.0.35")
-    include&= not "munin" in data["uri"] 
-    include&= not "munin" in data["referer"]
-    include&= datetime(2012,05,4,0,0,0) < data["_datetime"]
-    return include
-context.data_filter=include
-
 
 context.output(
     shoot(
@@ -39,8 +30,6 @@ context.output(
                 Hankyu({data["ua_browser_name"] :1 })}),
             'total_line' : 1,
         }),
-    )
+    ),
+    indent=4
 )
-#print yahi.log["error"]
-#print yahi.cachemaker._cache
-context.cachemaker.clear()

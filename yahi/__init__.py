@@ -28,14 +28,14 @@ HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
 
 def build_filter_from_json(str_or_file, positive_logic):
     matcher = {}
-    try:
-        matcher.update(str_or_file)
-    except TypeError:
-            matcher = load(open(str_or_file))
-    except ValueError:
-        ## errno 2 <=> file not found
-        matcher =  loads(str_or_file)
-
+    if type(str_or_file) is dict:
+        matcher=str_or_file
+    else:
+        try:
+            matcher =  loads(str_or_file)
+        except ValueError:
+            with open(str_or_file) as f:
+                matcher = load(f)
 
     if len(matcher):
         for field, regexp in matcher.items():
@@ -48,7 +48,8 @@ def build_filter_from_json(str_or_file, positive_logic):
             return lambda data : not(
                 any(matcher[k](data[k]) for k in matcher )
             ) if data else False
- 
+    if not len(matcher):
+        raise Exception("Lapin compris")
    
 ####################### UTILITIES ################################
 def dt_formater_from_format(date_format):
@@ -73,14 +74,11 @@ def normalize_user_agent(user_agent):
     user_agent.update( httpagentparser.detect(user_agent))
     flat=dict()
     for k in user_agent:
-        for sub_key,v in user_agent[k].iteritems():
+        for sub_key,v in user_agent[k].items():
             flat.update({ "_".join(["ua" , k, sub_key]) :v}) 
     return flat
     
-def shoot(
-        context,
-        group_by,
-        ):
+def shoot( context, group_by,):
     """Produce a dict of the data found in the line.
     and use group_by to  group according to option (that can contain 
     a data_filter)
@@ -149,7 +147,9 @@ def shoot(
                         _input.lineno(),_input.filename()) )
                     sys.stderr.write("NOT MATCHED:{0}\n".format(line))
     except Exception as e:
-        if context.silent:
+        if context.silent is True:
+            sys.stderr.write("ARRG:at %s:%s\n" % ( 
+                _input.lineno(),_input.filename()) )
             context.log["error"]+=["ARRG(%s):at %s:%s" % (e, _input.lineno(),_input.filename())]
         else:
             sys.stderr.write("ARRG:at %s:%s\n" % ( 
@@ -266,9 +266,9 @@ Hence a usefull trick to merge your old stats with your new one
     )
     parser.add_argument("-f",
         "--output-format",
-        help="""decide if output is in a specified formater amongst : csv, json,
-        indented_json""",
-        default="indented_json"
+        help="""decide if output is in a specified formater amongst : csv, json
+        """,
+        default="json"
     )
     parser.add_argument("-lf",
         "--log-format",
@@ -305,7 +305,6 @@ Hence a usefull trick to merge your old stats with your new one
             arg+=[ ("--%s" %k).replace("_","-") ]
             arg+=["%s" % v] 
         arg+= _file
-        print arg
         context=parser.parse_args(arg)
     else:
         context=parser.parse_args()
@@ -314,10 +313,8 @@ Hence a usefull trick to merge your old stats with your new one
 
     # loading if needed options as a json
     if context.config:
-        if option.config:
-            config_args = load(open(context.config))
-        else:
-            config_args = option
+        with open(context.config) as config_json:
+            config_args = loads(config_json.read())
         for k in config_args:
             setattr(context, k, config_args[k])
             if "output_file" == k:
@@ -353,15 +350,18 @@ Hence a usefull trick to merge your old stats with your new one
                 _inclusive_filter(data)
 
         context.data_filter=_data_filter
+   
+    def  csv_formater(aggreg):
+        with context.output_file as output:
+            csv.writer(output).writerows(mapping_row_iter(aggreg))
     
+    def  json_formater(aggreg, **kw):
+        output=context.output_file
+        dump(aggreg, output,**kw)
+            
     context.output=dict( 
-        csv = lambda aggreg : csv.writer(context.output_file).writerows( 
-            mapping_row_iter(aggreg)
-        ),
-        json = lambda aggreg : context.output_file.write( dumps(aggreg)),
-        indented_json = lambda aggreg : context.output_file.write(
-            dumps(aggreg,indent=4
-         )),
+        csv = csv_formater,
+        json = json_formater
     )[context.output_format]
 
     if "geo_ip" not in context.off:
