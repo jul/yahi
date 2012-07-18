@@ -1,25 +1,26 @@
 #!/usr/bin/env python
 from archery.bow import Hankyu 
-from yahi import Yahi
+from yahi import notch, shoot
 from datetime import datetime
 
 ######################## Setting UP ##################################
 # parsing command line & default settings. Return a not fully qualified object
-yahi=Yahi()#cache_size= 1000, silent=True, output_format='csv')
+context=notch('biggersample.log',cache_size= 1000, silent=True, output_format='csv')#, exclude='{ "country" : "FR", "ip":"^192"}')
 ##### OKAY, now we can do the job ########################################## 
 date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
-#def include(data):
-#    include=True
-#    include&= not data["ip"].startswith("192.168.0.35")
-#    include&= not "munin" in data["uri"] 
-#    include&= not "munin" in data["referer"]
-#    include&= datetime(2012,05,4,0,0,0) < data["_datetime"]
-#    return include
-#yahi.data_filter=include
+def include(data):
+    include=True
+    include&= not data["ip"].startswith("192.168.0.35")
+    include&= not "munin" in data["uri"] 
+    include&= not "munin" in data["referer"]
+    include&= datetime(2012,05,4,0,0,0) < data["_datetime"]
+    return include
+context.data_filter=include
 
 
-yahi.output(
-    yahi.shoot(
+context.output(
+    shoot(
+        context,
         lambda data : Hankyu({
             'by_country': Hankyu({data['country']: 1}),
             'by_date': Hankyu({date_formater(data['_datetime']): 1 }),
@@ -42,4 +43,4 @@ yahi.output(
 )
 #print yahi.log["error"]
 #print yahi.cachemaker._cache
-yahi.cachemaker.clear()
+context.cachemaker.clear()
