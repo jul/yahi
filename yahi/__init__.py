@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#i!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys
 from os import path
@@ -9,14 +9,34 @@ import httpagentparser
 import fileinput
 import csv
 from json import load, loads, dump, dumps
+from archery.trait import Copier
 from archery.barrack import mapping_row_iter
-from archery.bow import Hankyu
+from archery.bow import Hankyu 
 from .field import log_pattern, date_pattern
 from repoze.lru import CacheMaker
 import argparse
 
+class ToxicSet(Copier,set):
+    """a set for wich add is a shortcut for union
+    this way, I can now select all the distinct stuffs
+    However, I am pretty convinced I'd rather not see that too much. 
+    I have a legitimate use for it, but I do have the feeling to
+    solve a problem in a PHPish solution
+    Some people want to watch the world burn. 
+    """
+    def __iadd__(x,y):
+        x|=y
+        return x
 
+    def __add__(x,y):
+        return x|y
 
+    def to_json(self):
+        return list(self) 
+    def __str__(self):
+        return str(list(self))
+    def __repr__(self):
+        return repr(list(self))
 
 ####################### STATIC DATA ################################
 HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
@@ -32,7 +52,7 @@ def build_filter_from_json(str_or_file, positive_logic):
         matcher=str_or_file
     else:
         try:
-            matcher =  loads(str_or_file)
+            matcher=loads(str_or_file)
         except ValueError:
             with open(str_or_file) as f:
                 matcher = load(f)
@@ -118,7 +138,8 @@ def shoot( context, group_by,):
             match = look_for(line)
             if match:
                 data = match.groupdict()
-                data['_datetime']=dt_format(data["datetime"])
+                if data.get("datetime"):
+                    data['_datetime']=dt_format(data["datetime"])
 
                 if 'geo_ip' in context.skill:
                     data.update( {"country":country_by_ip(data["ip"])})
@@ -145,11 +166,9 @@ def shoot( context, group_by,):
                 else:
                     sys.stderr.write("at %s:%s:" % ( 
                         _input.lineno(),_input.filename()) )
-                    sys.stderr.write("NOT MATCHED:{0}\n".format(line))
+                    sys.stderr.write("NOT MATCHED:«{0}»\n".format(line))
     except Exception as e:
         if context.silent is True:
-            sys.stderr.write("ARRG:at %s:%s\n" % ( 
-                _input.lineno(),_input.filename()) )
             context.log["error"]+=["ARRG(%s):at %s:%s" % (e, _input.lineno(),_input.filename())]
         else:
             sys.stderr.write("ARRG:at %s:%s\n" % ( 
@@ -226,7 +245,7 @@ Hence a usefull trick to merge your old stats with your new one
     parser.add_argument("-q",
         "--silent",
         help="quietly discard errors",
-        default="False"
+        default=False
     )
     parser.add_argument("-cs",
         "--cache-size",
@@ -291,7 +310,6 @@ Hence a usefull trick to merge your old stats with your new one
         default=date_pattern["apache_log_combined"]
     )
 
-
     parser.add_argument("-o",
         "--output-file",
         help="output file",
@@ -327,7 +345,11 @@ Hence a usefull trick to merge your old stats with your new one
     # advice: use the json to load load log format, or send a patch
     # it will be easier. 
     if context.log_pattern:
-        log_pattern[context.log_pattern_name]=re.compile(context.log_pattern)
+        log_pattern[context.log_pattern_name]=re.compile(
+            context.log_pattern,
+            re.VERBOSE
+        )
+        
         if context.date_pattern:
             date_pattern[context.log_pattern_name]=context.date_pattern
 

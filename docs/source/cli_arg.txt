@@ -1,0 +1,87 @@
+usage: speed_shoot [-h] [-c FILE] [-g GEOIP] [-q SILENT] [-cs CACHE_SIZE]
+                   [-d DIAGNOSE [DIAGNOSE ...]] [-in INCLUDE] [--off OFF]
+                   [-x EXCLUDE] [-f OUTPUT_FORMAT] [-lf LOG_FORMAT]
+                   [-lp LOG_PATTERN] [-lpn LOG_PATTERN_NAME]
+                   [-dp DATE_PATTERN] [-o OUTPUT_FILE]
+                   ...
+
+Utility for parsing logs in the apache/nginx combined log format
+and output a json of various aggregatted metrics of frequentation :
+     * by Geolocation (quite fuzzy but still);
+     * by user agent;
+     * by hour;
+     * by day;
+     * by browser;
+     * by status code
+     * of url by ip;
+     * by ip;
+     * by url;
+     * and bandwidth by ip;
+
+Example :
+=========
+
+from stdin (useful for using zcat)
+**********************************
+zcat /var/log/apache.log.1.gz | parse_log.py  > dat1.json
+
+excluding IPs 192.168/16 and user agent containing Mozilla
+**********************************************************
+use::
+    parse_log -o dat2.json -x '{ "ip" : "^192.168", "agent": "Mozill" }'  /var/log/apache*.log 
+
+Since archery is cool here is a tip for aggregating data::
+    >>> from archery.barrack import bowyer
+    >>> from archery.bow import Hankyu
+    >>> from json import load, dumps
+    >>> dumps(
+            bowyer(Hankyu,load(file("dat1.json"))) + 
+            bowyer(Hankyu,load(file("dat2.json")))
+        )
+
+Hence a usefull trick to merge your old stats with your new one
+        
+
+positional arguments:
+  files
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c FILE, --config FILE
+                        specify a config file in json format for the command
+                        line arguments any command line arguments will disable
+                        values in the config
+  -g GEOIP, --geoip GEOIP
+                        specify a path to a geoip.dat file
+  -q SILENT, --silent SILENT
+                        quietly discard errors
+  -cs CACHE_SIZE, --cache-size CACHE_SIZE
+                        in conjonction with cp=fixed chooses dict size
+  -d DIAGNOSE [DIAGNOSE ...], --diagnose DIAGNOSE [DIAGNOSE ...]
+                        diagnose list of space separated arguments :
+                        **rejected** : will print on STDERR rejected parsed
+                        line, **match** : will print on stderr data filtered
+                        out
+  -in INCLUDE, --include INCLUDE
+                        include from extracted data with a json (string or
+                        filename) in the form { "field" : "pattern" }
+  --off OFF             turn off plugins : geo_ip to skip geoip, user_agent to
+                        turn httpagentparser off
+  -x EXCLUDE, --exclude EXCLUDE
+                        exclude from extracted data with a json (string or
+                        filename) in the form { "field" : "pattern" }
+  -f OUTPUT_FORMAT, --output-format OUTPUT_FORMAT
+                        decide if output is in a specified formater amongst :
+                        csv, json
+  -lf LOG_FORMAT, --log-format LOG_FORMAT
+                        log format amongst apache_log_combined, lighttpd
+  -lp LOG_PATTERN, --log-pattern LOG_PATTERN
+                        add a custom named regexp for parsing log lines
+  -lpn LOG_PATTERN_NAME, --log-pattern-name LOG_PATTERN_NAME
+                        the name with witch you want to register the pattern
+  -dp DATE_PATTERN, --date-pattern DATE_PATTERN
+                        add a custom date format, usefull if and only if using
+                        a custom log_pattern and date pattern differs from
+                        apache.
+  -o OUTPUT_FILE, --output-file OUTPUT_FILE
+                        output file

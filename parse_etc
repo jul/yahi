@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+from archery.bow import Hankyu as _dict
+from archery.barrack import bowyer
+from yahi import notch, shoot, ToxicSet
+from json import loads
+from datetime import datetime
+import re
+
+######################## Setting UP ##################################
+# parsing command line & default settings. Return a not fully qualified object
+context=notch("/etc/group",
+    off="pygeo_ip,user_agent",
+    log_format="custom",
+    diagnose="match",
+    output_format="json",
+    log_pattern="""^(?P<name>[^:]+):(?P<gni>[^:]+):(?P<gid>\d+):(?P<member>.*)$""")
+
+def perverse_arrow(data):
+    member=data["member"] != "" and data["member"].split(",") or []
+    collected=_dict({
+        data["name"]:
+            _dict(
+                gid=data["gid"],
+                member=member
+            ),
+            "user_belongs_to" : _dict(
+                zip(
+                    member, 
+                    len(member) * [ ToxicSet([data['name']])]
+                )
+            )
+    })
+    return collected
+
+##### OKAY, now we can do the job ########################################## 
+context.output(
+    shoot(
+        context,
+        perverse_arrow
+    ),
+    indent=4,
+    default=ToxicSet.to_json
+)
