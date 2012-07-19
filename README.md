@@ -1,7 +1,7 @@
 parseweblog
 ===========
 
-Aggregate information from a web log file without querying language using and abusing regexps in a structure way.
+Aggregate information from a web log file without querying language using and abusing regexps in a structured way.
 
 Sort of grep dedicated for weblogs on steroids with strutured results. 
 
