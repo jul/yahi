@@ -1,11 +1,15 @@
 parseweblog
 ===========
 
-Aggregate information from a log file using VectorDict.
+Aggregate information from a web log file without querying language using and abusing regexps in a structure way.
+
+Sort of grep dedicated for weblogs on steroids with strutured results. 
+
+
 
 ## Installation ##
 
-    pip install -r requirements
+    not packaged yet
     mkdir data
     wget -O- "http://www.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz" | zcat > data/GeoIP.dat
     
