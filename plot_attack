@@ -1,10 +1,30 @@
 #!/usr/bin/env python
+from archery.trait import Copier, InclusiveAdder
 from archery.bow import Hankyu as _dict
 from archery.barrack import bowyer
 from yahi import notch, shoot, ToxicSet
 from json import loads
 from datetime import datetime
+from datetime import date
+
+import dateutil
 import re
+import pylab as plt
+from collections import OrderedDict
+import numpy as np
+
+class StrongBow(Copier, InclusiveAdder, OrderedDict):
+    pass
+
+def ordered_top(a_dict, rank=10):
+    res=StrongBow({"other": 0})
+    for i,(k,v) in enumerate(sorted(a_dict.items(),key=lambda (k,v): (v,k), reverse=True)):
+        if i < rank:
+            res[k]=v
+        else:
+            res["other"]+=v
+    return res
+        
 
 ######################## Setting UP ##################################
 # parsing command line & default settings. Return a not fully qualified object
@@ -22,17 +42,51 @@ from\ (?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$""")
 
 date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
 ##### OKAY, now we can do the job ########################################## 
-context.output(
-    shoot(
+res= shoot(
         context,
         lambda data: _dict({
             "black_list" : ToxicSet([ data["ip"] ]),
             "by_country" : _dict({ data["country"] : 1 }),
-            "date" : _dict({ date_formater(data["_datetime"]) : 1 }),
+            "date_s" : _dict({ date_formater(data["_datetime"]) : 1 }),
             "by_ip" : _dict({ data["ip"] : 1 }),
+            "date" : _dict({ date(2012,
+                data["_datetime"].month,
+                data["_datetime"].day)
+                : 1 }),
             "by_user" : _dict({ data["user"] : 1 }),
+            "total" : 1 
         })
-    ),
-    indent=4,
-    default=ToxicSet.to_json
-)
+    )
+
+# Let's go draw some plot
+
+fig=plt.figure(221,figsize=(18,10))
+fig.suptitle("Analysing %d attacks" % res["total"], fontsize=16)
+ax=fig.add_subplot(221)
+by_country=ordered_top(res["by_country"])
+ax.set_title("Attack by country")
+ax.pie(by_country.values(), labels=map(lambda (k,v):"%s (%d)"%(k,v),by_country.items()), autopct='%1.1f%%',shadow=True)
+#plt.pie(by_country.values,explode=explode, labels=by_country.keys,shadow=True)
+
+def labeled_bar(ax, _dict):
+    pos=np.arange(len(_dict)) + .5
+    ax.set_xticks(pos, _dict.keys())
+    rects=ax.bar(pos,_dict.values(),label=_dict.keys(),align='center')
+    for i,rect in enumerate(rects):
+        height = rect.get_height()
+        ax.text(rect.get_x()+rect.get_width()/2., height-60,
+           '%.1f\n%s'%(height,_dict.keys()[i]), ha='center', va='bottom',color='white')
+#    plt.legend(rects,_dict.keys())
+    return rects
+ax=fig.add_subplot(222)
+ax.set_title("Most commons tested users")
+by_user=ordered_top(res["by_user"])
+del(by_user['other'])
+#ax.pie(by_user.values(), labels=by_user.keys(),shadow=True)
+labeled_bar(ax,by_user)
+ax=fig.add_subplot(212)
+ax.set_title("Attack by dates")
+res["date"]=OrderedDict([ (k,v) for k,v in sorted( res["date"].items()) ])
+ax.plot_date(plt.date2num(np.array( res["date"].keys())), res["date"].values(), linestyle="-")
+#ax=fig.add_subplot(313)
+plt.savefig("attack.png")
