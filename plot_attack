@@ -59,27 +59,31 @@ res= shoot(
     )
 
 # Let's go draw some plot
-
-fig=plt.figure(221,figsize=(18,10))
-fig.suptitle("Analysing %d attacks" % res["total"], fontsize=16)
-ax=fig.add_subplot(221)
-by_country=ordered_top(res["by_country"])
-ax.set_title("Attack by country")
-ax.pie(by_country.values(), labels=map(lambda (k,v):"%s (%d)"%(k,v),by_country.items()), autopct='%1.1f%%',shadow=True)
-#plt.pie(by_country.values,explode=explode, labels=by_country.keys,shadow=True)
-
 def labeled_bar(ax, _dict):
     pos=np.arange(len(_dict)) + .5
     ax.set_xticks(pos, _dict.keys())
     rects=ax.bar(pos,_dict.values(),label=_dict.keys(),align='center')
     for i,rect in enumerate(rects):
         height = rect.get_height()
-        ax.text(rect.get_x()+rect.get_width()/2., height-60,
-           '%.1f\n%s'%(height,_dict.keys()[i]), ha='center', va='bottom',color='white')
-#    plt.legend(rects,_dict.keys())
+        ax.text(rect.get_x()+rect.get_width()/2., height-80,
+           '%.1f\n%s'%(height,_dict.keys()[i]), 
+           ha='center', va='bottom',color='white')
     return rects
+
+fig=plt.figure(221,figsize=(18,9))
+fig.suptitle("%d SSH brute force attacks originating from %d sources" % 
+    (res["total"], len(res["black_list"])), fontsize=16)
+ax=fig.add_subplot(221)
+by_country=ordered_top(res["by_country"],5)
+ax.set_title("Top 5 country by sources")
+ax.pie(by_country.values(), 
+    labels=map(lambda (k,v):"%s (%d)"%(k,v),by_country.items()), 
+    shadow=True)
+#labeled_bar(ax, by_country)
 ax=fig.add_subplot(222)
-ax.set_title("Most commons tested users")
+ax.set_title(
+    "Top 10 tested users (amongst %d trials)" % len( res["by_user"])
+)
 by_user=ordered_top(res["by_user"])
 del(by_user['other'])
 #ax.pie(by_user.values(), labels=by_user.keys(),shadow=True)
@@ -87,6 +91,8 @@ labeled_bar(ax,by_user)
 ax=fig.add_subplot(212)
 ax.set_title("Attack by dates")
 res["date"]=OrderedDict([ (k,v) for k,v in sorted( res["date"].items()) ])
-ax.plot_date(plt.date2num(np.array( res["date"].keys())), res["date"].values(), linestyle="-")
+ax.plot_date(plt.date2num(np.array( res["date"].keys())), 
+    res["date"].values(), linestyle="-")
 #ax=fig.add_subplot(313)
+fig.autofmt_xdate()
 plt.savefig("attack.png")
