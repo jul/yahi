@@ -14,8 +14,6 @@ class FuncTest(unittest.TestCase):
         del(self.context.__dict__["help"])
         del(self.context.__dict__["output"])
         del(self.context.__dict__["files"])
-        del(self.context.__dict__["cache"])
-        del(self.context.__dict__["cachemaker"])
         del(self.context.__dict__["output_file"])
         self.assertEqual(
             self.context.__dict__,
@@ -25,7 +23,7 @@ class FuncTest(unittest.TestCase):
              'silent': 'False',
              'log_pattern': None,
              'geoip': 'data/GeoIP.dat',
-             'output_format': 'json',
+             'output_format': 'indented_json',
              'data_filter': None,
              'log_pattern_name': 'custom',
              'cache_size': '10000',
@@ -38,8 +36,14 @@ class FuncTest(unittest.TestCase):
         )
 
     def test_parse(self):
-        context=notch('yahi/test/biggersample.log', 
-        'yahi/test/biggersample.log',include="yahi/test/include.json",silent=True, exclude='{ "country" : "US"}', output_format="csv")
+        context=notch(
+            'yahi/test/biggersample.log', 
+            'yahi/test/biggersample.log',
+            include="yahi/test/include.json",
+            silent=True, 
+            exclude='{ "country" : "US"}', 
+            output_format="csv"
+        )
         context.diagnose=[ "rejected", "match" ]
         context.data_filter=lambda data: data["_datetime"].hour in [9,10]
         self.assertEqual(

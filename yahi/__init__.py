@@ -13,8 +13,12 @@ from archery.trait import Copier
 from archery.barrack import mapping_row_iter
 from archery.bow import Hankyu 
 from .field import log_pattern, date_pattern
-from repoze.lru import CacheMaker
+from repoze.lru import lru_cache
 import argparse
+import locale
+locale.setlocale(locale.LC_ALL,"C")
+
+
 
 class ToxicSet(Copier,set):
     """a set for wich add is a shortcut for union
@@ -30,7 +34,6 @@ class ToxicSet(Copier,set):
 
     def __add__(x,y):
         return x|y
-
     def to_json(self):
         return list(self) 
     def __str__(self):
@@ -126,12 +129,11 @@ def shoot( context, group_by,):
     look_for = log_pattern[context.log_format].search
     match = None
     dt_format = dt_formater_from_format(date_pattern[context.log_format])
-    parse_user_agent = context.cache("user_agent")(normalize_user_agent)
-
+    parse_user_agent = lru_cache(context.cache_size)(normalize_user_agent)
     if "geo_ip" in context.skill:
         from pygeoip import GeoIP
         gi = GeoIP(context.geoip)
-        country_by_ip = context.cache("geoip")(gi.country_code_by_addr)
+        country_by_ip = lru_cache(context.cache_size)(gi.country_code_by_addr)
     _input = fileinput.input(context.files)
     try:
         for line in _input:
@@ -147,6 +149,7 @@ def shoot( context, group_by,):
                     data.update(
                         parse_user_agent(data["agent"])
                     )
+                ##print "<%s>" % data["user"]
                 if context.data_filter and not context.data_filter(data):
                     if "rejected" in context.diagnose:
                         if context.silent:
@@ -173,8 +176,8 @@ def shoot( context, group_by,):
         else:
             sys.stderr.write("ARRG:at %s:%s\n" % ( 
                 _input.lineno(),_input.filename()) )
-            sys.stderr.write("CONTEXT:line %s:match %s:data : %s\n" % (
-                line,match.groupdict(),data))
+            sys.stderr.write("CONTEXT:match %s:data : %s\n" % (
+                match and match.groupdict() or "no_match",data))
             raise Exception(e)
     
     finally:
@@ -186,10 +189,19 @@ def shoot( context, group_by,):
 def notch(*_file,**option):
     """CLI parser
     returns an context object that contains all CLI params and values
-    print context.help for more informations
+    print( notch().help ) for more informations
     
-
-    TODO replace CLI parsing with taking input from a dict"""
+    Default values are the same as with the CLI, available options are:
+        - exclude,
+        - include,
+        - output_format,
+        - output_file,
+        - log_pattern,
+        - date_pattern,
+        - off (turning off user_agent detection or geoIP),
+        - log_pattern_name,
+        - cache_size,
+"""
 
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -267,7 +279,7 @@ Hence a usefull trick to merge your old stats with your new one
         
     )
         
-    parser.add_argument("-in",
+    parser.add_argument("-i",
         "--include",
         help="""include from extracted data with
         a json (string or filename) in the form { "field" : "pattern" } """,
@@ -287,7 +299,7 @@ Hence a usefull trick to merge your old stats with your new one
         "--output-format",
         help="""decide if output is in a specified formater amongst : csv, json
         """,
-        default="json"
+        default="indented_json"
     )
     parser.add_argument("-lf",
         "--log-format",
@@ -372,18 +384,23 @@ Hence a usefull trick to merge your old stats with your new one
                 _inclusive_filter(data)
 
         context.data_filter=_data_filter
-   
-    def  csv_formater(aggreg):
-        with context.output_file as output:
-            csv.writer(output).writerows(mapping_row_iter(aggreg))
-    
-    def  json_formater(aggreg, **kw):
+
+    def csv_formater(aggreg,**kw):
+        csv.writer(context.output_file).writerows(mapping_row_iter(aggreg))
+        ### py3/bpython nawak
+        try:
+            context.output_file.close()
+        except:
+            pass
+
+    def json_formater(aggreg, **kw):
         output=context.output_file
         dump(aggreg, output,**kw)
-            
+
     context.output=dict( 
         csv = csv_formater,
-        json = json_formater
+        json = json_formater,
+        indented_json = lambda a,**kw: json_formater(a,indent=4,**kw)
     )[context.output_format]
 
     if "geo_ip" not in context.off:
@@ -392,11 +409,6 @@ Hence a usefull trick to merge your old stats with your new one
     if "user_agent" not in context.off:
         context.skill+= [ "user_agent" ]
     
-    context.cachemaker=CacheMaker()
-    context.cache=lambda name : context.cachemaker.lrucache(
-            name,
-            context.cache_size,
-        )
     context.help = parser.format_help()
     for k,v in context.__dict__.items():
         setattr(context,k,v)
