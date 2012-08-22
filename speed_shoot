@@ -31,5 +31,4 @@ context.output(
             'total_line' : 1,
         }),
     ),
-    indent=4,
 )
