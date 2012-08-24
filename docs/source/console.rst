@@ -13,8 +13,7 @@ Notch and shoot by the example
 
 
 notch is all about setting up a context::
-    
-     context=notch(
+    >>> context=notch(
          'yahi/test/biggersample.log', 
          'yahi/test/biggersample.log',
          include="yahi/test/include.json",
@@ -64,17 +63,14 @@ Shoot
 =====
 
 Logic
-*****
+-----
 
 Given one or more context, you now can shoot your request to the context
 given back by notch. 
 
-The addition given by archery to dict or set, is the trick. 
-
-Here is the logic::
+Here how it goes::
     for each lines of each input file
         use a regexp to transform the parsed line in a dict
-        #lazyness
         add to record datetime string in _datetime key
         if geoIP in context.skill
             add country to the record
@@ -84,12 +80,11 @@ Here is the logic::
             add actual transformed record to the previous one
 
 It is basically a way to **GROUP BY** like in mysql.
-As my dict supports addition we have the following logic for each line::
-    >>> { 'country' : { 'BE' : 10, 'FR' : 20 }, 
-    'user_agent' : { 'mozilla' : 13, 'unknown' : 17  } } + { 
-    'country' : { 'BE' : 1}, 'user_agent' : { 'safari': 1 }
-    }
-    ## OUTPUT
+As my dict supports addition we have the following logic for each line (given 
+you request an aggregation on country and useragent and you are at the 31st line::
+    >>> { 'country' : { 'BE' : 10, 'FR' : 20  
+    ... },  'user_agent' : { 'mozilla' : 13, 'unknown' : 17  } } + { 
+    ... 'country' : { 'BE' : 1}, 'user_agent' : { 'safari': 1 } }
     { 'country' : { 'BE' : 11, 'FR' : 20 },
     'user_agent' : { 'mozilla' : 13, 'unknown' : 17,'safari': 1 } }
     },

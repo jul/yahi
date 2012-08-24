@@ -8,7 +8,7 @@ Contents:
 
 .. toctree::
    cli_arg.rst
-   console_example.rst
+   console.rst
    custom_script.rst
    
    :maxdepth: 2
