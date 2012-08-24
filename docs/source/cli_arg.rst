@@ -52,6 +52,8 @@ Here is a sample of a config file::
         "files" : [ "yahi/test/biggersample.log" ]
     }
 
+
+
 Easter eggs or bad idea
 ***********************
 
