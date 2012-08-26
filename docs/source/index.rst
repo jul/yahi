@@ -8,10 +8,12 @@ Contents:
 
 .. toctree::
    cli_arg.rst
+   logic.rst
    console.rst
    custom_script.rst
    
    :maxdepth: 2
+
 
 Shooting web log (apache included) like a native american
 =========================================================
@@ -37,10 +39,9 @@ Recommanded usage
 =================
 
 - for basic log aggregation, I do recommand using command line;
-- for one shot metrics I recommand an interactive console (bpython or ipython);
+- for one shot metrics I recommend an interactive console (bpython or ipython);
 - for specific metrics or elaborate filters I recommand using the API. 
 
-Since it is console oriented, it is easy to use as a requesting language. 
 
 
 

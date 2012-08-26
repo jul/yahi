@@ -1,5 +1,5 @@
-Using the console requesting a log like a boss
-**********************************************
+How it works?
+*************
 
 For this exercice I do have a preference for *bpython*, since it has the ctrl+S shortcut.  Thus, you can save any «experiments» in a file. 
 
@@ -11,19 +11,24 @@ so the API is not satisfying.
 Notch and shoot by the example
 ==============================
 
-
-notch is all about setting up a context::
-    >>> context=notch(
-         'yahi/test/biggersample.log', 
-         'yahi/test/biggersample.log',
+So let's take an example::
+    >>> context=notch( 
+         'yahi/test/biggersample.log' ,'another_log', 
          include="yahi/test/include.json",
-         silent=True, 
-         exclude='{ "country" : "US"}', 
+         exclude='{ "ip" : "^(192\.168|10\.)"}', 
          output_format="csv"
     )
+    # include.json contains : { "_country"  : "GB","user" : "-" }
 
-Would I have been smart, it would have been called «aim». Since you tell 
-your target, and the parameters of your parsing (log_format...). 
+Here you parse two files, you will want to get only GB hits of non authed users,except private IP, and you may want to sue CSV as an output format. (Since 
+no output file is set, output is redirected to stdout (errors are directed 
+on stderr). 
+
+Shoot
+=====
+
+Let's get a time serie of the hit per day and 
+
 
 Context methods & attributes
 ============================
@@ -33,31 +38,26 @@ Then, I noticed that a `for lines in files` was quite faster.
 
 Code was first a 100 lines script then it grew out of control.
 
-..warning:: you should notch once for every time you shoot. 
-    
 
-attributes safely modifyable after notch is called
---------------------------------------------------
-
-data_filter
-^^^^^^^^^^^
+attribute: data_filter
+-----------------------
 
 Stores the filter used to filter the data. If nothing specified it will
 use include and exclude. 
 
-methods
--------
-
-output
-^^^^^^
+method: output
+--------------
 
 Given output_file / output_format write a Mapping in the specified 
 file with the sepcified format. 
 
-..caution::
-    If it is a file, output will close it. And reusing it another time
-    will cause an exception. 
 
+.. warning:: 
+    Output will close output_file once it has written in it.
+    Thus, reusing it another time will cause an exception. 
+    you should notch once for every time you shoot if you `context.output`
+    for writing to a file. 
+    
 
 Shoot
 =====
@@ -68,10 +68,10 @@ Logic
 Given one or more context, you now can shoot your request to the context
 given back by notch. 
 
-Here how it goes::
+.. note::
     for each lines of each input file
-        use a regexp to transform the parsed line in a dict
-        add to record datetime string in _datetime key
+        - use a regexp to transform the parsed line in a dict
+        - add to record datetime string in _datetime key
         if geoIP in context.skill
             add country to the record
         if user_agent in context.skill
@@ -82,15 +82,45 @@ Here how it goes::
 It is basically a way to **GROUP BY** like in mysql.
 As my dict supports addition we have the following logic for each line (given 
 you request an aggregation on country and useragent and you are at the 31st line::
-    >>> { 'country' : { 'BE' : 10, 'FR' : 20  
+    >>> { '_country' : { 'BE' : 10, 'FR' : 20  
     ... },  'user_agent' : { 'mozilla' : 13, 'unknown' : 17  } } + { 
-    ... 'country' : { 'BE' : 1}, 'user_agent' : { 'safari': 1 } }
-    { 'country' : { 'BE' : 11, 'FR' : 20 },
+    ... '_country' : { 'BE' : 1}, 'user_agent' : { 'safari': 1 } }
+    { '_country' : { 'BE' : 11, 'FR' : 20 },
     'user_agent' : { 'mozilla' : 13, 'unknown' : 17,'safari': 1 } }
     },
 
+How lines of your log are transformed
+=====================================
 
+First since we use named capture in our log regexps, we directly transform 
+a log in a dict. You can give the name you want for your capture except for
+3 special things: 
 
+- *datetime* is required, because logs **always** have a datetime associated
+with each record;
+- *agent* is required if you want to use **httpagentparser**;
+- *ip* is required if you want to use **geoIP**
+
+Datetime
+--------
+
+Once *datetime* is captured since datetime objects are easier to use than strings
+`datetime` value is  transformed in `_datetime` with the date_pattern.
+
+GeoIP
+-----
+
+Once *ip* is catpured given `geo_ip` is enabled `_country` will be set with
+the 2 letters of the ISO code of the country.
+
+HttpUserAgentParser
+-------------------
+
+Once agent is captured, it will be transformed -if `user_agent` is enabled- into
+
+- `_dist_name`: the OS;
+- `_browser_name`: the name of the web browser;
+- `_browser_version`: the version of the browser.
 
 
 

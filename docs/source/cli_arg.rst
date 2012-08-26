@@ -13,7 +13,7 @@ A commented jumbo command line example
 **************************************
 The following command line::
 
-    ./speed_shoot -g data/GeoIP.dat -lf lighttpd -x '{ "datetime" : "^01/May", "uri" : "(.*munin|.*(png|jpg))$"}' -d rejected -d match -i '{ "country" : "(DE|GB)"  }' *log  yahi/test/biggersample.log 
+    ./speed_shoot -g data/GeoIP.dat -lf lighttpd -x '{ "datetime" : "^01/May", "uri" : "(.*munin|.*(png|jpg))$"}' -d rejected -d match -i '{ "_country" : "(DE|GB)"  }' *log  yahi/test/biggersample.log 
 
 does:
 
