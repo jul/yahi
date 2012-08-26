@@ -98,7 +98,7 @@ def normalize_user_agent(user_agent):
     flat=dict()
     for k in user_agent:
         for sub_key,v in user_agent[k].items():
-            flat.update({ "_".join(["ua" , k, sub_key]) :v}) 
+            flat.update({ "_" + "_".join([ k, sub_key]) :v}) 
     return flat
     
 def shoot( context, group_by,):
@@ -144,7 +144,7 @@ def shoot( context, group_by,):
                     data['_datetime']=dt_format(data["datetime"])
 
                 if 'geo_ip' in context.skill:
-                    data.update( {"country":country_by_ip(data["ip"])})
+                    data.update( {"_country":country_by_ip(data["ip"])})
                 if 'user_agent' in context.skill:
                     data.update(
                         parse_user_agent(data["agent"])

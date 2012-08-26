@@ -47,7 +47,7 @@ res= shoot(
         context,
         lambda data: _dict({
             "black_list" : ToxicSet([ data["ip"] ]),
-            "by_country" : _dict({ data["country"] : 1 }),
+            "by_country" : _dict({ data["_country"] : 1 }),
             "date_s" : _dict({ date_formater(data["_datetime"]) : 1 }),
             "by_ip" : _dict({ data["ip"] : 1 }),
             "date" : _dict({ date(2012,
@@ -72,7 +72,7 @@ def labeled_bar(ax, _dict):
     return rects
 
 fig=plt.figure(221,figsize=(18,9))
-fig.suptitle("%d SSH brute force attacks originating from %d sources" % 
+fig.suptitle("%d SSH unauthorized access from %d sources" % 
     (res["total"], len(res["black_list"])), fontsize=16)
 ax=fig.add_subplot(221)
 by_country=ordered_top(res["by_country"],5)
@@ -96,4 +96,4 @@ ax.plot_date(plt.date2num(np.array( res["date"].keys())),
     res["date"].values(), linestyle="-")
 #ax=fig.add_subplot(313)
 fig.autofmt_xdate()
-plt.savefig("attack.png")
+plt.savefig("attack.pdf")

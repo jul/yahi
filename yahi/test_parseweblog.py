@@ -41,7 +41,7 @@ class FuncTest(unittest.TestCase):
             'yahi/test/biggersample.log',
             include="yahi/test/include.json",
             silent=True, 
-            exclude='{ "country" : "US"}', 
+            exclude='{ "_country" : "US"}', 
             output_format="csv"
         )
         context.diagnose=[ "rejected", "match" ]
@@ -50,7 +50,7 @@ class FuncTest(unittest.TestCase):
             shoot(context, lambda x: { 
                 'total' : 1, 
                 "rfc1918":x["ip"].startswith("192.168"),
-                "from_gb" : "GB" == x["country"],
+                "from_gb" : "GB" == x["_country"],
                 "hour%d" %  x["_datetime"].hour : 0,
 
                 }),
@@ -68,7 +68,7 @@ class FuncTest(unittest.TestCase):
             shoot(context, lambda x: { 
                 'total' : 1, 
                 "rfc1918":x["ip"].startswith("192.168"),
-                "from_gb" : "GB" == x["country"],
+                "from_gb" : "GB" == x["_country"],
                 "hour%d" %  x["_datetime"].hour : 0,
 
                 }),
