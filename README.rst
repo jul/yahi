@@ -7,6 +7,7 @@ Command line usage
 Example of data parsed with yahi: http://wwstat.julbox.fr/
 
 Simplest usage is::
+    
     speed_shoot -g /usr/local/data/geoIP /var/www/apache/access*log
 
 Well I guess, it does not work because you first need to fetch geoIP data file::

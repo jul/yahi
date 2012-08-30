@@ -3,20 +3,28 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-
-.. include:: ../../README.rst
-
 Contents:
 
 .. toctree::
-    :maxdepth: 2
-  
+    :maxdepth: 1
+
     cli_arg.rst
     logic.rst
     console.rst
     custom_script.rst
     misusing.rst
    
+
+.. include:: ../../README.rst
+
+What's new?
+===========
+
+0.1.0
+-----
+
+* it is NEW, seen on TV, and is guaranteed to make you tenfolds more desirable. 
+
 
 
 Indices and tables

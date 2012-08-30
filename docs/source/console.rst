@@ -1,5 +1,5 @@
-Notch and shoot logic
-*********************
+Notch and shoot by the example
+******************************
 
 For this exercice I do have a preference for *bpython*, since it has the ctrl+S shortcut.  Thus, you can save any «experiments» in a file. 
 
@@ -8,8 +8,8 @@ It is pretty much a querying language in disguise.
 Initially I did not planned to use it in a console or as a standalone module
 so the API is not satisfying. 
 
-Notch and shoot by the example
-==============================
+Notch: choose your input
+========================
 
 So let's take an example::
     >>> context=notch( 
@@ -93,40 +93,20 @@ example::
     ... context,
     ... lambda data: _dict({ 
     ...     date_formater(data["_datetime"]) : 1 
-    ... })
+    ... }))
 
 
+Custom filtering
+================
 
+Sometimes regexp are not enough, imagine you have a function for checking 
+if a user belongs to the employees, and you want to check all the workhaolic 
+in your company reaching an authentified realm out of the working hours::
 
+    >>> context.data_filter= lambda data: ( 
+    ...     is_employee(data["user"]) and not working_hours(data["_datetime"])
+    ... )
+    >>> shoot( context, _dict(workaholicness = _dict({data["user"] : 1})))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.. note::
+   data_filter will override any include/exclude rules given in notch

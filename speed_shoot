@@ -5,9 +5,9 @@ from datetime import datetime
 
 
 ######################## Setting UP ##################################
-# parsing command line & default settings. Return a not fully qualified object
+# parsing command line & default settings. Return a context
 context=notch()
-##### OKAY, now we can do the job ########################################## 
+##### OKAY, now we can do the job #################################### 
 date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
 context.output(
     shoot(
