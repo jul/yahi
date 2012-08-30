@@ -11,8 +11,8 @@ Contents:
    logic.rst
    console.rst
    custom_script.rst
+   misusing.rst
    
-   :maxdepth: 2
 
 
 Shooting web log (apache included) like a native american

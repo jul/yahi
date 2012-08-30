@@ -1,5 +1,5 @@
-How it works?
-*************
+Notch and shoot logic
+*********************
 
 For this exercice I do have a preference for *bpython*, since it has the ctrl+S shortcut.  Thus, you can save any «experiments» in a file. 
 
@@ -20,107 +20,113 @@ So let's take an example::
     )
     # include.json contains : { "_country"  : "GB","user" : "-" }
 
-Here you parse two files, you will want to get only GB hits of non authed users,except private IP, and you may want to sue CSV as an output format. (Since 
-no output file is set, output is redirected to stdout (errors are directed 
-on stderr). 
+Here you parse two files, you want: 
 
-Shoot
-=====
+- only GB hits,
+- non authed users,
+- to filter out private IP, 
+- and you may want to use a CSV formater as an output format.
 
-Let's get a time serie of the hit per day and 
-
-
-Context methods & attributes
-============================
-
-Initially this code was written in pure map reduce unreadable style. 
-Then, I noticed that a `for lines in files` was quite faster. 
-
-Code was first a 100 lines script then it grew out of control.
+(Since no output file is set, output is redirected to stdout (errors are directed 
+on stderr)). 
 
 
-attribute: data_filter
------------------------
-
-Stores the filter used to filter the data. If nothing specified it will
-use include and exclude. 
-
-method: output
---------------
-
-Given output_file / output_format write a Mapping in the specified 
-file with the sepcified format. 
-
-
-.. warning:: 
-    Output will close output_file once it has written in it.
-    Thus, reusing it another time will cause an exception. 
-    you should notch once for every time you shoot if you `context.output`
-    for writing to a file. 
-    
-
-Shoot
-=====
-
-Logic
------
-
-Given one or more context, you now can shoot your request to the context
-given back by notch. 
-
-.. note::
-    for each lines of each input file
-        - use a regexp to transform the parsed line in a dict
-        - add to record datetime string in _datetime key
-        if geoIP in context.skill
-            add country to the record
-        if user_agent in context.skill
-            add os / dist / browser to the record based on the agent record 
-        if not filtered out by context.data_filter
-            add actual transformed record to the previous one
-
-It is basically a way to **GROUP BY** like in mysql.
-As my dict supports addition we have the following logic for each line (given 
-you request an aggregation on country and useragent and you are at the 31st line::
-    >>> { '_country' : { 'BE' : 10, 'FR' : 20  
-    ... },  'user_agent' : { 'mozilla' : 13, 'unknown' : 17  } } + { 
-    ... '_country' : { 'BE' : 1}, 'user_agent' : { 'safari': 1 } }
-    { '_country' : { 'BE' : 11, 'FR' : 20 },
-    'user_agent' : { 'mozilla' : 13, 'unknown' : 17,'safari': 1 } }
-    },
-
-How lines of your log are transformed
+Shoot: choose and aggregate your data
 =====================================
 
-First since we use named capture in our log regexps, we directly transform 
-a log in a dict. You can give the name you want for your capture except for
-3 special things: 
+Shoot has 2 inputs:
 
-- *datetime* is required, because logs **always** have a datetime associated
-with each record;
-- *agent* is required if you want to use **httpagentparser**;
-- *ip* is required if you want to use **geoIP**
+- a context (setup by notch);
+- an extractor;
 
-Datetime
---------
+Ad extractor is a function extracting and transforming datas, and since I love
+short circuits, that may contain some on the fly filtering :) 
 
-Once *datetime* is captured since datetime objects are easier to use than strings
-`datetime` value is  transformed in `_datetime` with the date_pattern.
+Total hits in a log matching the conditions from notch
+------------------------------------------------------
 
-GeoIP
------
+Example::
+    >>> from archery import Hankyu as _dict
+    >>> shoot( 
+    ... context,
+    ... lambda data: _dict({ 'total_lines' : 1 }) 
+    ... )
 
-Once *ip* is catpured given `geo_ip` is enabled `_country` will be set with
-the 2 letters of the ISO code of the country.
 
-HttpUserAgentParser
--------------------
+Gross total hits in business hours and off business hour
+--------------------------------------------------------
 
-Once agent is captured, it will be transformed -if `user_agent` is enabled- into
+Business hour being each weekday from monday to friday, between 8 am and 5 pm.
 
-- `_dist_name`: the OS;
-- `_browser_name`: the name of the web browser;
-- `_browser_version`: the version of the browser.
+Example::
+    >>> from archery import Hankyu as _dict
+    >>> shoot( 
+    ... context,
+    ... lambda data: _dict({ ( 
+    ...        8 >= data["_datetime"].hour >= 17 and 
+    ...        data["_datetime"].weekday() < 5 
+    ...    ) and "business_hour" or "other_hour" :  1 }) 
+    ... )
+
+Hankyu is a dict supporting addition.
+
+Distinct IP
+-----------
+
+
+Example::
+    >>> from archery import Hankyu as _dict
+    >>> from yahi import ToxicSet
+    >>> shoot( 
+    ... context,
+    ... lambda data: _dict(distinct_ip = ToxicSet({ data["ip"]}))
+    ... )
+
+ToxicSet is a set that maps add to union.
+
+Hits per day
+------------
+example:: 
+    >>> date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
+    >>> from archery import Hankyu as _dict
+    >>> shoot( 
+    ... context,
+    ... lambda data: _dict({ 
+    ...     date_formater(data["_datetime"]) : 1 
+    ... })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
