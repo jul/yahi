@@ -1,5 +1,5 @@
-Basic usage: command line
-=========================
+Command line basic usage
+========================
 
 help as usual is obtained this way::
 
