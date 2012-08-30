@@ -25,7 +25,7 @@ Default path for geoIP is data/GeoIP.dat
 Use as a script
 ---------------
 
-speed shoot is in fact a template of how to use yahi as a facility
+speed shoot is in fact a template of how to use yahi as a module::
 
     #!/usr/bin/env python
     from archery.bow import Hankyu as _dict
