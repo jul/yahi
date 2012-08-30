@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-from archery.trait import Copier, InclusiveAdder
 from archery.bow import Hankyu as _dict
-from archery.barrack import bowyer
 from yahi import notch, shoot, ToxicSet
-from json import loads
 from datetime import datetime
 from datetime import date
 
@@ -13,25 +10,26 @@ import pylab as plt
 from collections import OrderedDict
 import numpy as np
 
-class StrongBow(Copier, InclusiveAdder, OrderedDict):
-    pass
 
 def ordered_top(a_dict, rank=10):
-    res=StrongBow({"other": 0})
-    for i,(k,v) in enumerate(sorted(a_dict.items(),key=lambda (k,v): (v,k), reverse=True)):
+    res=OrderedDict({"other": 0})
+    for i,(k,v) in enumerate(
+            sorted(a_dict.items(),
+                key=lambda (k,v): (v,k),
+                reverse=True)
+            ):
         if i < rank:
             res[k]=v
         else:
             res["other"]+=v
     return res
-        
+
 
 ######################## Setting UP ##################################
 # parsing command line & default settings. Return a not fully qualified object
 context=notch("yahi/test/auth.log",
     off="user_agent",
     log_format="custom",
-#    diagnose="match",
     output_format="json",
     date_pattern="%b %d %H:%M:%S", 
     log_pattern="""
@@ -39,6 +37,7 @@ context=notch("yahi/test/auth.log",
     (?P<nawak>[^:]+):\s
     Invalid\ user\ (?P<user>.*?)\s
     from\ (?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$""")
+# log sample
 #May 20 12:14:15 lupin sshd[36291]: Invalid user dave from 69.60.114.57
 
 date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
@@ -72,28 +71,34 @@ def labeled_bar(ax, _dict):
     return rects
 
 fig=plt.figure(221,figsize=(18,9))
-fig.suptitle("%d SSH unauthorized access from %d sources" % 
-    (res["total"], len(res["black_list"])), fontsize=16)
+fig.suptitle(
+    "%d SSH unauthorized access from %d sources" % (
+        res["total"], len(res["black_list"])),
+    fontsize=16,
+)
 ax=fig.add_subplot(221)
 by_country=ordered_top(res["by_country"],5)
 ax.set_title("Top 5 country by sources")
-ax.pie(by_country.values(), 
-    labels=map(lambda (k,v):"%s (%d)"%(k,v),by_country.items()), 
-    shadow=True)
-#labeled_bar(ax, by_country)
+ax.pie(by_country.values(),
+    labels=map(lambda (k,v):"%s (%d)"%(k,v),by_country.items()),
+    shadow=True
+)
+
 ax=fig.add_subplot(222)
 ax.set_title(
     "Top 10 tested users (amongst %d trials)" % len( res["by_user"])
 )
 by_user=ordered_top(res["by_user"])
 del(by_user['other'])
-#ax.pie(by_user.values(), labels=by_user.keys(),shadow=True)
 labeled_bar(ax,by_user)
+
 ax=fig.add_subplot(212)
-ax.set_title("Attack by dates")
-res["date"]=OrderedDict([ (k,v) for k,v in sorted( res["date"].items()) ])
-ax.plot_date(plt.date2num(np.array( res["date"].keys())), 
+ax.set_title("Unauthorized connections by dates")
+res["date"]=OrderedDict([
+    (k,v) for k,v in sorted( res["date"].items()) ]
+)
+ax.plot_date(plt.date2num(np.array( res["date"].keys())),
     res["date"].values(), linestyle="-")
-#ax=fig.add_subplot(313)
+
 fig.autofmt_xdate()
 plt.savefig("attack.pdf")
