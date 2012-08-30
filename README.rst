@@ -20,8 +20,10 @@ Well I guess, it does not work because you first need to fetch geoIP data file::
 
     wget -O- "http://www.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz" | zcat > /usr/local/data/GeoIP.dat
 
-Default path for geoIP is data/GeoIP.dat
+Of course, this is the geoLite database, I don't include the data in the package
+since geoIP must be updated often to stay accurate. 
 
+Default path for geoIP is data/GeoIP.dat
 Use as a script
 ---------------
 
