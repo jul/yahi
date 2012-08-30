@@ -108,5 +108,5 @@ in your company reaching an authentified realm out of the working hours::
     ... )
     >>> shoot( context, _dict(workaholicness = _dict({data["user"] : 1})))
 
-.. note::
+.. warning::
    data_filter will override any include/exclude rules given in notch

@@ -1,3 +1,9 @@
+
+- source: https://github.com/jul/yahi
+- doc: http://yahi.readthedocs.org/
+- ticketting: https://github.com/jul/yahi/issues
+
+
 Versatile log parser (providing default extractors for apache/lighttpd)
 =======================================================================
 
@@ -21,7 +27,40 @@ Use as a script
 
 speed shoot is in fact a template of how to use yahi as a facility
 
-.. literalinclude:: ../../speed_shoot
+    #!/usr/bin/env python
+    from archery.bow import Hankyu as _dict
+    from yahi import notch, shoot
+    from datetime import datetime
+
+
+    ######################## Setting UP ##################################
+    # parsing command line & default settings. Return a context
+    context=notch()
+    ##### OKAY, now we can do the job #################################### 
+    date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
+    context.output(
+        shoot(
+            context,
+            lambda data : _dict({
+                'by_country': _dict({data['_country']: 1}),
+                'by_date': _dict({date_formater(data['_datetime']): 1 }),
+                'by_hour': _dict({data['_datetime'].hour: 1 }),
+                'by_os': _dict({data['_os_name']: 1 }),
+                'by_dist': _dict({data['_dist_name']: 1 }),
+                'by_browser': _dict({data['_browser_name']: 1 }),
+                'by_ip': _dict({data['ip']: 1 }),
+                'by_status': _dict({data['status']: 1 }),
+                'by_url': _dict({data['uri']: 1}),
+                'by_agent': _dict({data['agent']: 1}),
+                'by_referer': _dict({data['referer']: 1}),
+                'ip_by_url': _dict({data['uri']: _dict( {data['ip']: 1 })}),
+                'bytes_by_ip': _dict({data['ip']: int(data['bytes'])}),
+                'week_browser' : _dict({data['_datetime'].weekday():
+                    _dict({data["_browser_name"] :1 })}),
+                'total_line' : 1,
+            }),
+        ),
+    )
 
 Recommanded usage
 =================
