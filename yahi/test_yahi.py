@@ -57,14 +57,11 @@ class FuncTest(unittest.TestCase):
                 {'rfc1918': 844, 'hour9': 0, 'total': 864, 'from_gb': 4, 'hour10': 0},
         )
         self.assertEqual(len(context.log["warning"]),2136)
-        print("a,b,1")
         context.output({"a":{"b" :1 }})
 
     def test_loadconfig(self):
         context=notch('',config='yahi/test/config.json')
-        print( '{"a" :1}' )
         context.output(dict(a=1))
-        print context.files
         self.assertEqual(
             shoot(context, lambda x: { 
                 'total' : 1, 

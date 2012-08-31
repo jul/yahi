@@ -6,3 +6,4 @@ you do, and you don't like using excel
 
 .. literalinclude:: ../../plot_attack
 
+.. image:: ../../attack.png
