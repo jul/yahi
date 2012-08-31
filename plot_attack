@@ -66,9 +66,9 @@ def labeled_bar(ax, _dict):
     rects=ax.bar(pos,_dict.values(),label=_dict.keys(),align='center')
     for i,rect in enumerate(rects):
         height = rect.get_height()
-        ax.text(rect.get_x()+rect.get_width()/2., height-80,
+        ax.text(rect.get_x()+rect.get_width()/2., height-100,
            '%.1f\n%s'%(height,_dict.keys()[i]), 
-           ha='center', va='bottom',color='white')
+           ha='center', va='bottom',color='white', fontsize=8)
     return rects
 
 fig=plt.figure(221,figsize=(18,9))
