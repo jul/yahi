@@ -135,9 +135,14 @@ def shoot( context, group_by,):
         gi = GeoIP(context.geoip)
         country_by_ip = lru_cache(context.cache_size)(gi.country_code_by_addr)
     _input = fileinput.input(context.files)
+    if not context.silent:
+        sys.stderr.write("parsing:\n %s\n" % "\n-" . join(context.files))
     try:
         for line in _input:
             match = look_for(line)
+            if not context.silent and not _input.lineno() % 10000:
+                sys.stderr.write("*")
+                
             if match:
                 data = match.groupdict()
                 if data.get("datetime"):
@@ -153,14 +158,14 @@ def shoot( context, group_by,):
                 if context.data_filter and not context.data_filter(data):
                     if "rejected" in context.diagnose:
                         if context.silent:
-                            context.log["warning"]+=[ "REJECTED:at %s:%s:%s"%(_input.lineno(),_input.filename(),data) ]
+                            context.log["warning"]+=[ "REJECTED:at %s:%s:%s"%(
+                                _input.lineno(),_input.filename(),data) ]
                         else:
                             sys.stderr.write("at %s:%s:" % (
                                 _input.lineno(),_input.filename()) )
                             sys.stderr.write("REJECTED:{0}\n".format(data))
                 else:
                     aggregator += group_by(data)
-
             elif "match" in context.diagnose:
                 if context.silent:
                     context.log["warning"]+=[
@@ -179,9 +184,11 @@ def shoot( context, group_by,):
             sys.stderr.write("CONTEXT:match %s:data : %s\n" % (
                 match and match.groupdict() or "no_match",data))
             raise Exception(e)
-    
     finally:
-        _input.close()
+        ## causes a problem with stdin/stderr
+        #_input.close()
+        if not context.silent:
+            sys.stderr.write("\n%s lines parsed\n" % _input.lineno())
     return aggregator
 
 #################### CLI and DOC #################################
@@ -264,21 +271,19 @@ Hence a usefull trick to merge your old stats with your new one
         help="in conjonction with cp=fixed chooses dict size",
         default="10000"
     )
-        
-    
+
+
     parser.add_argument("-d",
         "--diagnose",
         help="""diagnose 
             list of space separated arguments :
                 **rejected** : will print on STDERR rejected parsed line,
                 **match** : will print on stderr data filtered out
-        
         """,
         default="",
         nargs='+',
-        
     )
-        
+
     parser.add_argument("-i",
         "--include",
         help="""include from extracted data with
@@ -334,11 +339,14 @@ Hence a usefull trick to merge your old stats with your new one
         for k, v in option.items():
             arg+=[ ("--%s" %k).replace("_","-") ]
             arg+=["%s" % v] 
-        arg+= _file
-        context=parser.parse_args(arg)
+        if _file : arg+=  _file 
+        if __file__ in sys.argv:
+            _from = index(__file__)
+            arg+=[sys.argv[_from+1:]]
+        context=parser.parse_args(arg )
     else:
         context=parser.parse_args()
-        
+
     context.skill=[]
 
     # loading if needed options as a json
@@ -361,7 +369,7 @@ Hence a usefull trick to merge your old stats with your new one
             context.log_pattern,
             re.VERBOSE
         )
-        
+
         if context.date_pattern:
             date_pattern[context.log_pattern_name]=context.date_pattern
 
@@ -389,7 +397,9 @@ Hence a usefull trick to merge your old stats with your new one
         csv.writer(context.output_file).writerows(mapping_row_iter(aggreg))
         ### py3/bpython nawak
         try:
-            context.output_file.close()
+            #I close file or .... I create bug when input is stdout/stderr
+            #context.output_file.close()
+            pass
         except:
             pass
 
@@ -408,7 +418,7 @@ Hence a usefull trick to merge your old stats with your new one
 
     if "user_agent" not in context.off:
         context.skill+= [ "user_agent" ]
-    
+
     context.help = parser.format_help()
     for k,v in context.__dict__.items():
         setattr(context,k,v)

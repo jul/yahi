@@ -64,6 +64,7 @@ class FuncTest(unittest.TestCase):
         context=notch('',config='yahi/test/config.json')
         print( '{"a" :1}' )
         context.output(dict(a=1))
+        print context.files
         self.assertEqual(
             shoot(context, lambda x: { 
                 'total' : 1, 

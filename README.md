@@ -13,7 +13,7 @@ Sort of grep dedicated for weblogs on steroids with strutured results.
     mkdir data
     wget -O- "http://www.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz" | zcat > data/GeoIP.dat
     
-sc Licenses checking
+Misc Licenses checking
 ======================
 
 * GeoIP http://www.maxmind.com/app/sitelicense OK
