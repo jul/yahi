@@ -24,6 +24,7 @@ Of course, this is the geoLite database, I don't include the data in the package
 since geoIP must be updated often to stay accurate. 
 
 Default path for geoIP is data/GeoIP.dat
+
 Use as a script
 ---------------
 

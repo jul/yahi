@@ -21,6 +21,7 @@ your target, and the parameters of your parsing (log_format...).
 Command line arguments vs notch arguments
 =========================================
 
+
 - first command lines arguments are parsed, and setup;
 - then the arguments of `notch` are parsed. 
 
@@ -30,12 +31,6 @@ Command line arguments vs notch arguments
 
 Context methods & attributes
 ============================
-
-Initially this code was written in pure map reduce unreadable style. 
-Then, I noticed that a `for lines in files` was quite faster. 
-
-Code was first a 100 lines script then it grew out of control.
-
 
 attribute: data_filter
 -----------------------
@@ -69,11 +64,11 @@ given back by notch.
 .. note::
     for each lines of each input file
         - use a regexp to transform the parsed line in a dict
-        - add to record datetime string in _datetime key
-        if geoIP in context.skill
-            add country to the record
-        if user_agent in context.skill
-            add os / dist / browser to the record based on the agent record 
+        - add to record datetime string in **_datetime** key
+        if **geoIP** in **context.skill**
+            add *_country* to the record bades on *ip*
+        if **user_agent** in **context.skill**
+            add *_dist_name*, *_browser_version*, *_browser_version* on *agent* 
         if not filtered out by context.data_filter
             add actual transformed record to the previous one
 
@@ -94,8 +89,7 @@ First since we use named capture in our log regexps, we directly transform
 a log in a dict. You can give the name you want for your capture except for
 3 special things: 
 
-- *datetime* is required, because logs **always** have a datetime associated
-with each record;
+- *datetime* is required, because logs **always** have a datetime associated with each record;
 - *agent* is required if you want to use **httpagentparser**;
 - *ip* is required if you want to use **geoIP**
 

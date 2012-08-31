@@ -39,7 +39,7 @@ Shoot has 2 inputs:
 - a context (setup by notch);
 - an extractor;
 
-Ad extractor is a function extracting and transforming datas, and since I love
+An extractor is a function extracting and transforming datas, and since I love
 short circuits, that may contain some on the fly filtering :) 
 
 Total hits in a log matching the conditions from notch
@@ -110,3 +110,4 @@ in your company reaching an authentified realm out of the working hours::
 
 .. warning::
    data_filter will override any include/exclude rules given in notch
+   
