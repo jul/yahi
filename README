@@ -10,7 +10,7 @@ Versatile log parser (providing default extractors for apache/lighttpd)
 Command line usage
 ------------------
 
-Example of data parsed with yahi: http://wwstat.julbox.fr/
+Example of data parsed with yahi: http://wwwstat.julbox.fr/
 
 Simplest usage is::
     
