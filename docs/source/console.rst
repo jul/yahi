@@ -70,6 +70,20 @@ Example::
 
 Hankyu is a dict supporting addition.
 
+Grouping hits per country code
+------------------------------
+
+
+Example::
+    >>> from archery import Hankyu as _dict
+    >>> shoot( 
+    ... context,
+    ... lambda data: _dict({ data["_country"]: 1 })
+    ... )
+
+ToxicSet is a set that maps add to union.
+
+
 Distinct IP
 -----------
 
@@ -95,6 +109,14 @@ example::
     ...     date_formater(data["_datetime"]) : 1 
     ... }))
 
+
+Parallelizing request
+---------------------
+
+You can now parallize all your requests by adding one key in the aggregator
+dict. 
+
+Just beware of the memory consumption. 
 
 Custom filtering
 ================

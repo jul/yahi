@@ -22,11 +22,15 @@ Contents:
 What's new?
 ===========
 
+0.1.1
+-----
+
+* bad url for the demo  
+
 0.1.0
 -----
 
 * it is NEW, seen on TV, and is guaranteed to make you tenfolds more desirable. 
-
 
 
 Indices and tables

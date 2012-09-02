@@ -42,7 +42,6 @@ context=notch(
 #May 20 12:14:15 lupin sshd[36291]: Invalid user dave from 69.60.114.57
 
 date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
-##### OKAY, now we can do the job ########################################## 
 res= shoot(
         context,
         lambda data: _dict({
