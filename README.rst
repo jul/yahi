@@ -17,7 +17,7 @@ Simplest usage is::
     speed_shoot -g /usr/local/data/geoIP /var/www/apache/access*log
 
 
-it will yield a json in the form::
+it will return a json in the form::
     
     {
         "by_date": {
