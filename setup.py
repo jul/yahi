@@ -22,7 +22,7 @@ if "sdist" in sys.argv or "bdist_egg" in sys.argv:
 
 setup(
         name='yahi',
-        version='0.1.1',
+        version='0.1.2',
         author='Julien Tayon',
         author_email='julien@tayon.net',
         packages=['yahi'],
