@@ -1,13 +1,8 @@
 language: python
 python:
-# 2.5 is for centos and the old cranky people 
-#  - "2.5"
-  - "2.6"
   - "2.7"
+  - "3.5"
   - "3.6"
-  - "3.7"
-# I will troubleshoot this one later
-#  - "3.3"
 #install: "pip install -r requirements.txt --use-mirrors"
 #install:
 install:
