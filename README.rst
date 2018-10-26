@@ -4,13 +4,11 @@
 - ticketting: https://github.com/jul/yahi/issues
 
 
-Versatile log parser (providing default extractors for apache/lighttpd)
-=======================================================================
+Versatile log parser (providing default extractors for apache/lighttpd/varnish)
+===============================================================================
 
 Command line usage
 ------------------
-
-Example of data parsed with yahi: http://wwwstat.julbox.fr/
 
 Simplest usage is::
     
@@ -128,7 +126,8 @@ Your result is::
 
 Well I guess, it does not work because you first need to fetch geoIP data file::
 
-    wget -O- "http://www.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz" | zcat > /usr/local/data/GeoIP.dat
+    mkdir data
+    wget -O- "http://www.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz" | zcat > data/GeoIP.dat
 
 Of course, this is the geoLite database, I don't include the data in the package
 since geoIP must be updated often to stay accurate. 
@@ -192,4 +191,11 @@ Recommanded usage
 - for one shot metrics I recommend an interactive console (bpython or ipython);
 - for specific metrics or elaborate filters I recommand using the API. 
 
+CHANGELOG
+=========
+
+0.1.3
+-----
+
+Adding varnish incomplete regexp for log parsing (I miss 2 fields)
 

@@ -1,0 +1,1 @@
+example.com 10.215.199.253 - - [16/Oct/2018:06:25:26 +0200] "GET /api/1.0/stations/50011860/nextbus?direction=forward HTTP/1.1" 200 1053 "-" "okhttp/3.9.1" "miss" "https"

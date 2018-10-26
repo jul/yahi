@@ -1,0 +1,8 @@
+{ "exclude" : { 
+    "uri"  : ".*munin.*", 
+    "referer" : ".*(munin|php).*" 
+  },
+  "log_format" : "varnish",
+  "silent" : "False",
+  "files" : [ "yahi/test/varnish.sample.log" ]
+}

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: "utf-8" -*-
 
-#from distutils.command.build_py import build_py as _build_py
-#from distutils.core import setup
 from setuptools import setup, find_packages
 import unittest
 import sys
@@ -20,9 +18,11 @@ if "sdist" in sys.argv or "bdist_egg" in sys.argv:
  
     test()
 
+long_description = open("README.rst").read()
+
 setup(
         name='yahi',
-        version='0.1.2',
+        version='0.1.4',
         author='Julien Tayon',
         author_email='julien@tayon.net',
         packages=['yahi'],
@@ -32,9 +32,8 @@ setup(
         scripts=["speed_shoot"],
         license=open('LICENSE.txt').read(),
         description='Versatile parallel log parser',
+        long_description=long_description, 
         classifiers=[
-          'Development Status :: 4 - Beta',
-          'Intended Audience :: Developers',
           'License :: OSI Approved :: Python Software Foundation License',
           'Operating System :: MacOS :: MacOS X',
           'Operating System :: Microsoft :: Windows',

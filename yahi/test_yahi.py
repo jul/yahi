@@ -1,5 +1,6 @@
 #/usr/bin/env python
 import os
+from os.path import join
 import sys
 
 import unittest
@@ -9,6 +10,7 @@ from archery.bow import Hankyu as dict
 class FuncTest(unittest.TestCase):
     def setUp(self):
         self.context=notch("",silent=False)
+        self.here = os.path.dirname(os.path.realpath(__file__))
 
     def test_default(self):
         del(self.context.__dict__["help"])
@@ -37,9 +39,9 @@ class FuncTest(unittest.TestCase):
 
     def test_parse(self):
         context=notch(
-            'yahi/test/biggersample.log', 
-            'yahi/test/biggersample.log',
-            include="yahi/test/include.json",
+            join(self.here, 'test/biggersample.log'), 
+            join(self.here, 'test/biggersample.log'),
+            include=join(self.here,"test/include.json"),
             silent=True, 
             exclude='{ "_country" : "US"}', 
             output_format="csv"
@@ -57,10 +59,9 @@ class FuncTest(unittest.TestCase):
                 {'rfc1918': 844, 'hour9': 0, 'total': 864, 'from_gb': 4, 'hour10': 0},
         )
         self.assertEqual(len(context.log["warning"]),2136)
-        context.output({"a":{"b" :1 }})
 
     def test_loadconfig(self):
-        context=notch('',config='yahi/test/config.json')
+        context=notch('',config=join(self.here,'test/config.json'))
         context.output(dict(a=1))
         self.assertEqual(
             shoot(context, lambda x: { 
@@ -73,4 +74,29 @@ class FuncTest(unittest.TestCase):
                 {'rfc1918': 0, 'hour9': 0, 'total': 10, 'from_gb': 2}
         )
         self.assertEqual(context.log, { "error": [], "warning" : [] })
+
+    def test_varnish_log(self):
+        context=notch('', config=join(self.here,'test/config.varnish.json'))
+        res= shoot(context, lambda x: {
+            "total" : 1,
+            "rfc1918" : x["ip"].startswith('10.'),
+            'status_by_uri' : {
+                x["uri"].split("?")[1] : { x["cache_status"] :1 
+                }
+            }, 
+            "hour%d" % x["_datetime"].hour: 1}
+        )
+
+        self.assertEqual(res,
+            {
+                'total': 1, 
+                'rfc1918': True, 
+                'status_by_uri': {
+                    'direction=forward': {
+                        'miss': 1
+                }}, 
+                'hour6': 1
+            }
+        )
+        
 

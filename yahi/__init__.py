@@ -1,11 +1,20 @@
 #i!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import sys
+from warnings import warn
 from os import path
 import re
 from datetime import datetime
-import pygeoip
-import httpagentparser
+try:
+    import pygeoip
+except ModuleNotFoundError:
+    warn("pygeoip required for full feartures" ,ImportWarning)
+try:
+    import httpagentparser
+except ModuleNotFoundError:
+    warn("httpagentparser required for full features", ImportWarning)
+
 import fileinput
 import csv
 from json import load, loads, dump, dumps
@@ -154,7 +163,6 @@ def shoot( context, group_by,):
                     data.update(
                         parse_user_agent(data["agent"])
                     )
-                ##print "<%s>" % data["user"]
                 if context.data_filter and not context.data_filter(data):
                     if "rejected" in context.diagnose:
                         if context.silent:
