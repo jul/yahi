@@ -1,39 +1,45 @@
 {% extends "base.html" %}
 {% block title %}Charts &amp; Histograms {% endblock %} 
 {% block head %}
-    
     <script language="javascript" type="text/javascript" 
     src="{{url_for('static',filename="data.js")}}"></script>
-    <script language="javascript" type="text/javascript" 
-    src="{{url_for('static',filename="js/jquery.js")}}"></script>
+    
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
 
-        <script language="javascript" type="text/javascript" 
-    src="{{url_for('static',filename="js/jquery.flot.js")}}"></script>
-        <script language="javascript" type="text/javascript" 
-    src="{{url_for('static',filename="js/jquery.flot.pie.js")}}"></script>
-
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.canvaswrapper.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.colorhelpers.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.saturated.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.browser.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.drawSeries.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.uiConstants.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.time.js")}}></script>
 <script>
-        function _values(arr) { 
+// set the dimensions and margins of the graph
+        function _values(arr) {
             var arrr=[];
             $.each( arr, function(k,v) { arrr.push( v )});
             return arrr;
-            
+
         }
 function get_data(category, for_pie) {
     var here_data=[];
         var top_ten=0;
         sortme=function(){};
-        
+
         sorted = _values(data[category]).sort(function(a,b) { return(  a - b) }).reverse();
         top_ten = _values(data[category]).length > 10 ? sorted[10] : 0;
-        $.each( data[category], function(key,value) { 
-            if( value > top_ten ){ 
-                here_data.push( { "label" : key.slice(0,40) + ( key.length > 40 ? "..." : "" )    + "(" + value  + ")" , "data" : 1 * value } ); 
+        $.each( data[category], function(key,value) {
+            if( value > top_ten ){
+                here_data.push( { "label" : key.slice(0,40) + ( key.length > 40 ? "..." : "" )    + "(" + value  + ")" , "data" : 1 * value } );
             }
         });
         return( here_data);
         };
-$(document).ready(function() { 
+$(document).ready(function() {
 
 
 if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.platform == 'iPod') {
@@ -52,7 +58,7 @@ if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.p
         update_for("by_status");
         return false;
     });
-    function update_for(category){ 
+    function update_for(category){
 
         want_pie = $('#wp').val();
         var serie=get_data(category,want_pie==true);
@@ -69,31 +75,32 @@ if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.p
         };
 
         var opt={};
-        if( want_pie==true){ 
-            opt ={  
-                'series' : 
-                    { 'pie' : {  'show' : true } }, 
+        if( want_pie==true){
+            opt ={
+                'series' :
+                    { 'pie' : {  'show' : true },"label" : { "show" : true } },
                 'legend': { 'show' : true }
             }
         }  else {
-            opt= { 
+            opt= {
                 "legend" : { 'position' : "ne"} ,
-                "series" :{  
-                    "bars" : { "show" : true },  
+                "series" :{
+                    "bars" : { "show" : true },
                     "label" : { "show" : true }
             } }
         }
         $.plot("#plot",serie,opt);
     }
-    $(".selector").click(function() { 
+    $(".selector").click(function() {
        update_for( ($(this).attr("href")));
        $("#ctitle").text( $(this).text());
-        
+
        return false;
     });
     update_for("by_status");
 });
 </script>
+
 {% endblock %}
 
 
@@ -103,10 +110,10 @@ if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.p
 
 {% block content %}
 <div id=plotbox class="centered" >
-<h2>Top ten web requests <span id=ctitle > by status</span></h2>
+    <h2>Top ten web requests <span id=ctitle > by status</span></h2>
     <div id=plot class=centered ></div>
-    </div>
-    </div>
+</div>
+
 
 {% endblock %}
 {% block footer %}

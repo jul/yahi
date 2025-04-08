@@ -5,13 +5,16 @@ Frequentation by country
 {% block head %}
     <script language="javascript" type="text/javascript" 
     src="{{url_for('static',filename="data.js")}}"></script>
-    <script language="javascript" type="text/javascript" 
-    src="{{url_for('static',filename="js/jquery.js")}}"></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.canvaswrapper.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.colorhelpers.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.saturated.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.browser.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.drawSeries.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.uiConstants.js")}}></script>
+	<script language="javascript" type="text/javascript" src={{url_for('static',filename="js/jquery.flot.time.js")}}></script>
 
-        <script language="javascript" type="text/javascript" 
-    src="{{url_for('static',filename="js/jquery.flot.js")}}"></script>
-        <script language="javascript" type="text/javascript" 
-    src="{{url_for('static',filename="js/jquery.flot.pie.js")}}"></script>
 
 <script>
         function obj_to_arr(an_obj, js_ts_conv) { 
