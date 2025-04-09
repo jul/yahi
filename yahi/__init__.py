@@ -154,8 +154,14 @@ def shoot( context, group_by,):
                 
             if match:
                 data = match.groupdict()
-                if data.get("datetime"):
-                    data['_datetime']=dt_format(data["datetime"])
+                if dt := dt_format(data.get("datetime")):
+                    data['_datetime']=dt
+                    data['_hour'] = dt.hour
+                    data['_month'] = dt.hour
+                    data['_date'] = dt.date()
+
+
+                    
 
                 if 'geo_ip' in context.skill:
                     data.update( {"_country":country_by_ip(data["ip"])})
@@ -190,7 +196,7 @@ def shoot( context, group_by,):
             sys.stderr.write("ARRG:at %s:%s\n" % ( 
                 _input.lineno(),_input.filename()) )
             sys.stderr.write("CONTEXT:match %s:data : %s\n" % (
-                match and match.groupdict() or "no_match",data))
+                match and match.groupdict() or "no_match",dumps(data, indent=4, default=repr)))
             raise Exception(e)
     finally:
         ## causes a problem with stdin/stderr

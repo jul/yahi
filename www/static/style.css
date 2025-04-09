@@ -18,12 +18,11 @@ body         { font-family: 'Georgia', serif; font-size: 17px; color: #000; }
     margin:auto;
     text-align:center;
     }
-#plot     { 
+#plot   { 
+    
     max-width:900px;
     background:#f0f0fF;
     min-height:300px;
-    max-height:650px;
-    height:560px;
    margin-bottom:7em;
 
     }

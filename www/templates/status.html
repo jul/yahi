@@ -21,79 +21,22 @@ function _values(arr) {
     return arrr;
 
 }
-function get_data(category, for_pie) {
-    var here_data=[];
-    var top_ten=0;
-    sortme=function(){};
-
-
-    sorted = _values(data[category]).sort(function(a,b) { return(  a - b) }).reverse();
-    top_ten = _values(data[category]).length > 10 ? sorted[10] : 0;
-    $.each( data[category], function(key,value) {
-        if( value > top_ten ){
-            here_data.push( { "label" : key.slice(0,40) + ( key.length > 40 ? "..." : "" )    + "(" + value  + ")" , "data" : 1 * value } );
-        }
-    });
-    return( here_data);
-};
 
 $(document).ready(function() {
     if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.platform == 'iPod') {
          $(".footer").css("position", "static");
     };
+    $.each(_keys(data), (i,e) => {
+        $('#menu_down').append("<li><a class=selector href=#" + e + " >" + e + "</a></li>")
+    })
 
-    $('#pie').click( function() {
-        $('#wp').val(1);
-        $('#ctitle').text("by_status");
-        update_for("by_status");
-        return false;
-    });
-    $('#nopie').click( function(){
-        $('#wp').val(false);
-        $('#ctitle').text("by_status");
-        update_for("by_status");
-        return false;
-
-    });
     function update_for(category){
-        want_pie = $('#wp').val();
-        history.pushState('data to be passed', category, "{{url_for('static',filename='by_status/')}}" + category);
-        var serie=get_data(category,want_pie==true);
-        serie=serie.sort(function(a, b) {
-            a = a['data'];
-            b = b['data'];
-            return a < b ? -1 : (a > b ? 1 : 0);
-        }).reverse();
-        i=0;
-        if( want_pie != true){
-            for( k in serie){
-                serie[k]["data"]= [ [i++,serie[k]["data"]]] ;
-            };
-        };
-
-        var opt={};
-        if( want_pie==true){
-            opt ={
-                'series' :
-                    { 'pie' : {  'show' : true },"label" : { "show" : true } },
-                'legend': { 'show' : true }
-
-            }
-        }  else {
-            opt= {
-                "legend" : { 'position' : "ne"} ,
-                "series" :{
-                    "bars" : { "show" : true },
-                    "label" : { "show" : true }
-                } 
-            }
-        }
-
+        history.pushState('data to be passed', category, "{{url_for('status')}}" + "#" + category);
 
         // set the dimensions and margins of the graph
-        const margin = {top: 30, right: 30, bottom: 70, left: 60},
+        const margin = {top: 30, right: 30, bottom: 170, left: 60},
             width = 460 - margin.left - margin.right,
-            height = 400 - margin.top - margin.bottom;
+            height = 500 - margin.top - margin.bottom;
 
         // append the svg object to the body of the page
         $("#plot > svg").remove()
@@ -127,8 +70,9 @@ $(document).ready(function() {
             .style("text-anchor", "end");
 
         // Add Y axis
+        maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
         const y = d3.scaleLinear()
-          .domain([0, 2000])
+          .domain([0, maxou])
           .range([ height, 0]);
         svg.append("g")
           .call(d3.axisLeft(y));
@@ -148,12 +92,13 @@ $(document).ready(function() {
 
 
     $(".selector").click(function() {
-       update_for( ($(this).attr("href")));
+       update_for( ($(this).attr("href")).substring(1) );
+       console.log($(this).attr("href"))
        $("#ctitle").text( $(this).text());
 
        return false;
     });
-    update_for("by_status");
+    $(".selector")[0].click()
 
 });
 </script>
@@ -175,18 +120,8 @@ $(document).ready(function() {
 {% endblock %}
 {% block footer %}
 <div style="height:1px"></div>
-<ul class=horizontal>
+<ul class=horizontal id=menu_down>
 <li><em>Charts Availables (Top ten) </em> </li>
-<li ><a class=selector href=by_status>by status</a></li>
-<li ><a class=selector href=by_hour>by hour</a></li>
-<li ><a class=selector href=by_browser >by browser</a></li>
-<li ><a class=selector href=by_os >by os</a></li>
-<li ><a class=selector href=by_country >by country</a></li>
-<li ><a class=selector href=by_url >by url</a></li>
-<li ><a class=selector href=by_agent >by agent</a></li>
-<li ><a class=selector href=by_date >by date</a></li>
-<li ><a class=selector href=by_referer >by referer</a></li>
-<li ><a class=selector href=bytes_by_ip >bandwidth</a></li>
 
 </ul>
 {% endblock %}
