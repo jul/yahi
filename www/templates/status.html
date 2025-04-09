@@ -27,7 +27,8 @@ $(document).ready(function() {
          $(".footer").css("position", "static");
     };
     $.each(_keys(data), (i,e) => {
-        $('#menu_down').append("<li><a class=selector href=#" + e + " >" + e + "</a></li>")
+        if ( e.substring(0,3) == "by_" )
+            $('#menu_down').append("<li><a class=selector href=#" + e + " >" + e + "</a></li>")
     })
 
     function update_for(category){
