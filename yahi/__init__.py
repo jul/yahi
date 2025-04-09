@@ -97,7 +97,6 @@ def normalize_user_agent(user_agent):
     subkey in ["name", "version" ]
     """
     flat=dict()
-    sys.stderr.write(dumps(httpagentparser.detect(user_agent),indent=4))
     _user_agent = {
         'platform': {'name': "unknown", "version": 'unknown'},
         'browser': {'name': "unknown", "version": 'unknown'},
@@ -111,7 +110,6 @@ def normalize_user_agent(user_agent):
         for sub_key,v in _user_agent[k].items():
             flat.update({ "_" + "_".join([ k, sub_key]) :v}) 
 
-    sys.stderr.write(dumps(flat,indent=4))
     return flat
     
 def shoot( context, group_by,):
