@@ -1,4 +1,4 @@
-#i!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import sys
@@ -93,20 +93,25 @@ def normalize_user_agent(user_agent):
     """
     set default value for useragent and
     flatten httpuseragentparser result, in the form ua_%(key)s_%(subkey)s
-    key in ["os", "browser", "dist" ]
+    key in ["platform", "browser", "dist" ]
     subkey in ["name", "version" ]
     """
     flat=dict()
-    user_agent = {
-        'os': {'name': "unknown", "version": 'unknown'},
+    sys.stderr.write(dumps(httpagentparser.detect(user_agent),indent=4))
+    _user_agent = {
+        'platform': {'name': "unknown", "version": 'unknown'},
         'browser': {'name': "unknown", "version": 'unknown'},
         'dist': {'name': "unknown", "version": 'unknown'},
+       
         }
-    user_agent.update( httpagentparser.detect(user_agent))
+    _user_agent.update( httpagentparser.detect(user_agent))
     flat=dict()
-    for k in user_agent:
-        for sub_key,v in user_agent[k].items():
+    for k in _user_agent:
+        if k == "bot": continue
+        for sub_key,v in _user_agent[k].items():
             flat.update({ "_" + "_".join([ k, sub_key]) :v}) 
+
+    sys.stderr.write(dumps(flat,indent=4))
     return flat
     
 def shoot( context, group_by,):
@@ -138,6 +143,7 @@ def shoot( context, group_by,):
     match = None
     dt_format = dt_formater_from_format(date_pattern[context.log_format])
     parse_user_agent = lru_cache(context.cache_size)(normalize_user_agent)
+
     if "geo_ip" in context.skill:
         from pygeoip import GeoIP
         gi = GeoIP(context.geoip)
