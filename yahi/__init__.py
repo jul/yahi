@@ -28,7 +28,6 @@ import locale
 locale.setlocale(locale.LC_ALL,"C")
 
 
-
 class ToxicSet(Copier,set):
     """a set for wich add is a shortcut for union
     this way, I can now select all the distinct stuffs
@@ -143,7 +142,7 @@ def shoot( context, group_by,):
         from pygeoip import GeoIP
         gi = GeoIP(context.geoip)
         country_by_ip = lru_cache(context.cache_size)(gi.country_code_by_addr)
-    _input = fileinput.input(context.files)
+    _input = fileinput.input(context.files, openhook=fileinput.hook_compressed)
     if not context.silent:
         sys.stderr.write("parsing:\n %s\n" % "\n-" . join(context.files))
     try:
