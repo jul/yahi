@@ -4,9 +4,8 @@ Frequentation by country
 {% endblock %}
 {% block head %}
     <script language="javascript" type="text/javascript" 
-    src="{{url_for('static',filename="data.js")}}"></script>
     <script src="https://d3js.org/d3.v6.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
 
 
@@ -24,94 +23,100 @@ function _values(arr) {
 
 }
 
-$(document).ready(function() { 
-    if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.platform == 'iPod') {
-         $(".footer").css("position", "static");
-    };
-    $.each(_keys(data), (i,e) => {
-        if (e.substring(0,4) == "date" || e.substring(0,4) == "hour") {
-            console.log("yarta")
-            $('#menu_down').append("<li><a class=selector href=#" + e + " >" + e + "</a></li>")
-        }
-    })
-
-    function update_for(category){
-        history.pushState('data to be passed', category, "{{url_for('time')}}" + "#" + category);
-
-const margin = {top: 30, right: 30, bottom: 170, left: 60},
-            width = 460 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
-
-
-        $("#plot > svg").remove()
-        const svg = d3.select("#plot")
-          .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
-
-
-        serie = data[category]
-        serie = _keys(serie).map((e,i) => [ e, serie[e] ])
-        serie=serie.sort(function(a, b) {
-            a = a[0];
-            b = b[0];
-            return a < b ? -1 : (a > b ? 1 : 0);
+$.ajax({
+    dataType: "json",
+    url:"{{url_for('static',filename="data.js")}}", 
+    success: (data) => {
+    $(document).ready(function() { 
+        if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.platform == 'iPod') {
+             $(".footer").css("position", "static");
+        };
+        $.each(_keys(data), (i,e) => {
+            if (e.substring(0,4) == "date" || e.substring(0,4) == "hour") {
+                console.log("yarta")
+                $('#menu_down').append("<li><a class=selector href=#" + e + " >" + e + "</a></li>")
+            }
         })
-        console.log(serie)
-        k = serie.map(d => d[0])
-        // X axis
-        console.log(k)
-        console.log(k.length)
-        step=Math.floor(k.length / 10)
-        tval = []
-        for (i=0;i<k.length;i+=step ) {
-            tval.push(k[i])
-            console.log(i)
-            console.log(k[i])
+
+        function update_for(category){
+            history.pushState('data to be passed', category, "{{url_for('time')}}" + "#" + category);
+
+    const margin = {top: 30, right: 30, bottom: 170, left: 60},
+                width = 460 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
+
+
+            $("#plot > svg").remove()
+            const svg = d3.select("#plot")
+              .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+
+            serie = data[category]
+            serie = _keys(serie).map((e,i) => [ e, serie[e] ])
+            serie=serie.sort(function(a, b) {
+                a = a[0];
+                b = b[0];
+                return a < b ? -1 : (a > b ? 1 : 0);
+            })
+            console.log(serie)
+            k = serie.map(d => d[0])
+            // X axis
+            console.log(k)
+            console.log(k.length)
+            step=Math.floor(k.length / 10)
+            tval = []
+            for (i=0;i<k.length;i+=step ) {
+                tval.push(k[i])
+                console.log(i)
+                console.log(k[i])
+            }
+            console.log(tval)
+            const x = d3.scaleBand()
+              .range([ 0, width ])
+              .domain(tval)
+              .padding(0.2)
+            svg.append("g")
+              .attr("transform", `translate(0, ${height})`)
+              .call(d3.axisBottom(x))
+              .selectAll("text")
+                .attr("transform", "translate(-10,0)rotate(-45)")
+                .style("text-anchor", "end")
+
+            // Add Y axis
+            maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
+            const y = d3.scaleLinear()
+              .domain([0, maxou])
+              .range([ height, 0]);
+            svg.append("g")
+              .call(d3.axisLeft(y));
+
+            // Bars
+
+            console.log(serie)
+            svg.selectAll("mybar")
+              .data(serie)
+              .join("rect")
+                .attr("x", d => x( d[0] ))
+                .attr("y", d => y(d[1]))
+                .attr("width", x.bandwidth())
+                .attr("height", d => 1 * ( height - y(d[1])))
+                .attr("fill", "#46A")
         }
-        console.log(tval)
-        const x = d3.scaleBand()
-          .range([ 0, width ])
-          .domain(tval)
-          .padding(0.2)
-        svg.append("g")
-          .attr("transform", `translate(0, ${height})`)
-          .call(d3.axisBottom(x))
-          .selectAll("text")
-            .attr("transform", "translate(-10,0)rotate(-45)")
-            .style("text-anchor", "end")
+        $(".selector").click(function() {
+           update_for( ($(this).attr("href")).substring(1) );
+           console.log($(this).attr("href"))
+           $("#ctitle").text( $(this).text());
 
-        // Add Y axis
-        maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
-        const y = d3.scaleLinear()
-          .domain([0, maxou])
-          .range([ height, 0]);
-        svg.append("g")
-          .call(d3.axisLeft(y));
-
-        // Bars
-
-        console.log(serie)
-        svg.selectAll("mybar")
-          .data(serie)
-          .join("rect")
-            .attr("x", d => x( d[0] ))
-            .attr("y", d => y(d[1]))
-            .attr("width", x.bandwidth())
-            .attr("height", d => 1 * ( height - y(d[1])))
-            .attr("fill", "#46A")
-    }
-    $(".selector").click(function() {
-       update_for( ($(this).attr("href")).substring(1) );
-       console.log($(this).attr("href"))
-       $("#ctitle").text( $(this).text());
-
-       return false;
-    });
-    $(".selector")[0].click()
+           return false;
+        });
+        $(".selector")[0].click()
     })
+}
+})
 
 </script>
 {% endblock %}

@@ -2,10 +2,9 @@
 {% block title %}Charts &amp; Histograms {% endblock %} 
 {% block head %}
     <script language="javascript" type="text/javascript" 
-    src="{{url_for('static',filename="data.js")}}"></script>
     
     <script src="https://d3js.org/d3.v6.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
 <script>
 // set the dimensions and margins of the graph
@@ -21,87 +20,101 @@ function _values(arr) {
     return arrr;
 
 }
+$.ajax({
+    dataType: "json",
+    url:"{{url_for('static',filename="data.js")}}", 
+    success: (data) => {
+        $(document).ready(function() {
 
-$(document).ready(function() {
-    if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.platform == 'iPod') {
-         $(".footer").css("position", "static");
-    };
-    $.each(_keys(data), (i,e) => {
-        if ( e.substring(0,3) == "by_" )
-            $('#menu_down').append("<li><a class=selector href=#" + e + " >" + e + "</a></li>")
-    })
+    /*$.ajax({
+      dataType: "json",
+      url: "{{url_for('static',filename="data.js")}}",
+      data: data,
+      success: (e) => console.log(e) 
+    });*/
+            if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.platform == 'iPod') {
+                 $(".footer").css("position", "static");
+            };
+            $.each(_keys(data), (i,e) => {
+                if ( e.substring(0,3) == "by_" )
+                    $('#menu_down').append("<li><a class=selector href=#" + e + " >" + e + "</a></li>")
+            })
 
-    function update_for(category){
-        history.pushState('data to be passed', category, "{{url_for('status')}}" + "#" + category);
+            function update_for(category){
+                history.pushState('data to be passed', category, "{{url_for('status')}}" + "#" + category);
 
-        // set the dimensions and margins of the graph
-        const margin = {top: 30, right: 30, bottom: 170, left: 60},
-            width = 460 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
+                // set the dimensions and margins of the graph
+                const margin = {top: 30, right: 30, bottom: 170, left: 160},
+                    width = 1000 - margin.left - margin.right,
 
-        // append the svg object to the body of the page
-        $("#plot > svg").remove()
-        const svg = d3.select("#plot")
-          .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
+                    height = 500 - margin.top - margin.bottom;
+
+                // append the svg object to the body of the page
+                $("#plot > svg").remove()
+                const svg = d3.select("#plot")
+                  .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
 
 
-        serie = data[category]
-        serie = _keys(serie).map((e,i) => [ e, serie[e] ])
-        serie=serie.sort(function(a, b) {
-            a = a[1];
-            b = b[1];
-            return a < b ? -1 : (a > b ? 1 : 0);
-        }).reverse().slice(0,10);
-        console.log(serie)
-        console.log(serie.map(d => d[0]))
-        // X axis
-        const x = d3.scaleBand()
-          .range([ 0, width ])
-          .domain(serie.map( (e) => ""+ e[0]))
-          .padding(0.2);
-        svg.append("g")
-          .attr("transform", `translate(0, ${height})`)
-          .call(d3.axisBottom(x))
-          .selectAll("text")
-            .attr("transform", "translate(-10,0)rotate(-45)")
-            .style("text-anchor", "end");
+                serie = data[category]
+                serie = _keys(serie).map((e,i) => [ e, serie[e] ])
+                serie=serie.sort(function(a, b) {
+                    a = a[1];
+                    b = b[1];
+                    return a < b ? -1 : (a > b ? 1 : 0);
+                }).reverse().slice(0,40);
+                console.log(serie)
+                console.log(serie.map(d => d[0]))
+                // X axis
+                const x = d3.scaleBand()
+                  .range([ 0, width ])
+                  .domain(serie.map( (e) => ""+ e[0]))
+                  .padding(0.2);
+                svg.append("g")
+                  .attr("transform", `translate(0, ${height})`)
+                  .call(d3.axisBottom(x))
+                  .selectAll("text")
+                    .attr("transform", "translate(-10,0)rotate(-45)")
+                    .style("text-anchor", "end");
 
-        // Add Y axis
-        maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
-        const y = d3.scaleLinear()
-          .domain([0, maxou])
-          .range([ height, 0]);
-        svg.append("g")
-          .call(d3.axisLeft(y));
+                // Add Y axis
+                maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
+                const y = d3.scaleLinear()
+                  .domain([0, maxou])
+                  .range([ height, 0]);
+                svg.append("g")
+                  .call(d3.axisLeft(y));
 
-        // Bars
+                // Bars
 
-        console.log(serie)
-        svg.selectAll("mybar")
-          .data(serie)
-          .join("rect")
-            .attr("x", d => x( d[0] ))
-            .attr("y", d => y(d[1]))
-            .attr("width", x.bandwidth())
-            .attr("height", d => 1 * ( height - y(d[1])))
-            .attr("fill", "#46A")
+                console.log(serie)
+                svg.selectAll("mybar")
+                  .data(serie)
+                  .join("rect")
+                    .attr("x", d => x( d[0] ))
+                    .attr("y", d => y(d[1]))
+                    .attr("width", x.bandwidth())
+                    .attr("height", d => 1 * ( height - y(d[1])))
+                    .attr("fill", "#46A")
+            }
+
+
+            $(".selector").click(function() {
+               update_for( ($(this).attr("href")).substring(1) );
+               console.log($(this).attr("href"))
+               $("#ctitle").text( $(this).text());
+
+               return false;
+            });
+            $(".selector")[0].click()
+
+        });
     }
-
-
-    $(".selector").click(function() {
-       update_for( ($(this).attr("href")).substring(1) );
-       console.log($(this).attr("href"))
-       $("#ctitle").text( $(this).text());
-
-       return false;
-    });
-    $(".selector")[0].click()
-
 });
+
 </script>
 
 {% endblock %}
@@ -110,8 +123,8 @@ $(document).ready(function() {
 
 {% block content %}
 <div id=plotbox class="centered" >
-    <h2>Top ten web requests <span id=ctitle > by status</span></h2>
     <div id=plot class=centered ></div>
+    <h2>Top web requests <span id=ctitle > by status</span></h2>
 </div>
 
 

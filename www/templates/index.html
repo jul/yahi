@@ -5,10 +5,14 @@ Frequentation by country
 {% endblock %}
 {% block head %}
 
-    <script type='text/javascript' src='./static/data.js' ></script>
     <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 <script type='text/javascript'>
-google.load('visualization', '1', {'packages' : ["geochart"]});
+$.ajax({
+    dataType: "json",
+    url:"{{url_for('static',filename="data.js")}}", 
+    success: (data) => {
+        google.load('visualization', '1', {'packages' : ["geochart"]});
         function fucking_google_callbak() {
         var items = [["Country","popularity"]];
         for( key in data["by_country"]){
@@ -20,7 +24,8 @@ google.load('visualization', '1', {'packages' : ["geochart"]});
             chart.draw(data2, {});
         };
         google.setOnLoadCallback( fucking_google_callbak);
-
+    }
+})
 </script>
 {% endblock %}
 

@@ -14,7 +14,7 @@ option = notch()
 ##### OKAY, now we can do the job ##########################################
 
 option.output_file.write(
-    "data=" + dumps(
+    dumps(
         shoot(
             option,
             lambda data : mdict({
@@ -32,7 +32,7 @@ option.output_file.write(
                 'by_ip': mdict({data['ip']: 1 }),
                 'by_status': mdict({data['status']: 1 }),
                 'by_url': mdict({data['uri']: 1}),
-                'by_agent': mdict({data['agent']: 1}),
+                'by_agent': mdict({data['agent'][:40] + "...": 1}),
                 'by_referer': mdict({data['referer']: 1}),
                 'ip_by_url': mdict({data['uri']: mdict( {data['ip']: 1 })}),
                 'bytes_by_ip': mdict({data['ip']: int(data['bytes'])}),

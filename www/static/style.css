@@ -10,17 +10,17 @@ a:visited, a { color:#46A}
 .horizontal li { display:inline; list-style-type: none; color:white; }
 .horizontal li a { margin-left:3px;margin-right:2px; padding: .7em; color:white;}
 .horizontal li a:hover { border:1px solid grey;margin:-1px;color:#46A; background: white;display: inline;  padding-right: 1em; }
-body         { font-family: 'Georgia', serif; font-size: 17px; color: #000; }
+body         { font-family: 'Georgia', serif; font-size: 100% ; color: #000; }
 #plotbox     { 
-    width:80%;
-    max-width:1000px;
+    width:95%;
+
     border:1px solid lightgrey;
     margin:auto;
     text-align:center;
     }
 #plot   { 
     
-    max-width:900px;
+    max-width:1900px;
     background:#f0f0fF;
     min-height:300px;
    margin-bottom:7em;
