@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <style>
+    .content { visibility: none }
+    </style>
+    <script>
+        $(document).ready(() => {
+            $(".router").each( (i,e) => {
+                var query = new URLSearchParams( e.attributes.href.value )
+                $(e).addClass("a" + query.get("route"))
+            })
+            $(".router").click( (e) => {
+                e.preventDefault()
+                var href=$(e.target)[0].attributes.href
+                history.pushState({}, null,  href.value)
+                var query = new URLSearchParams( href.value )
+                var route = query.get("route");
+                ({
+                    "route1": () => { $(".content").hide(); $("." + route).show() },
+                    "route2": () => { $(".content").hide(); $("." + route).show() },
+                })[route]()
+            })
+            var query = new URLSearchParams(window.location.search )
+            route = query.get("route")
+            if (route == undefined ) {
+                console.log("default route")
+                $(".aroute1").click()
+            } else {
+                $(".a" + route).click()
+            }
+            console.log("ready")
+        })
+</script>
+</head>
+<body>
+    <ul>
+        <li><a class="router" href=?route=route1>route1</a></li>
+        <li><a class="router" href=?route=route2>route2</a></li>
+    </ul>
+    <div class='content route1'>route 1</div>
+    <div class='content route2'>route 2</div>
+</body>
+</html>
+
