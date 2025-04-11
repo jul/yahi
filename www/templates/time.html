@@ -3,7 +3,6 @@
 Frequentation by country
 {% endblock %}
 {% block head %}
-    <script language="javascript" type="text/javascript" 
     <script src="https://d3js.org/d3.v6.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 
@@ -33,17 +32,16 @@ $.ajax({
         };
         $.each(_keys(data), (i,e) => {
             if (e.substring(0,4) == "date" || e.substring(0,4) == "hour") {
-                console.log("yarta")
                 $('#menu_down').append("<li><a class=selector href=#" + e + " >" + e + "</a></li>")
             }
         })
 
-        function update_for(category){
+        function update_for(category, is_top){
             history.pushState('data to be passed', category, "{{url_for('time')}}" + "#" + category);
 
     const margin = {top: 30, right: 30, bottom: 170, left: 60},
-                width = 460 - margin.left - margin.right,
-                height = 500 - margin.top - margin.bottom;
+                width = 1200 - margin.left - margin.right,
+                height = 550 - margin.top - margin.bottom;
 
 
             $("#plot > svg").remove()
@@ -62,7 +60,6 @@ $.ajax({
                 b = b[0];
                 return a < b ? -1 : (a > b ? 1 : 0);
             })
-            console.log(serie)
             k = serie.map(d => d[0])
             // X axis
             console.log(k)
@@ -71,10 +68,8 @@ $.ajax({
             tval = []
             for (i=0;i<k.length;i+=step ) {
                 tval.push(k[i])
-                console.log(i)
-                console.log(k[i])
             }
-            console.log(tval)
+            maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
             const x = d3.scaleBand()
               .range([ 0, width ])
               .domain(tval)
@@ -87,7 +82,6 @@ $.ajax({
                 .style("text-anchor", "end")
 
             // Add Y axis
-            maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
             const y = d3.scaleLinear()
               .domain([0, maxou])
               .range([ height, 0]);
@@ -108,7 +102,6 @@ $.ajax({
         }
         $(".selector").click(function() {
            update_for( ($(this).attr("href")).substring(1) );
-           console.log($(this).attr("href"))
            $("#ctitle").text( $(this).text());
 
            return false;
@@ -122,7 +115,7 @@ $.ajax({
 {% endblock %}
 
 {% block content %}
-<div id=plotbox class="centered" >
+<div id=plotbox class="centered top chrono" >
 <h2><span id=ctitle > </span></h2>
     <div id=plot class=centered ></div>
     </div>
@@ -130,7 +123,7 @@ $.ajax({
 
 {% endblock %}
 {% block footer %}
-<ul id=menu_down class=horizontal>
+<ul id=menu_down class="horizontal top">
 <li><em>Chronological series available  :</em> </li>
 
 </ul>

@@ -40,6 +40,7 @@ option.output_file.write(
                 'by_referer': mdict({data['referer']: 1}),
                 'ip_by_url': mdict({data['uri']: mdict( {data['ip']: 1 })}),
                 'bytes_by_ip': mdict({data['ip']: int(data['bytes'])}),
+                'transition' : mdict({ "%s__%s" % ( data['referer'], data['uri']) :1 }),
                 'total_line' : 1,
             }),
         ),

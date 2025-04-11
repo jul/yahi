@@ -19,6 +19,10 @@ def data():
     return redirect(url_for('static', filename="data.json"))
 
 
+@app.route("/histo/", methods=['GET'])
+def histo():
+    return render_template("histo.html")
+
 @app.route("/status/", methods=['GET'])
 def status():
     return render_template("status.html")

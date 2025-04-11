@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Charts &amp; Histograms {% endblock %} 
 {% block head %}
-    <script language="javascript" type="text/javascript" 
     
     <script src="https://d3js.org/d3.v6.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
@@ -25,14 +24,7 @@ $.ajax({
     url:"{{url_for('static',filename="data.js")}}", 
     success: (data) => {
         $(document).ready(function() {
-
-    /*$.ajax({
-      dataType: "json",
-      url: "{{url_for('static',filename="data.js")}}",
-      data: data,
-      success: (e) => console.log(e) 
-    });*/
-            if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' || navigator.platform == 'iPod') {
+            if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' ) {
                  $(".footer").css("position", "static");
             };
             $.each(_keys(data), (i,e) => {
@@ -47,7 +39,7 @@ $.ajax({
                 const margin = {top: 30, right: 30, bottom: 170, left: 160},
                     width = 1000 - margin.left - margin.right,
 
-                    height = 500 - margin.top - margin.bottom;
+                    height = 400 - margin.top - margin.bottom;
 
                 // append the svg object to the body of the page
                 $("#plot > svg").remove()
@@ -99,6 +91,7 @@ $.ajax({
                     .attr("width", x.bandwidth())
                     .attr("height", d => 1 * ( height - y(d[1])))
                     .attr("fill", "#46A")
+                    .attr("stroke", "#eef")
             }
 
 
@@ -123,8 +116,8 @@ $.ajax({
 
 {% block content %}
 <div id=plotbox class="centered" >
+    <h2>Top requests <span id=ctitle > by status</span></h2>
     <div id=plot class=centered ></div>
-    <h2>Top web requests <span id=ctitle > by status</span></h2>
 </div>
 
 
@@ -132,7 +125,7 @@ $.ajax({
 {% block footer %}
 <div style="height:1px"></div>
 <ul class=horizontal id=menu_down>
-<li><em>Charts Availables (Top ten) </em> </li>
+<li><em>Charts Availables</em> </li>
 
 </ul>
 {% endblock %}

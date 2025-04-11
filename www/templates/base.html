@@ -9,7 +9,7 @@
     {% endblock %}
 </head>
 <body>
-<div class=centered>
+<div class=centered style="width:100%" >
 <span style="line-height:1.4em">Built with 
 <a href=http://github.com/jul/yahi>yahi</a> 
 &amp; <a href=http://archery.readthedocs.org>archery</a>
@@ -18,10 +18,10 @@
         <a href=https://github.com/bmispelon/ >bmispelon</a></span>
 <ul class=horizontal >
 <li id=top ><em>Type of presentation:</em></li>
-<li><a href={{url_for("index")}} >geo chart</a><li>
-<li><a href={{url_for("status")}} >histograms</a></li>
-<li><a href={{url_for("time")}} >time series</a></li>
-<li><a href={{url_for("core")}} >raw data</a></li>
+<li><a class=router href=?route=geo >geo chart</a><li>
+<li><a class=router href=?route=top >histograms</a></li>
+<li><a class=router href=?route=chrono >time series</a></li>
+<li><a class=router href=?route=raw >raw data</a></li>
 {% block options %}
 {% endblock %}
 </ul>

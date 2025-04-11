@@ -98,6 +98,11 @@ $.ajax({
                     
                 })[route]()
             })
+            anchor = document.URL.match(/#[^\?]+/)
+            console.log(anchor)
+            if (anchor) 
+                $( anchor[0]).click()
+            console.log("ready")
             var query = new URLSearchParams(window.location.search )
             route = query.get("route")
             if (route == undefined ) {
@@ -106,11 +111,6 @@ $.ajax({
             } else {
                 $(".a" + route).click()
             }
-            anchor = document.URL.match(/#[^\?].*/)
-            if (anchor) 
-                $("#" + anchor).click()
-            console.log(anchor)
-            console.log("ready")
 
 
             function update_for(category, top){
