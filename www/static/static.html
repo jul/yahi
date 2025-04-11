@@ -72,31 +72,29 @@ $.ajax({
                 var route = query.get("route")
                 console.log("route:" + route);
                 ({
-                    "chrono": () => { $(".content").hide(); $("." + route).show() },
+                    "chrono": () => { $(".content").hide(); $("." + route).show();
+                    $(".selector",".chrono")[0].click()
+                    },
                     "top": () => { $(".content").hide(); $("." + route).show() 
                     console.log(href)
                     $(".selector",".top")[0].click()
-
                     },
                     "raw": () => { $(".content").hide(); $("." + route).show() 
-
-
                     },
                     "geo": () => { 
                           google.load('visualization', '1', {'packages' : ["geochart"]});
                           $(".content").hide(); $("." + route).show()
-        function fucking_google_callbak() {
-        var items = [["Country","popularity"]];
-        for( key in data["by_country"]){
-            val = data["by_country"][key] * 1 ;
-            items.push( [key, val ] )
-        };
-        data2 = google.visualization.arrayToDataTable(items);
-            var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
-            chart.draw(data2, {});
-        };
-        google.setOnLoadCallback( fucking_google_callbak);
-
+                            function fucking_google_callbak() {
+                            var items = [["Country","popularity"]];
+                            for( key in data["by_country"]){
+                                val = data["by_country"][key] * 1 ;
+                                items.push( [key, val ] )
+                            };
+                            data2 = google.visualization.arrayToDataTable(items);
+                                var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
+                                chart.draw(data2, {});
+                            };
+                            google.setOnLoadCallback( fucking_google_callbak);
                     }
                     
                 })[route]()
@@ -110,7 +108,8 @@ $.ajax({
             route = query.get("route")
             if (route == undefined ) {
                 console.log("default route")
-                $(".aroute1").click()
+                $(".ageo").click()
+
             } else {
                 $(".a" + route).click()
             }
