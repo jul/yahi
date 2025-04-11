@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}Charts &amp; Histograms {% endblock %} 
+{% block head %}
+    
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+        <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+
+
+<script>
+// set the dimensions and margins of the graph
+function _keys(arr) {
+    var arrr=[];
+    $.each( arr, function(k,v) { arrr.push( k )});
+    return arrr;
+
+}
+function _values(arr) {
+    var arrr=[];
+    $.each( arr, function(k,v) { arrr.push( v )});
+    return arrr;
+
+}
+$.ajax({
+    dataType: "json",
+    url:"{{url_for('static',filename="data.js")}}", 
+    success: (data) => {
+        $(document).ready(function() {
+            $(".raw").load("{{url_for('static', filename="data.js")}}")
+            if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' ) {
+                 $(".footer").css("position", "static");
+            };
+            $.each(_keys(data), (i,e) => {
+                if ( e.substring(0,3) == "by_" )
+                    $('#menu_down.top').append("<li><a id="+e+" class=selector href=#" + e + "?route=top >" + e + "</a></li>")
+                if ( e.substring(0,5) == "date_" ||  e.substring(0,5) == "hour_" )
+                    $('#menu_down.chrono').append("<li><a id="+e+" class=selector href=#" + e + "?route=chrono >" + e + "</a></li>")
+            })
+            $(".selector", ".top").click(function(e) {
+                e.preventDefault()
+                history.pushState({} ,"", $(this).attr("href"));
+               update_for( ($(this).attr("href")).substring(1).replace(/\?.*/,""), 40 );
+               console.log($(this).attr("href"))
+               $("#ctitle").text( $(this).text());
+
+               return false;
+            });
+            $(".selector", ".chrono").click(function(e) {
+
+                e.preventDefault()
+                history.pushState({}, "",$(this).attr("href")  );
+               update_for( ($(this).attr("href")).substring(1).replace(/\?.*/,"" ));
+
+               console.log("href:" + $(this).attr("href"))
+               $("#ctitle").text( $(this).text());
+
+               return false;
+            });
+            
+            $(".router").each( (i,e) => {
+                var query = new URLSearchParams( e.attributes.href.value )
+                $(e).addClass("a" + query.get("route"))
+            })
+            $(".router").click( (e) => {
+                e.preventDefault()
+                var href=$(e.target)[0].attributes.href
+                history.pushState({}, null,  href.value)
+                var query = new URLSearchParams( href.value )
+                var route = query.get("route")
+                console.log("route:" + route);
+                ({
+                    "chrono": () => { $(".content").hide(); $("." + route).show() },
+                    "top": () => { $(".content").hide(); $("." + route).show() 
+                    console.log(href)
+                    $(".selector",".top")[0].click()
+
+                    },
+                    "raw": () => { $(".content").hide(); $("." + route).show() 
+
+
+                    },
+                    "geo": () => { 
+                          google.load('visualization', '1', {'packages' : ["geochart"]});
+                          $(".content").hide(); $("." + route).show()
+        function fucking_google_callbak() {
+        var items = [["Country","popularity"]];
+        for( key in data["by_country"]){
+            val = data["by_country"][key] * 1 ;
+            items.push( [key, val ] )
+        };
+        data2 = google.visualization.arrayToDataTable(items);
+            var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
+            chart.draw(data2, {});
+        };
+        google.setOnLoadCallback( fucking_google_callbak);
+
+                    }
+                    
+                })[route]()
+            })
+            var query = new URLSearchParams(window.location.search )
+            route = query.get("route")
+            if (route == undefined ) {
+                console.log("default route")
+                $(".aroute1").click()
+            } else {
+                $(".a" + route).click()
+            }
+            anchor = document.URL.match(/#[^\?].*/)
+            if (anchor) 
+                $("#" + anchor).click()
+            console.log(anchor)
+            console.log("ready")
+
+
+            function update_for(category, top){
+
+                // set the dimensions and margins of the graph
+                const margin = {top: 30, right: 30, bottom: 170, left: 160},
+                    width = 1000 - margin.left - margin.right,
+
+                    height = 400 - margin.top - margin.bottom;
+
+                // append the svg object to the body of the page
+                $("#plot > svg").remove()
+                const svg = d3.select("#plot")
+                  .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+
+                serie = data[category]
+                serie = _keys(serie).map((e,i) => [ e, serie[e] ])
+                if (top) {
+                    serie=serie.sort(function(a, b) {
+                        a = a[1];
+                        b = b[1];
+                        return a < b ? -1 : (a > b ? 1 : 0);
+                    }).reverse().slice(0,top);
+                }
+                // X axis
+                const x = d3.scaleBand()
+                  .range([ 0, width ])
+                  .domain(serie.map( (e) => ""+ e[0]))
+                  .padding(0.2);
+                svg.append("g")
+                  .attr("transform", `translate(0, ${height})`)
+                  .call(d3.axisBottom(x))
+                  .selectAll("text")
+                    .attr("transform", "translate(-10,0)rotate(-45)")
+                    .style("text-anchor", "end");
+
+                // Add Y axis
+                maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
+                const y = d3.scaleLinear()
+                  .domain([0, maxou])
+                  .range([ height, 0]);
+                svg.append("g")
+                  .call(d3.axisLeft(y));
+
+                // Bars
+
+                console.log(serie)
+                svg.selectAll("mybar")
+                  .data(serie)
+                  .join("rect")
+                    .attr("x", d => x( d[0] ))
+                    .attr("y", d => y(d[1]))
+                    .attr("width", x.bandwidth())
+                    .attr("height", d => 1 * ( height - y(d[1])))
+                    .attr("fill", "#46A")
+                    .attr("stroke", "#eef")
+            }
+
+
+
+        });
+    }
+});
+
+</script>
+
+{% endblock %}
+
+
+
+{% block content %}
+  <div id="chart_div" class="centered content geo" style="left:7%;right:7%;position:absolute;width: 80%;top:5em;bottom:2em;border:1px solid lightgrey"></div>
+
+<div id="plotbox" class="content centered top chrono" >
+    <h2 class="content top">Top requests <span id=ctitle > by status</span></h2>
+    <h2 class="content chrono" >Chronologicial <span id=ctitle > by status</span></h2>
+    <div id=plot class=centered ></div>
+</div>
+<pre class="content raw" >
+</pre>
+
+{% endblock %}
+{% block footer %}
+
+<div style="height:1px"></div>
+<ul class="content top horizontal" id="menu_down" >
+    <li><em>Charts Availables</em> </li>
+</ul>
+<ul id=menu_down class="content horizontal chrono">
+    <li><em>Chronological series available  :</em> </li>
+</ul>
+
+{% endblock %}
+
