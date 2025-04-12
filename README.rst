@@ -127,12 +127,17 @@ Your result is::
 Well I guess, it does not work because you first need to fetch geoIP data file::
 
     mkdir data
-    wget -O- "http://www.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz" | zcat > data/GeoIP.dat
+    wget -O- https://mailfud.org/geoip-legacy/GeoIP.dat.gz | zcat > data/GeoIP.dat
 
 Of course, this is the geoLite database, I don't include the data in the package
 since geoIP must be updated often to stay accurate. 
 
 Default path for geoIP is data/GeoIP.dat
+
+And a big thanks to this lonely hero that host these legacy format geoIP database that host
+this on `mailfud <http://mailfud.org>`. Thanks to him this project still works 13 years after 
+its conception without a scratch.
+
 
 Use as a script
 ---------------

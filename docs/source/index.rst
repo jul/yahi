@@ -9,6 +9,7 @@ Contents:
 .. toctree::
     :maxdepth: 1
 
+    web.rst
     cli_arg.rst
     logic.rst
     console.rst
@@ -21,6 +22,11 @@ Contents:
 
 What's new?
 ===========
+
+0.1.5
+-----
+
+* preparing a new release that generates all in one html static pages
 
 0.1.1
 -----
