@@ -22,10 +22,13 @@ then do::
 
     python make_static.py && firefox aio.html
 
+*make_static.py* being available `here<https://github.com/jul/yahi/blob/master/www/make_static.py>`.
+
+
 and enjoy the result : as you have a single app web page (require javascript
 activated, sorry w3m users)
 
-A `full functional example is there <demo.html>`
+A `full functional example is there <https://github.com/jul/yahi/blob/master/www/demo.html>`
 
 Screenshots
 -----------
