@@ -1,0 +1,641 @@
+<!doctype html>
+<head>
+    <link href="data:image/x-icon;base64,AAABAAEAEBAAAAAAAABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////AAAAAJ4YGAClFxcApRcXAKUWFgCkFRUApBQUAKQTEwCjEhIAoxESAKMREgCjAAAAnv///wAAAAAAAAAAAAAAAJ6zHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf8BAQCfAAAAAAAAAAAREQCjsx0Ju7MdCbuzHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQm7CwsAoQAAAAAAAAAAAAAARLMdCbuzHQm7sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQm7sx0J/wAAAD4AAAAAAAAAAP///wAkJACosx0JlbMdCbuzHQn/sx0J/7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0J/wAAAJ7///8AAAAAAAAAAAD///8AnZ2dCbMdCZWzHQm7sx0Ju7MdCf+zHQn/sx0J/7MdCf+zHQn/sx0JuzAvAqz///8A////AAAAAAAAAAAA////AP///wAAAABWsx0JlbMdCbuzHQm7sx0J/7MdCf+zHQn/sx0Ju7MdCf8AAAA/////AP///wAAAAAAAAAAAP///wD///8A////ACAgAKf8/6Bv/P+TXvz/AC/8/wAs/P8AKvz/llACAgCf////AP///wD///8AAAAAAAAAAAD///8A////AP///wCoqKgJaWsAiP3/oWj8/wAw/P8ALfz/i008PQCn/v7+AP///wD///8A////AAAAAAAAAAAA////AP///wD///8A////AAAAAFbW2ABB+/9rTfz/AC6PkQBRAAAAQP///wD///8A////AP///wAAAAAAAAAAAP///wD///8A////AP///wDt7e0EgYMAZ/v/ak9OTwCWP0AAr////wD///8A////AP///wD///8AAAAAAAAAAAD///8A////AP///wD///8AjY2NBoKEAGf9/2BP/P8AL2xtAGn///8A////AP///wD///8A////AAAAAAAAAAAA////AP///wD///8A////AI2NjQqEhQBn/P9JTfz/ADBpaQBz////AP///wD///8A////AP///wAAAAAAAAAAAP///wD///8A////AP///wCNjY0LhogAZ/z/REv8/wAxYGEAfv///wD///8A////AP///wD///8AAAAAAAAAAAD///8A////AP///wD///8AAAAAPMHEAE37/wA1/P8AMXd4AGLj4+MB////AP///wD///8A////AAAAAAAAAAAA////AP///wD///8A////AB8fAKcdHgCmHBwAphsbAKYaGgClBAUAoP///wD///8A////AP///wAAAAAAwAMAAIABAACAAQAAwAMAAMADAADgBwAA8A8AAPfvAAD73wAA//8AAP8/AAD//wAA//8AAP//AAD//wAA+B8AAA==" rel="icon" type="image/x-icon" />
+    <title>Charts &amp; Histograms  - Yahi</title>
+    
+<style>
+
+* { margin:0; padding:0}
+.horizontal { 
+display:block;
+margin:auto;
+background:#46B;
+padding:.7em 0;
+}
+a:visited, a { color:#46A}
+.horizontal li { display:inline; list-style-type: none; color:white; }
+.horizontal li a { margin-left:3px;margin-right:2px; padding: .7em; color:white;}
+.horizontal li a:hover { border:1px solid grey;margin:-1px;color:#46A; background: white;display: inline;  padding-right: 1em; }
+body         {
+    font-family: 'Georgia', serif; font-size: 100% ; color: #000; 
+    }
+#plotbox     { 
+    width:95%;
+
+    border:1px solid lightgrey;
+    margin:auto;
+    text-align:center;
+    }
+#plot   { 
+    
+    max-width:1900px;
+    background:#f0f0fF;
+    min-height:300px;
+   margin-bottom:1em;
+
+    }
+.centered { 
+    margin: auto ; 
+    padding:0;
+    text-align:center; 
+    }
+h1, h2, h3   { font-family: 'Georgia', serif; font-weight: normal; }
+.header      { height: 165px; }
+               font-size: 50px; padding-top: 50px; height: 120px; }
+h2           { font-size: 24px; margin: 25px 0 5px 0; }
+.json { }
+pre          { font-family: 'Consolas', 'Menlo', 'Deja Vu Sans Mono',
+               'Bitstream Vera Sans Mono', monospace!important; font-size: 15px;
+               background: #eee; }
+.footer      { position:fixed; bottom:0px; text-align: center;left:0;right:0  }
+</style>
+
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+        <script type='text/javascript' src='https://www.google.com/jsapi'></script>
+
+
+
+
+</head>
+<body>
+<div class=centered style="width:100%" >
+<span style="line-height:1.4em">Built with 
+<a href=http://github.com/jul/yahi>yahi</a> 
+&amp; <a href=http://archery.readthedocs.org>archery</a>
+// &copy; Copyright (2012) <a href="http://github.com/jul">jul</a> &amp;
+  <a href="http://github.com/19emtuck">19emtuck</a> &amp; 
+        <a href=https://github.com/bmispelon/ >bmispelon</a></span>
+<ul class=horizontal >
+<li id=top ><em>Type of presentation:</em></li>
+<li><a class=router href=?route=geo >geo chart</a><li>
+<li><a class=router href=?route=top >histograms</a></li>
+<li><a class=router href=?route=chrono >time series</a></li>
+<li><a class=router href=?route=raw >raw data</a></li>
+
+
+</ul>
+</div>
+
+
+
+    <div id="content">
+  <div id="chart_div" class="centered content geo" style="left:7%;right:7%;position:absolute;width: 80%;top:5em;bottom:2em;border:1px solid lightgrey"></div>
+
+<div id="plotbox" class="content centered top chrono" >
+    <h2 class="content top">Top requests <span class=top id=ctitle > by status</span></h2>
+    <h2 class="content chrono" >Chronologicial <span class=chrono id=ctitle > by status</span></h2>
+    <div id=plot class=centered ></div>
+</div>
+<pre class="content raw" >
+{
+    "by_country": {
+        "US": 183,
+        "SK": 16,
+        "NL": 1,
+        "MD": 98,
+        "MY": 6,
+        "IE": 13,
+        "CN": 854,
+        "SG": 4,
+        "GB": 30,
+        "": 310,
+        "RU": 1,
+        "RS": 1,
+        "DE": 31,
+        "FR": 273,
+        "BG": 1,
+        "AE": 7,
+        "CA": 2,
+        "LU": 1,
+        "BE": 2,
+        "HK": 1,
+        "IN": 3,
+        "TR": 1,
+        "VN": 1
+    },
+    "date_bandwidth": {
+        "2025-04-08": 30450,
+        "2025-04-07": 3519884,
+        "2023-06-21": 86688,
+        "2023-06-20": 141136,
+        "2023-06-19": 90639,
+        "2023-06-18": 40635,
+        "2023-06-17": 102143,
+        "2021-08-21": 2023,
+        "2021-08-20": 2586,
+        "2021-08-18": 66687,
+        "2023-06-30": 309999,
+        "2021-08-17": 52451,
+        "2021-08-15": 23184,
+        "2021-08-13": 89354200,
+        "2021-08-12": 9272,
+        "2021-08-07": 1542,
+        "2021-08-05": 62920,
+        "2021-08-04": 7727,
+        "2021-08-03": 37216,
+        "2023-06-29": 1802705,
+        "2021-08-01": 27196,
+        "2021-07-30": 2541,
+        "2021-07-29": 249835,
+        "2021-07-28": 27185,
+        "2021-07-24": 89731,
+        "2021-07-23": 1542,
+        "2021-07-22": 299722,
+        "2021-07-21": 20545,
+        "2021-07-20": 28513,
+        "2021-07-19": 26910,
+        "2023-06-28": 661,
+        "2021-07-18": 27846,
+        "2021-07-17": 27191,
+        "2021-07-15": 1542,
+        "2021-07-13": 54366,
+        "2021-07-12": 7339636,
+        "2021-07-10": 27193,
+        "2021-07-09": 28737,
+        "2021-07-08": 27195,
+        "2021-07-06": 42872,
+        "2021-07-05": 89950,
+        "2023-06-27": 138773,
+        "2021-07-04": 33501,
+        "2021-07-02": 348765,
+        "2021-06-30": 27189,
+        "2023-06-25": 78346,
+        "2023-06-24": 34196,
+        "2023-06-23": 64649,
+        "2023-06-22": 7985
+    },
+    "date_hit": {
+        "2025-04-08": 18,
+        "2025-04-07": 127,
+        "2023-06-21": 20,
+        "2023-06-20": 29,
+        "2023-06-19": 20,
+        "2023-06-18": 3,
+        "2023-06-17": 11,
+        "2021-08-21": 16,
+        "2021-08-20": 10,
+        "2021-08-18": 219,
+        "2023-06-30": 12,
+        "2021-08-17": 195,
+        "2021-08-15": 3,
+        "2021-08-13": 813,
+        "2021-08-12": 2,
+        "2021-08-07": 1,
+        "2021-08-05": 3,
+        "2021-08-04": 1,
+        "2021-08-03": 13,
+        "2023-06-29": 63,
+        "2021-08-01": 1,
+        "2021-07-30": 9,
+        "2021-07-29": 10,
+        "2021-07-28": 1,
+        "2021-07-24": 5,
+        "2021-07-23": 1,
+        "2021-07-22": 38,
+        "2021-07-21": 81,
+        "2021-07-20": 3,
+        "2021-07-19": 20,
+        "2023-06-28": 1,
+        "2021-07-18": 2,
+        "2021-07-17": 1,
+        "2021-07-15": 1,
+        "2021-07-13": 2,
+        "2021-07-12": 3,
+        "2021-07-10": 1,
+        "2021-07-09": 2,
+        "2021-07-08": 1,
+        "2021-07-06": 5,
+        "2021-07-05": 11,
+        "2023-06-27": 24,
+        "2021-07-04": 13,
+        "2021-07-02": 11,
+        "2021-06-30": 1,
+        "2023-06-25": 6,
+        "2023-06-24": 3,
+        "2023-06-23": 3,
+        "2023-06-22": 1
+    },
+    "hour_hit": {
+        " 4": 48,
+        " 9": 68,
+        "13": 67,
+        "14": 47,
+        "17": 14,
+        "19": 58,
+        "22": 216,
+        "23": 34,
+        " 1": 13,
+        " 0": 5,
+        " 3": 28,
+        "20": 2,
+        "12": 31,
+        " 6": 580,
+        "11": 172,
+        "10": 107,
+        "21": 5,
+        "15": 28,
+        " 7": 255,
+        " 2": 3,
+        " 5": 4,
+        " 8": 42,
+        "16": 11,
+        "18": 2
+    },
+    "hour_bandwidth": {
+        " 4": 427193,
+        " 9": 43516,
+        "13": 1995294,
+        "14": 435261,
+        "17": 37611,
+        "19": 1855934,
+        "22": 401160,
+        "23": 101532,
+        " 1": 341991,
+        " 0": 50314,
+        " 3": 411525,
+        "20": 32644,
+        "12": 144991,
+        " 6": 61058325,
+        "11": 54426,
+        "10": 155293,
+        "21": 48869,
+        "15": 96913,
+        " 7": 28176280,
+        " 2": 55924,
+        " 5": 23689,
+        " 8": 1469498,
+        "16": 7472362,
+        "18": 27855
+    },
+    "by_os": {
+        "null": 687,
+        "Mac OS": 100,
+        "Android": 846,
+        "Windows": 130,
+        "Linux": 57,
+        "iOS": 13,
+        "Symbian": 4,
+        "PlayStation": 1,
+        "BlackBerry": 2
+    },
+    "by_dist": {
+        "unknown": 976,
+        "Android": 846,
+        "iPhone": 12,
+        "Debian": 2,
+        "Ubuntu": 3,
+        "IPad": 1
+    },
+    "by_browser": {
+        "unknown": 685,
+        "ChromiumEdge": 119,
+        "Firefox": 39,
+        "Chrome": 913,
+        "Safari": 25,
+        "Opera": 10,
+        "AndroidBrowser": 7,
+        "ChromeiOS": 5,
+        "SeaMonkey": 1,
+        "NetFront": 2,
+        "BrowserNG": 2,
+        "Yandex.Browser": 2,
+        "Microsoft Internet Explorer": 3,
+        "MSEdge": 24,
+        "Opera Mobile": 1,
+        "Konqueror": 2
+    },
+    "by_status": {
+        "499": 2,
+        "404": 116,
+        "200": 1665,
+        "302": 9,
+        "301": 1,
+        "401": 47
+    },
+    "by_agent": {
+        "Mozilla/5.0 (compatible; CensysInspect/1...": 10,
+        "python-requests/2.32.3...": 16,
+        "-...": 6,
+        "POLARIS/6.01(BREW 3.1.5;U;en-us;LG;LX265...": 1,
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 1...": 95,
+        "Mozilla/5.0 (OS/2; Warp 4.5; rv:45.0) Ge...": 1,
+        "Mozilla/5.0 (Linux; Android 7.0; Lenovo ...": 1,
+        "Mozilla/5.0 (Windows NT 6.1; Win64; x64)...": 5,
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWeb...": 31,
+        "Mozilla/5.0 (Windows NT 6.1; WOW64) Appl...": 10,
+        "Mozilla/5.0 (Linux; U; Android 1.5; en-u...": 4,
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 12_4 ...": 1,
+        "Mozilla/5.0 (OS/2; Warp 4.5; rv:38.0) Ge...": 1,
+        "Mozilla/5.0 (Linux; Android 8.0.0; LG-H8...": 1,
+        "Gregarius/0.5.2 ( http://devlog.gregariu...": 1,
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 ...": 2,
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64...": 87,
+        "Opera/9.80 (X11; FreeBSD 8.1-RELEASE i38...": 2,
+        "Mozilla/5.0 (Linux; Android 9; RMX1805) ...": 1,
+        "Download Demon/3.5.0.11...": 1,
+        "Mozilla/5.0 (Linux; Android 8.0.0; XT165...": 1,
+        "Mozilla/5.0 (Windows NT 6.3; WOW64) Appl...": 2,
+        "Mozilla/5.0 (X11; U; Linux x86_64; en-US...": 2,
+        "Mozilla/5.0 (Linux; Android 9; Pixel 3a)...": 1,
+        "Mozilla/5.0 (Windows NT 6.1) AppleWebKit...": 1,
+        "SonyEricssonW850i/R1ED Browser/NetFront/...": 1,
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4 ...": 1,
+        "Mozilla/5.0 (Linux; Android 7.0; SM-N920...": 1,
+        "SonyEricssonK800i/R1CB Browser/NetFront/...": 1,
+        "Mozilla/5.0 (iPod; CPU iPhone OS 8_4 lik...": 1,
+        "Mozilla/5.0 (Symbian/3; Series60/5.2 Nok...": 3,
+        "Mozilla/5.0 (Windows NT 10.0; WOW64) App...": 3,
+        "Mozilla/5.0 (Linux; Android 8.0.0; G8441...": 1,
+        "python-requests/2.31.0...": 6,
+        "Mozilla/5.0 (compatible; NetcraftSurveyA...": 5,
+        "Mozilla/5.0 (webOS/1.3; U; en-US) AppleW...": 1,
+        "Gulper Web Bot 0.2.4 (www.ecsl.cs.sunysb...": 1,
+        "Mozilla/5.0 (X11; Linux x86_64; rv:2.2a1...": 1,
+        "Mozilla/5.0 (Linux; Android 7.1.2; Pixel...": 1,
+        "Mozilla/5.0 (X11; U; SunOS i86pc; en-US;...": 1,
+        "Mozilla/5.0 (Linux; Android 7.1.2; Redmi...": 1,
+        "Mozilla/5.0 (Linux; Android 8.0.0; SM-G9...": 1,
+        "Mozilla/5.0 (X11; U; Linux i686; en-US) ...": 1,
+        "Mozilla/5.0 (Mobile; Windows Phone 8.1; ...": 1,
+        "Mozilla/5.0 (Linux; Android 8.0.0; LDN-L...": 1,
+        "Mozilla/5.0 (Linux; Android 9; CLT-L29 B...": 1,
+        "Mozilla/5.0 (Linux; Android 9; SM-A505F)...": 1,
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 12_3 ...": 1,
+        "Mozilla/5.0 (Linux; Android 6.0.1; SM-T5...": 1,
+        "Mozilla/5.0 (Maemo; Linux armv7l; rv:2.0...": 1,
+        "Mozilla/5.0 (Linux; Android 6.0.1; SM-J7...": 1,
+        "Mozilla/5.0 (Linux; Android 9; ANE-LX1) ...": 1,
+        "Mozilla/5.0 (Linux; Android 9; Pixel 2) ...": 1,
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 11_2_...": 1,
+        "Mozilla/5.0 (Linux; Android 9; Mi MIX 2S...": 1,
+        "Opera/8.01 (J2ME/MIDP; Opera Mini/1.0.14...": 1,
+        "Mozilla/5.0 (iPad; U; CPU OS 4_2_1 like ...": 1,
+        "Mozilla/5.0 (Windows NT 6.3; Win64; x64)...": 1,
+        "Mozilla/5.0 (Linux; U; Android 1.5; de-c...": 1,
+        "Mozilla/4.0 (compatible; MSIE 6.0; Windo...": 4,
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 ...": 1,
+        "Mozilla/5.0 (Linux; Android 5.0) AppleWe...": 1,
+        "Mozilla/5.0 (X11; Fedora; Linux x86_64; ...": 7,
+        "Mozilla/5.0 (Linux; Android 10; Mi Note ...": 1,
+        "Mozilla/5.0 (Windows; U; Windows NT 5.1;...": 2,
+        "Mozilla/5.0 (compatible; InternetMeasure...": 2,
+        "Mozlila/5.0 (Linux; Android 7.0; SM-G892...": 10,
+        "Links (2.22; Linux X86_64; GNU C; text)...": 2,
+        "Expanse, a Palo Alto Networks company, s...": 11,
+        "Mozilla/5.0 (Windows NT 6.2; WOW64) Appl...": 1,
+        "mercurial/proto-1.0 (Mercurial 5.0.2)...": 18,
+        "mercurial/proto-1.0 (Mercurial 4.8.2)...": 220,
+        "mercurial/proto-1.0 (Mercurial 5.3.1)...": 318,
+        "Mozilla/5.0 (Linux; Android 10; LIO-AN00...": 4,
+        "Chrome/54.0 (Windows NT 10.0)...": 9,
+        "Mozilla/5.0 (Linux; Android 8.0; Pixel 2...": 66,
+        "Mozilla/5.0 (Linux; Android 9.0; LG G2 B...": 56,
+        "Mozilla/5.0 (Linux; Android 8.0; HUAWEI ...": 60,
+        "Mozilla/5.0 (Linux; Android 8.0; OPPO x2...": 69,
+        "Mozilla/5.0 (Linux; Android 9.0; MI 10 B...": 65,
+        "Mozilla/5.0 (Linux; Android 10.0; MI 2 B...": 74,
+        "Mozilla/5.0 (Linux; Android 10.0; LG G2 ...": 70,
+        "Mozilla/5.0 (Linux; Android 7.0; OPPO x2...": 71,
+        "Mozilla/5.0 (Linux; U; Android 9; zh-cn;...": 76,
+        "Mozilla/5.0 (Linux; Android 7.0; HUAWEI ...": 63,
+        "Mozilla/5.0 (Linux; Android 10.0; VIVO f...": 66,
+        "Mozilla/5.0 (Linux; Android 7.0; Pixel 1...": 65,
+        "Mozilla/5.0 (compatible; ThinkBot/0.3.0;...": 2,
+        "Mozilla/5.0 (Macintosh; U; PPC Mac OS X;...": 2,
+        "Mozilla/5.0 (Linux; U; Android 1.6; en-u...": 1,
+        "SonyEricssonT100/R101...": 1,
+        "Opera/9.51 Beta (Microsoft Windows; PPC;...": 1,
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 14_8 ...": 1,
+        "Nokia6230i/2.0 (03.80) Profile/MIDP-2.0 ...": 1,
+        "Mozilla/5.0 (X11; Linux i686; rv:28.0) G...": 1,
+        "Mozilla/5.0 (Windows; U; Windows NT 6.0;...": 1,
+        "Mozilla/5.0 (Linux; Android 11; SM-M515F...": 1,
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 ...": 1,
+        "Mozilla/5.0 (Windows NT 6.1; rv:21.0) Ge...": 1,
+        "Mozilla/5.0 (Macintosh; U; Intel Mac OS ...": 3,
+        "ELinks/0.12~pre5-4...": 1,
+        "Mozilla/5.0 (SymbianOS/9.1; U; en-us) Ap...": 1,
+        "Mozilla/5.0 (X11; Linux i686; rv:49.0) G...": 1,
+        "Mozilla/5.0 (compatible; Konqueror/3.5; ...": 1,
+        "Mozilla/5.0 (compatible; Konqueror/4.4; ...": 1,
+        "Mozilla/5.0 (X11; FreeBSD amd64; rv:5.0)...": 1,
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 15_4 ...": 1,
+        "Mozilla/5.0 (X11; Linux i686) AppleWebKi...": 1,
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 15_2_...": 1,
+        "Mozilla/4.0 (PSP (PlayStation Portable);...": 1,
+        "Mozilla/5.0 (Linux; Android 10; M2010J19...": 1,
+        "BlackBerry9530/4.7.0.167 Profile/MIDP-2....": 1,
+        "Mozilla/5.0 (Windows NT 5.1) AppleWebKit...": 1,
+        "Mozilla/5.0 (Linux; Android 11; Redmi No...": 1,
+        "Mozilla/5.0 (Linux; Android 11; SM-A526U...": 1,
+        "Mozilla/5.0 (Linux; Android 12; SM-G991U...": 1,
+        "LG-LX550 AU-MIC-LX550/2.0 MMP/2.0 Profil...": 1,
+        "Mozilla/5.0 (BlackBerry; U; BlackBerry 9...": 1,
+        "NetSystemsResearch studies the availabil...": 5,
+        "Go http package...": 2,
+        "mercurial/proto-1.0 (Mercurial 4.9)...": 21,
+        "bitdiscovery...": 18,
+        "Go-http-client/1.1...": 2,
+        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; ...": 1,
+        "httpx - Open-source project (github.com/...": 1,
+        "Mozilla/5.0 (X11; Linux x86_64; rv:83.0)...": 6,
+        "python-requests/2.25.1...": 6
+    },
+    "total_line": 1840
+}
+</pre>
+
+</div>
+    <div id='#footer' class="footer">
+        
+
+<div style="height:1px"></div>
+<ul class="content top horizontal" id="menu_down" >
+    <li><em>Charts Availables</em> </li>
+</ul>
+<ul id=menu_down class="content horizontal chrono">
+    <li><em>Chronological series available  :</em> </li>
+</ul>
+
+
+    </div>
+<script>
+// set the dimensions and margins of the graph
+function _keys(arr) {
+    var arrr=[];
+    $.each( arr, function(k,v) { arrr.push( k )});
+    return arrr;
+
+}
+function _values(arr) {
+    var arrr=[];
+    $.each( arr, function(k,v) { arrr.push( v )});
+    return arrr;
+
+}
+data = JSON.parse($("pre").html())
+
+$(document).ready(function() {
+    const max_ticks=40;
+    if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' ) {
+         $(".footer").css("position", "static");
+    };
+    $.each(_keys(data), (i,e) => {
+        if ( e.substring(0,3) == "by_" )
+            $('#menu_down.top').append("<li><a id="+e+" class=selector href=#" + e + "?route=top >" + e + "</a></li>")
+        if ( e.substring(0,5) == "date_" ||  e.substring(0,5) == "hour_" )
+            $('#menu_down.chrono').append("<li><a id="+e+" class=selector href=#" + e + "?route=chrono >" + e + "</a></li>")
+    })
+    $(".selector", ".top").click(function(e) {
+        e.preventDefault()
+        history.pushState({} ,"", $(this).attr("href"));
+        update_for( ($(this).attr("href")).substring(1).replace(/\?.*/,""),max_ticks );
+        console.log($(this).attr("href"))
+        $("#ctitle", ".top").text( $(this).text());
+        return false;
+    });
+    $(".selector", ".chrono").click(function(e) {
+        e.preventDefault()
+        history.pushState({}, "",$(this).attr("href")  );
+        update_for( ($(this).attr("href")).substring(1).replace(/\?.*/,"" ));
+        console.log("href:" + $(this).attr("href"))
+        $("#ctitle.chrono" ).text( $(this).text());
+
+       return false;
+    });
+    $(".router").each( (i,e) => {
+        var query = new URLSearchParams( e.attributes.href.value )
+        $(e).addClass("a" + query.get("route"))
+    })
+    $(".router").click( (e) => {
+        e.preventDefault()
+        var href=$(e.target)[0].attributes.href
+        history.pushState({}, null,  href.value)
+        var query = new URLSearchParams( href.value )
+        var route = query.get("route")
+        console.log("route:" + route);
+        ({
+            "chrono": () => { 
+                $(".content").hide(); $("." + route).show();
+                $(".selector",".chrono")[0].click()
+            },
+            "top": () => { 
+                $(".content").hide(); $("." + route).show() 
+                $(".selector",".top")[0].click()
+            },
+            "raw": () => { $(".content").hide(); $("." + route).show() 
+            },
+            "geo": () => { 
+                google.load('visualization', '1', {'packages' : ["geochart"]});
+                $(".content").hide(); $("." + route).show()
+                function fucking_google_callbak() {
+                var items = [["Country","popularity"]];
+                for( key in data["by_country"]){
+                    val = data["by_country"][key] * 1 ;
+                    items.push( [key, val ] )
+                };
+                data2 = google.visualization.arrayToDataTable(items);
+                    var chart = new google.visualization.GeoChart(
+                        document.getElementById('chart_div'));
+                    chart.draw(data2, {});
+                };
+                google.setOnLoadCallback( fucking_google_callbak);
+            }
+        })[route]()
+    })
+    anchor = document.URL.match(/#[^\?]+/)
+    console.log(anchor)
+    if (anchor) 
+        $( anchor[0]).click()
+    console.log("ready")
+    var query = new URLSearchParams(window.location.search )
+    route = query.get("route")
+    if (route == undefined ) {
+        console.log("default route")
+        $(".ageo").click()
+
+    } else {
+        $(".a" + route).click()
+    }
+
+
+    function update_for(category, top){
+
+        // set the dimensions and margins of the graph
+        const margin = {top: 30, right: 30, bottom: 170, left: 160},
+            width = 1000 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        $("#plot > svg").remove()
+        const svg = d3.select("#plot")
+          .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+
+
+        serie = data[category]
+        serie = _keys(serie).map((e,i) => [ e, serie[e] ])
+        k = serie.map(d => d[0])
+
+        if (top) {
+            console.log("sorting")
+            serie=serie.sort(function(a, b) {
+                a = a[1];
+                b = b[1];
+                return a < b ? -1 : (a > b ? 1 : 0);
+            }).reverse().slice(0,max_ticks);
+            console.log(serie)
+        } 
+        // X axis
+        const x = d3.scaleBand()
+          .range([ 0, width ])
+          .domain(serie.map( (e) => ""+ e[0]))
+          .padding(0.2);
+        svg.append("g")
+          .attr("transform", `translate(0, ${height})`)
+          .call(d3.axisBottom(x))
+          .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
+
+        // Add Y axis
+        maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
+        const y = d3.scaleLinear()
+          .domain([0, maxou])
+          .range([ height, 0]);
+        svg.append("g")
+          .call(d3.axisLeft(y));
+
+        // Bars
+        console.log("serie before making bars")
+        console.log(serie)
+        svg.selectAll("mybar")
+          .data(serie)
+          .join("rect")
+            .attr("x", d => x( d[0] ))
+            .attr("y", d => y(d[1]))
+            .attr("width", x.bandwidth())
+            .attr("height", d => 1 * ( height - y(d[1])))
+            .attr("fill", "#46A")
+            .attr("stroke", "#eef")
+        if (!top) {
+            console.log("too much ticks")
+            console.log(k.length)
+            if (k.length > (max_ticks/2)) {
+                every= Math.floor(k.length/(max_ticks/2))
+                var ticks = d3.selectAll(".tick text");
+                ticks.each(function(_,i){
+                    if(i%every !== 0) d3.select(this).remove();
+                });
+
+            }
+        }
+    }
+});
+
+</script>
+</body>
