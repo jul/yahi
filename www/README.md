@@ -20,6 +20,8 @@ then do
 and enjoy the result : as you have a single app web page (require javascript
 activated, sorry w3m users)
 
+A [full functional example is there](demo.html)
+
 # Screenshots
 
 ![geo IP rendering](img/geo.png)
