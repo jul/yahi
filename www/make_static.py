@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-with open("static/data.js") as f:
+with open("./data.js") as f:
     DATA=f.read()
     with open("./static.template") as g:
         res = g.read().replace("{{DATA}}", DATA)
