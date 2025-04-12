@@ -1,5 +1,5 @@
 include yahi/__init__.py
 include yahi/field.py
-include README
+include README*
 include LICENSE.txt
 include speed_shoot
