@@ -4,16 +4,15 @@
 </style>
 <script>
 $(document).ready(() => {
+    var query = new URLSearchParams(window.location.search )
+    route = query.get("route")
+    anchor = document.URL.match(/#[^\?]+/)
+
     $(".router").each( (i,e) => {
         var query = new URLSearchParams( e.attributes.href.value )
         $(e).addClass(query.get("route"))
     })
-        $(".selector").each( (i,e) => {
-        $(e).addClass($(e).attr("href").substr(1))
-    })
-    var query = new URLSearchParams(window.location.search )
-    route = query.get("route")
-    anchor = document.URL.match(/#[^\?]+/)
+    $(".selector").each((i,e) => $(e).addClass($(e).attr("href").substr(1)))
     $(".selector").click( function(e) {
         e.preventDefault()
         history.pushState({} ,"", "" + $(this).attr("href"));
@@ -24,7 +23,7 @@ $(document).ready(() => {
             "#subroute3" : console.log,
             "#subroute4":  (e) => alert(e)  })[anchor](anchor)
         console.log("subroute called:" + anchor)
-        return false
+        return true
     })
     $(".router").click( (e) => {
         e.preventDefault()
@@ -38,8 +37,10 @@ $(document).ready(() => {
         ({
             "route1": () => { $(".content").hide(); $("." + route).show() },
             "route2": () => { $(".content").hide(); $("." + route).show() },
+            "route3": () => { $(".content").hide(); $("." + route).show() },
         })[route]()
         console.log("route called:" + route)
+        return true
     })
     if (route == undefined ) {
         console.log("default route")
@@ -47,11 +48,12 @@ $(document).ready(() => {
     } else {
         console.log('dealing with: ' +route +':'+ anchor)
         $(".router" + "." + route).click()
+        console.log("hog beteween here and latest log")
     }
     anchor = document.URL.match(/#[^\?]+/)
     if (anchor) {
-        console.log("anchor detected in URL:" + anchor[0])
-        $("." + anchor[0].substr(1)).click()
+        console.log("anchor detected in URL:" + anchor[0] + "route:" + route)
+        $("." + route +"  ." + anchor[0].substr(1)).click()
         console.log("sub route called:" +anchor[0])
     }
     console.log("ready")
@@ -68,7 +70,9 @@ $(document).ready(() => {
         <li><a class=selector href=#subroute3 >sub menu 3</a></li>
         <li><a class=selector href=#subroute4 >sub menu 4</a></li>
     </ul>
+    <li><a class="router" href=?route=route3>route3</a></li>
 </ul>
 <div class='content route1'>route 1</div>
 <div class='content route2'>route 2</div>
+<div class='content route3'>no subroute</div>
 
