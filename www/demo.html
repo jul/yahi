@@ -1040,6 +1040,7 @@ $(document).ready(function() {
     if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' ) {
          $(".footer").css("position", "static");
     };
+    //create sub routes py parsing json
     $.each(_keys(data), (i,e) => {
         if ( e.substring(0,3) == "by_" )
             $('#menu_down.top').append("<li><a id="+e+" class=selector href=#" + e + "?route=top >" + e + "</a></li>")
@@ -1055,7 +1056,7 @@ $(document).ready(function() {
     })
     $(".selector", ".top").click(function(e) {
         e.preventDefault()
-        history.pushState({} ,"", $(this).attr("href"));
+        history.pushState({} ,"", $(this).attr("href").replace(/\?.*/,""));
         update_for( ($(this).attr("href")).substring(1).replace(/\?.*/,""),max_ticks );
         console.log($(this).attr("href"))
         $("#ctitle", ".top").text( $(this).text());
@@ -1063,7 +1064,7 @@ $(document).ready(function() {
     });
     $(".selector", ".chrono").click(function(e) {
         e.preventDefault()
-        history.pushState({}, "",$(this).attr("href")  );
+        history.pushState({}, "",$(this).attr("href").replace(/\?.*/,"")  );
         update_for( ($(this).attr("href")).substring(1).replace(/\?.*/,"" ));
         console.log("href:" + $(this).attr("href"))
         $("#ctitle.chrono" ).text( $(this).text());
@@ -1161,12 +1162,23 @@ $(document).ready(function() {
         if (top) {
             console.log("sorting")
             serie=serie.sort(function(a, b) {
-                a = a[1];
-                b = b[1];
+                a =  a[1];
+                b =  b[1];
                 return a < b ? -1 : (a > b ? 1 : 0);
             }).reverse().slice(0,max_ticks);
             console.log(serie)
-        } 
+        } else {
+
+            console.log("sorting")
+            serie=serie.sort(function(a, b) {
+                a =  a[0];
+                b = b[0];
+                return a < b ? -1 : (a > b ? 1 : 0);
+            }).slice(0,max_ticks);
+            console.log(serie)
+
+
+        }
         // X axis
         const x = d3.scaleBand()
           .range([ 0, width ])
@@ -1202,8 +1214,8 @@ $(document).ready(function() {
         if (!top) {
             console.log("too much ticks")
             console.log(k.length)
-            if (k.length > (max_ticks/2)) {
-                every= Math.floor(k.length/(max_ticks/2))
+            if (k.length > (max_ticks)) {
+                every= Math.floor(k.length/(max_ticks))
                 var ticks = d3.selectAll(".tick text");
                 ticks.each(function(_,i){
                     if(i%every !== 0) d3.select(this).remove();
