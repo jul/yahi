@@ -68,7 +68,7 @@ pre          { font-family: 'Consolas', 'Menlo', 'Deja Vu Sans Mono',
         <a href=https://github.com/bmispelon/ >bmispelon</a></span>
 <ul class=horizontal >
 <li id=top ><em>Type of presentation:</em></li>
-<li><a class=router href=?route=geo >geo chart</a><li>
+<li><a class=router href=?route=geo >geo chart</a></li>
 <li><a class=router href=?route=top >histograms</a></li>
 <li><a class=router href=?route=chrono >time series</a></li>
 <li><a class=router href=?route=raw >raw data</a></li>
@@ -132,6 +132,13 @@ $(document).ready(function() {
         if ( e.substring(0,5) == "date_" ||  e.substring(0,5) == "hour_" )
             $('#menu_down.chrono').append("<li><a id="+e+" class=selector href=#" + e + "?route=chrono >" + e + "</a></li>")
     })
+    $(".router").each( (i,e) => {
+        var query = new URLSearchParams( e.attributes.href.value )
+        $(e).addClass(query.get("route"))
+    })
+        $(".selector").each( (i,e) => {
+        $(e).addClass($(e).attr("href").substr(1).replace(/\?.*/,""))
+    })
     $(".selector", ".top").click(function(e) {
         e.preventDefault()
         history.pushState({} ,"", $(this).attr("href"));
@@ -149,16 +156,23 @@ $(document).ready(function() {
 
        return false;
     });
-    $(".router").each( (i,e) => {
-        var query = new URLSearchParams( e.attributes.href.value )
-        $(e).addClass("a" + query.get("route"))
-    })
+    anchor = document.URL.match(/#[^\?]+/)
+    console.log("nchor"+anchor)
     $(".router").click( (e) => {
         e.preventDefault()
         var href=$(e.target)[0].attributes.href
-        history.pushState({}, null,  href.value)
-        var query = new URLSearchParams( href.value )
+        var query = new URLSearchParams( $(e.target)[0].attributes.href.value )
+
+
+        url = href.value
+
         var route = query.get("route")
+            anchor = document.URL.match(/#[^\?]+/)
+
+        if (anchor)
+            url += anchor
+        history.pushState({}, null,  url)
+        var query = new URLSearchParams( url)
         console.log("route:" + route);
         ({
             "chrono": () => { 
@@ -188,12 +202,10 @@ $(document).ready(function() {
                 google.setOnLoadCallback( fucking_google_callbak);
             }
         })[route]()
+        return false
     })
     anchor = document.URL.match(/#[^\?]+/)
-    console.log(anchor)
-    if (anchor) 
-        $( anchor[0]).click()
-    console.log("ready")
+
     var query = new URLSearchParams(window.location.search )
     route = query.get("route")
     if (route == undefined ) {
@@ -201,9 +213,15 @@ $(document).ready(function() {
         $(".ageo").click()
 
     } else {
-        $(".a" + route).click()
+        $(".router." + route).click()
     }
+    console.log("anchor is " + anchor)
+    if (anchor != undefined){
+        console.log( ".selector." +  anchor[0].substr(1))
 
+        $(".selector." +  anchor[0].substr(1)).click()
+    }
+    console.log("ready")
 
     function update_for(category, top){
 
