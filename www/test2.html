@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <style>
+    .content { visibility: none }
+    </style>
+    <script>
+
+        $(document).ready(() => {
+            $(".router").each( (i,e) => {
+                var query = new URLSearchParams( e.attributes.href.value )
+                $(e).addClass(query.get("route"))
+            })
+             $(".selector").each( (i,e) => {
+                $(e).addClass($(e).attr("href").substr(1))
+            })
+            var query = new URLSearchParams(window.location.search )
+            route = query.get("route")
+            anchor = document.URL.match(/#[^\?]+/)
+             $(".selector", ".route1").click( function(e) {
+                e.preventDefault()
+                history.pushState({} ,"", "" + $(this).attr("href"));
+                anchor = $(this).attr("href").replace(/\?.*/,"");
+                ({ "#subroute1" : console.log,
+                   "#subroute2":  (e) => alert(e)  })[anchor](anchor)
+            })
+            $(".selector", ".route2").click( function(e) {
+                e.preventDefault()
+                   history.pushState({} ,"", "" + $(this).attr("href"));
+                   anchor = $(this).attr("href").replace(/\?.*/,"");
+                ({ "#subroute3" : console.log,
+                   "#subroute4":  (e) => alert(e)  })[anchor](anchor)
+            })
+            $(".router").click( (e) => {
+                e.preventDefault()
+                var href=$(e.target)[0].attributes.href
+                url = href.value
+                if (anchor)
+                    url += anchor
+                history.pushState({}, null, url)
+                var query = new URLSearchParams( href.value )
+                var route = query.get("route");
+                ({
+                    "route1": () => { $(".content").hide(); $("." + route).show() },
+                    "route2": () => { $(".content").hide(); $("." + route).show() },
+                })[route]()
+            })
+
+            if (route == undefined ) {
+                console.log("default route")
+                $(".router.route1").click()
+            } else {
+                console.log('dealing with: ' +route +':'+ anchor)
+                $(".router" + "." + route).click()
+            }
+            anchor = document.URL.match(/#[^\?]+/)
+            console.log('deaking with:' + anchor)
+            if (anchor) {
+                console.log("anchor detected in URL:" + anchor[0])
+                console.log($(anchor[0]))
+                $("." + anchor[0].substr(1)).click()
+
+                console.log("anchor CLIKCED")
+            }
+                    console.log("ready")
+            })
+</script>
+</head>
+<body>
+    <ul>
+        <li><a class="router" href=?route=route1>route1</a></li>
+        <ul class="content route1">
+            <li><a class="selector" href=#subroute1 >sub menu 1</a></li>
+            <li><a class="selector" href=#subroute2 >sub menu 2</a></li>
+        </ul>
+        <li><a class="router" href=?route=route2>route2</a></li>
+        <ul class="content route2" >
+            <li><a class=selector href=#subroute3 >sub menu 2</a></li>
+            <li><a class=selector href=#subroute4 >sub menu 3</a></li>
+        </ul>
+    </ul>
+    <div class='content route1'>route 1</div>
+    <div class='content route2'>route 2</div>
+</body>
+</html>
+
