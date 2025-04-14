@@ -11,148 +11,64 @@ Synopsis
 --------
 
 Given a regexp for a log, enables data viz users and sysadmins to quicly create
-aggregation statisctics by writing very few code.
+aggregation statisctics by writing very few code and generates a static web page with all vizualisations dans data.
 
-Also comes with tooling to transform your aggregated datas in a dynamically constructed all in one web page (CSS/JS/HTML/assets) that can be shared in standalone.
 
-For the data visualiser it means that some classical cases of building
-histograms and data series is already taken care of. 
+The library comes with an exemple that works out of the box for common log format (apache, nginx) :
+:ref:`speed_shoot`.
 
-For sysadmins it means you can serve your data in one and only one static file without a docker compose nightmare for deployment or security holes.
+And a script to generate the all in one view :ref:`yahi_all_in_one_maker`.
 
 The `demo being there <https://jul.github.io/cv/demo.html?route=chrono#hour_hit>`_
 
+Installation
+============
+::
 
-Command line usage
-------------------
-
-Simplest usage is::
-    
-    speed_shoot -g /usr/local/data/geoIP /var/www/apache/access*log
+    pip install yahi
 
 
-it will return a json in the form::
-    
-    {
-        "by_date": {
-            "2012-5-3": 11
-        }, 
-        "total_line": 11, 
-        "ip_by_url": {
-            "/favicon.ico": {
-                "192.168.0.254": 2, 
-                "192.168.0.35": 2
-            }, 
-            "/": {
-                "74.125.18.162": 1, 
-                "192.168.0.254": 1, 
-                "192.168.0.35": 5
-            }
-        }, 
-        "by_status": {
-            "200": 7, 
-            "404": 4
-        }, 
-        "by_dist": {
-            "unknown": 11
-        }, 
-        "bytes_by_ip": {
-            "74.125.18.162": 151, 
-            "192.168.0.254": 489, 
-            "192.168.0.35": 1093
-        }, 
-        "by_url": {
-            "/favicon.ico": 4, 
-            "/": 7
-        }, 
-        "by_os": {
-            "unknown": 11
-        }, 
-        "week_browser": {
-            "3": {
-                "unknown": 11
-            }
-        }, 
-        "by_referer": {
-            "-": 11
-        }, 
-        "by_browser": {
-            "unknown": 11
-        }, 
-        "by_ip": {
-            "74.125.18.162": 1, 
-            "192.168.0.254": 3, 
-            "192.168.0.35": 7
-        }, 
-        "by_agent": {
-            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0,gzip(gfe) (via translate.google.com)": 1, 
-            "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0": 10
-        }, 
-        "by_hour": {
-            "9": 3, 
-            "10": 4, 
-            "11": 1, 
-            "12": 3
-        }, 
-        "by_country": {
-            "": 10, 
-            "US": 1
-        }
-    }
+Quickstart
+----------
 
-
-If you use::
-
-    speed_shoot -f csv -g /usr/local/data/geoIP /var/www/apache/access*log
-    
-
-Your result is::
-
-    by_date,2012-5-3,11
-    total_line,11
-    ip_by_url,/favicon.ico,192.168.0.254,2
-    ip_by_url,/favicon.ico,192.168.0.35,2
-    ip_by_url,/,74.125.18.162,1
-    ip_by_url,/,192.168.0.254,1
-    ip_by_url,/,192.168.0.35,5
-    by_status,200,7
-    by_status,404,4
-    by_dist,unknown,11
-    bytes_by_ip,74.125.18.162,151
-    bytes_by_ip,192.168.0.254,489
-    bytes_by_ip,192.168.0.35,1093
-    by_url,/favicon.ico,4
-    by_url,/,7
-    by_os,unknown,11
-    week_browser,3,unknown,11
-    by_referer,-,11
-    by_browser,unknown,11
-    by_ip,74.125.18.162,1
-    by_ip,192.168.0.254,3
-    by_ip,192.168.0.35,7
-    by_agent,"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0,gzip(gfe) (via translate.google.com)",1
-    by_agent,Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:12.0) Gecko/20100101 Firefox/12.0,10
-    by_hour,9,3
-    by_hour,10,4
-    by_hour,11,1
-    by_hour,12,3
-    by_country,,10
-    by_country,US,1
-
-
-Well I guess, it does not work because you first need to fetch geoIP data file::
+First you need a geoIP database in legacy format::
 
     mkdir data
     wget -O- https://mailfud.org/geoip-legacy/GeoIP.dat.gz | zcat > data/GeoIP.dat
 
-Of course, this is the geoLite database, I don't include the data in the package
-since geoIP must be updated often to stay accurate. 
+And a big thanks to this lonely hero that host these legacy format geoIP database that host this on `mailfud <http://mailfud.org>`_.
 
-Default path for geoIP is data/GeoIP.dat
+Simplest usage is::
 
-And a big thanks to this lonely hero that host these legacy format geoIP database that host
-this on `mailfud <http://mailfud.org>`. Thanks to him this project still works 13 years after 
-its conception without a scratch.
+    speed_shoot -g /usr/local/data/geoIP.dat /var/www/apache/access*log* > data.js
+
+It reads gzipped file format automatically I have been told.
+
+And then::
+
+    yahi_all_in_one_maker data.js
+
+To create a « all in one »© HTML page with all JS/CSS/data included that has a multi route view.
+
+
+Screenshots
+-----------
+
+* *Geo IP rendering*
+
+.. image:: img/geo.png
+
+* *Top n charts*
+
+.. image:: img/histo.png
+
+* *Date rendering*
+
+.. image:: img/chrono.png
+
+* *Raw data*
+
+.. image:: img/raw.png
 
 
 Use as a script
@@ -161,32 +77,38 @@ Use as a script
 speed shoot is in fact a template of how to use yahi as a module::
 
     #!/usr/bin/env python
-    from archery.bow import Hankyu as _dict
+    from archery import mdict
     from yahi import notch, shoot
     from datetime import datetime
 
 
     context=notch()
+
     date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
     context.output(
         shoot(
             context,
-            lambda data : _dict({
-                'by_country': _dict({data['_country']: 1}),
-                'by_date': _dict({date_formater(data['_datetime']): 1 }),
-                'by_hour': _dict({data['_datetime'].hour: 1 }),
-                'by_os': _dict({data['_os_name']: 1 }),
-                'by_dist': _dict({data['_dist_name']: 1 }),
-                'by_browser': _dict({data['_browser_name']: 1 }),
-                'by_ip': _dict({data['ip']: 1 }),
-                'by_status': _dict({data['status']: 1 }),
-                'by_url': _dict({data['uri']: 1}),
-                'by_agent': _dict({data['agent']: 1}),
-                'by_referer': _dict({data['referer']: 1}),
-                'ip_by_url': _dict({data['uri']: _dict( {data['ip']: 1 })}),
-                'bytes_by_ip': _dict({data['ip']: int(data['bytes'])}),
-                'week_browser' : _dict({data['_datetime'].weekday():
-                    _dict({data["_browser_name"] :1 })}),
+            lambda data : mdict({
+                'by_country': mdict({data['_country']: 1}),
+                'date_hit': mdict({date_formater(data['_datetime']): 1 }),
+                'date_bandwidth': mdict({date_formater(data['_datetime']): int(data["bytes"]) }),
+                'hour_hit': mdict({data['_datetime'].hour: 1 }),
+                'hour_bandwidth': mdict({data['_datetime'].hour: int(data["bytes"]) }),
+                'by_os': mdict({data['_platform_name']: 1 }),
+                'by_dist': mdict({data['_dist_name']: 1 }),
+                'by_browser': mdict({data['_browser_name']: 1 }),
+                'by_bandwidth_by_browser': mdict({data['_browser_name']: int(data["bytes"]) }),
+                'by_ip': mdict({data['ip']: 1 }),
+                'by_bandwidth_by_ip': mdict({data['ip']: int(data["bytes"]) }),
+                'by_status': mdict({data['status']: 1 }),
+                'by_url': mdict({data['uri']: 1}),
+                'by_agent': mdict({data['agent']: 1}),
+                'by_referer': mdict({data['referer']: 1}),
+                'ip_by_url': mdict({data['uri']: mdict( {data['ip']: 1 })}),
+                'bytes_by_ip': mdict({data['ip']: int(data['bytes'])}),
+                'date_dayofweek_hit' : mdict({data['_datetime'].weekday(): 1 }),
+                'weekday_browser' : mdict({data['_datetime'].weekday():
+                    mdict({data["_browser_name"] :1 })}),
                 'total_line' : 1,
             }),
         ),
@@ -194,26 +116,29 @@ speed shoot is in fact a template of how to use yahi as a module::
 
 
 
-Installation
-============
-
-easy as::
-    
-    pip install yahi
-
-or::
-    
-    easy_install yahi
-
-Recommanded usage
-=================
-
-- for basic log aggregation, I do recommand using command line;
-- for one shot metrics I recommend an interactive console (bpython or ipython);
-- for specific metrics or elaborate filters I recommand using the API. 
-
-CHANGELOG
+Changelog
 =========
+
+0.1.6
+-----
+
+* adding yahi_all_in_one_maker to generate the all in one HTML file with vizualation from speed_shoot
+
+0.1.5
+-----
+
+* preparing a new release that generates all in one html static pages
+
+0.1.1
+-----
+
+* bad url for the demo  
+
+0.1.0
+-----
+
+* it is NEW, seen on TV, and is guaranteed to make you tenfolds more desirable. 
+
 
 0.1.3
 -----
