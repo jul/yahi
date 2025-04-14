@@ -9,31 +9,12 @@ Contents:
 .. toctree::
     :maxdepth: 1
 
-    web.rst
     cli_arg.rst
-    logic.rst
     console.rst
+    logic.rst
     misusing.rst
 
 .. include:: ../../README.rst
-
-What's new?
-===========
-
-0.1.5
------
-
-* preparing a new release that generates all in one html static pages
-
-0.1.1
------
-
-* bad url for the demo  
-
-0.1.0
------
-
-* it is NEW, seen on TV, and is guaranteed to make you tenfolds more desirable. 
 
 
 Indices and tables
