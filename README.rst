@@ -4,8 +4,24 @@
 - ticketting: https://github.com/jul/yahi/issues
 
 
-Versatile log parser (providing default extractors for apache/lighttpd/varnish)
-===============================================================================
+Versatile log parser
+====================
+
+Synopsis
+--------
+
+Given a regexp for a log, enables data viz users and sysadmins to quicly create
+aggregation statisctics by writing very few code.
+
+Also comes with tooling to transform your aggregated datas in a dynamically constructed all in one web page (CSS/JS/HTML/assets) that can be shared in standalone.
+
+For the data visualiser it means that some classical cases of building
+histograms and data series is already taken care of. 
+
+For sysadmins it means you can serve your data in one and only one static file without a docker compose nightmare for deployment or security holes.
+
+The `demo being there <https://jul.github.io/cv/demo.html?route=chrono#hour_hit>`_
+
 
 Command line usage
 ------------------
