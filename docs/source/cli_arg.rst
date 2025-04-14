@@ -27,7 +27,7 @@ does:
     - any IP which has been geoloclaized,
     - any non authentified user;
 - will diagnose (*d*) (thus print on stderr) any lines that would not match
-the log format regexp or any lines rejected by *-x* and  *-i*
+  the log format regexp or any lines rejected by *-x* and  *-i*
 
 for all the given log files.
 

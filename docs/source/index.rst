@@ -13,7 +13,6 @@ Contents:
     cli_arg.rst
     logic.rst
     console.rst
-    custom_script.rst
     misusing.rst
 
 .. include:: ../../README.rst
