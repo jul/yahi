@@ -1,5 +1,5 @@
-Command line basic usage
-========================
+speed_shoot
+===========
 
 help as usual is obtained this way::
 
