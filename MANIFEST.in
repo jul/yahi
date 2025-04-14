@@ -1,5 +1,6 @@
 include yahi/__init__.py
 include yahi/field.py
+include yahi/test_yahi.py
 include yahi/all_in_one.template
 include README.rst
 include LICENSE.txt

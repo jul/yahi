@@ -22,9 +22,9 @@ long_description = open("README.rst").read()
 
 setup(
         name='yahi',
-        version='0.1.7',
+        version='0.1.8',
         author='Julien Tayon, Stephane Bard',
-        author_email='julien@tayon.net, stephanebard@gmail.com',
+        author_email='julien@tayon.net',
         packages=['yahi'],
         install_requires=[ 'archery>=0.1', 'pygeoip', 'httpagentparser', 'repoze.lru>=0.6' ],
         keywords=['log', 'parsing' ],

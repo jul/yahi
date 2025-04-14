@@ -10,14 +10,14 @@ Versatile log parser
 Synopsis
 ========
 
-Given a regexp for a log, enables data viz users and sysadmins to quicly create
-aggregation statisctics by writing very few code and generates a static web page with all vizualisations dans data.
+Given a regexp for a log, enables to quicly create
+aggregation statisctics by writing few code and generates a all in one web page with all vizualisations and data (that requires javascript to work and has some dependencies).
 
 
-The library comes with an exemple that works out of the box for common log format (apache, nginx) :
+The library comes with a script that aggregates various data from common log format (apache, nginx) :
 *speed_shoot*.
 
-And a script to generate the all in one view *yahi_all_in_one_maker*
+And a script to generate the all in one view *yahi_all_in_one_maker*.
 
 The `demo being there <https://jul.github.io/cv/demo.html?route=chrono#hour_hit>`_
 
@@ -36,20 +36,21 @@ First you need a geoIP database in legacy format::
     mkdir data
     wget -O- https://mailfud.org/geoip-legacy/GeoIP.dat.gz | zcat > data/GeoIP.dat
 
-And a big thanks to this lonely hero that host these legacy format geoIP database that host this on `mailfud <http://mailfud.org>`_.
+And thanks to `mailfud <http://mailfud.org>`_ for keeping these legacy databases.
+
 
 Simplest usage is::
 
     speed_shoot -g /usr/local/data/geoIP.dat /var/www/apache/access*log* > data.js
 
-It reads gzipped file format automatically I have been told.
+It reads gzipped file format automatically.
 
 And then::
 
     yahi_all_in_one_maker data.js
 
 To create a *all in one* HTML page with all JS/CSS/data included that has a multi route view.
-
+It includes various external libraries to work : D3js (charting), jquery, google js api (geo chart).
 
 
 Use as a script
@@ -99,6 +100,11 @@ speed shoot is in fact a template of how to use yahi as a module::
 
 Changelog
 =========
+
+0.1.8
+-----
+
+* adding tests in the package so package does not install if tests dont pass
 
 0.1.7
 -----

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from archery.bow import Hankyu as _dict
+from archery import mdict
 from yahi import notch, shoot, ToxicSet
 from datetime import datetime
 from datetime import date
@@ -13,10 +13,10 @@ import numpy as np
 
 locale.setlocale(locale.LC_ALL,"C")
 
-def ordered_top(a_dict, rank=10):
+def ordered_top(amdict, rank=10):
     res=OrderedDict({"other": 0})
     for i,(k,v) in enumerate(
-            sorted(a_dict.items(),
+            sorted(amdict.items(),
                 key=lambda (k,v): (v,k),
                 reverse=True)
             ):
@@ -37,36 +37,36 @@ context=notch(
     log_pattern="""^(?P<datetime>[^\ ]+\s{1,2}\d{1,2}\s\d{2,2}:\d{2,2}:\d{2,2})\s
     (?P<nawak>[^:]+):\s
     Invalid\ user\ (?P<user>.*?)\s
-    from\ (?P<ip>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$""")
+    from\ (?P<ip>.*)$""")
 # log sample
 #May 20 12:14:15 lupin sshd[36291]: Invalid user dave from 69.60.114.57
 
 date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
 res= shoot(
         context,
-        lambda data: _dict({
+        lambda data: mdict({
             "black_list" : ToxicSet([ data["ip"] ]),
-            "by_country" : _dict({ data["_country"] : 1 }),
-            "date_s" : _dict({ date_formater(data["_datetime"]) : 1 }),
-            "by_ip" : _dict({ data["ip"] : 1 }),
-            "date" : _dict({ date(2012,
+            "by_country" : mdict({ data["_country"] : 1 }),
+            "date_s" : mdict({ date_formater(data["_datetime"]) : 1 }),
+            "by_ip" : mdict({ data["ip"] : 1 }),
+            "date" : mdict({ date(2012,
                 data["_datetime"].month,
                 data["_datetime"].day)
                 : 1 }),
-            "by_user" : _dict({ data["user"] : 1 }),
+            "by_user" : mdict({ data["user"] : 1 }),
             "total" : 1 
         })
     )
 
 # Let's go draw some plot
-def labeled_bar(ax, _dict):
-    pos=np.arange(len(_dict)) + .5
-    ax.set_xticks(pos, _dict.keys())
-    rects=ax.bar(pos,_dict.values(),label=_dict.keys(),align='center')
+def labeled_bar(ax, mdict):
+    pos=np.arange(len(mdict)) + .5
+    ax.set_xticks(pos, mdict.keys())
+    rects=ax.bar(pos,mdict.values(),label=mdict.keys(),align='center')
     for i,rect in enumerate(rects):
         height = rect.get_height()
         ax.text(rect.get_x()+rect.get_width()/2., height-100,
-           '%.1f\n%s'%(height,_dict.keys()[i]), 
+           '%.1f\n%s'%(height,mdict.keys()[i]), 
            ha='center', va='bottom',color='white', fontsize=8)
     return rects
 

@@ -6,17 +6,16 @@ Notch: setting up a context
 
 
 notch is all about setting up a context::
-    >>> context=notch(
+    >>> context = notch(
          'yahi/test/biggersample.log', 
-         'yahi/test/biggersample.log',
          include="yahi/test/include.json",
          silent=True, 
          exclude='{ "_country" : "US"}', 
          output_format="csv"
     )
 
-Would I have been smart, it would have been called «aim». Since you tell 
-your target, and the parameters of your parsing (log_format...). 
+It defines the parameter for your parsing and the target.
+
 
 Command line arguments vs notch arguments
 =========================================
