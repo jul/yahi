@@ -1,5 +1,5 @@
-Notch and shoot by the example
-******************************
+Programmatic API
+****************
 
 For this exercice I do have a preference for *bpython*, since it has the ctrl+S shortcut.  Thus, you can save any «experiments» in a file. 
 
