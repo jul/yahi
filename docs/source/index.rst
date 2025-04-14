@@ -15,8 +15,6 @@ Contents:
     console.rst
     custom_script.rst
     misusing.rst
-    extra.rst
-   
 
 .. include:: ../../README.rst
 
