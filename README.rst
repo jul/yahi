@@ -1,23 +1,23 @@
+====================
+Versatile log parser
+====================
 
 - source: https://github.com/jul/yahi
 - doc: http://yahi.readthedocs.org/
 - ticketting: https://github.com/jul/yahi/issues
 
 
-Versatile log parser
-====================
-
 Synopsis
---------
+========
 
 Given a regexp for a log, enables data viz users and sysadmins to quicly create
 aggregation statisctics by writing very few code and generates a static web page with all vizualisations dans data.
 
 
 The library comes with an exemple that works out of the box for common log format (apache, nginx) :
-:ref:`speed_shoot`.
+*speed_shoot*.
 
-And a script to generate the all in one view :ref:`yahi_all_in_one_maker`.
+And a script to generate the all in one view *yahi_all_in_one_maker*
 
 The `demo being there <https://jul.github.io/cv/demo.html?route=chrono#hour_hit>`_
 
@@ -29,7 +29,7 @@ Installation
 
 
 Quickstart
-----------
+==========
 
 First you need a geoIP database in legacy format::
 
@@ -51,28 +51,9 @@ And then::
 To create a *all in one* HTML page with all JS/CSS/data included that has a multi route view.
 
 
-Screenshots
------------
-
-* *Geo IP rendering*
-
-.. image:: img/geo.png
-
-* *Top n charts*
-
-.. image:: img/histo.png
-
-* *Date rendering*
-
-.. image:: img/chrono.png
-
-* *Raw data*
-
-.. image:: img/raw.png
-
 
 Use as a script
----------------
+===============
 
 speed shoot is in fact a template of how to use yahi as a module::
 
@@ -118,6 +99,11 @@ speed shoot is in fact a template of how to use yahi as a module::
 
 Changelog
 =========
+
+0.1.7
+-----
+
+* oopsies removed needless pictures of the package
 
 0.1.6
 -----
