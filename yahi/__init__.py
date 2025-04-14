@@ -19,7 +19,7 @@ import csv
 from json import load, loads, dump, dumps
 from archery.trait import Copier
 from archery.barrack import mapping_row_iter
-from archery.bow import Hankyu 
+from archery import mdict
 from .field import log_pattern, date_pattern
 from repoze.lru import lru_cache
 import argparse
@@ -119,7 +119,7 @@ def shoot( context, group_by,):
     """Produce a dict of the data found in the line.
     and use group_by to  group according to option (that can contain 
     a data_filter)
-    * group_by : a lambda returning a Hankyu (dict)
+    * group_by : a lambda returning a mdict (dict)
         used to extract the valid informations
     * option.cache : cache strategy (beaker, repoze, dict, fixed, no_cache)
     * option.data_filter : f(data) => bool
@@ -136,7 +136,7 @@ def shoot( context, group_by,):
         also used to select the datetime parser
     """
     context.log=dict(error=[],warning=[]) 
-    aggregator=Hankyu({})
+    aggregator=mdict({})
     if 'user_agent' in context.skill:
         import httpagentparser
     
@@ -155,8 +155,8 @@ def shoot( context, group_by,):
     try:
         for line in _input:
             match = look_for(line)
-            if not context.silent and not _input.lineno() % 10000:
-                sys.stderr.write("*")
+            if not context.silent and not _input.lineno() % 1000:
+                sys.stderr.write(".")
                 
             if match:
                 data = match.groupdict()
@@ -189,7 +189,7 @@ def shoot( context, group_by,):
             elif "match" in context.diagnose:
                 if context.silent:
                     context.log["warning"]+=[
-                        "NOTMATCH:at %s:%s:\%s not match" % ( 
+                        "NOTMATCH:at %s:%s:%s not match" % ( 
                         _input.lineno(),_input.filename(), line)]
                 else:
                     sys.stderr.write("at %s:%s:" % ( 
@@ -207,6 +207,7 @@ def shoot( context, group_by,):
     finally:
         ## causes a problem with stdin/stderr
         #_input.close()
+        sys.stderr.write("\n")
         if not context.silent:
             sys.stderr.write("\n%s lines parsed\n" % _input.lineno())
     return aggregator
@@ -259,11 +260,11 @@ parse_log -o dat2.json -x '{ "ip" : "^192.168", "agent": "Mozill" }'  /var/log/a
 
 Since archery is cool here is a tip for aggregating data
 >>> from archery.barrack import bowyer
->>> from archery.bow import Hankyu
+>>> from archery.bow import mdict
 >>> from json import load, dumps
 >>> dumps(
-        bowyer(Hankyu,load(file("dat1.json"))) + 
-        bowyer(Hankyu,load(file("dat2.json")))
+        bowyer(mdict,load(file("dat1.json"))) + 
+        bowyer(mdict,load(file("dat2.json")))
     )
 
 Hence a usefull trick to merge your old stats with your new one
