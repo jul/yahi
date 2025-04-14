@@ -22,14 +22,14 @@ long_description = open("README.rst").read()
 
 setup(
         name='yahi',
-        version='0.1.5',
+        version='0.1.6',
         author='Julien Tayon',
         author_email='julien@tayon.net',
         packages=['yahi'],
         install_requires=[ 'archery>=0.1', 'pygeoip', 'httpagentparser', 'repoze.lru>=0.6' ],
         keywords=['log', 'parsing' ],
         url='http://yahi.readthedocs.org/',
-        scripts=["speed_shoot"],
+        scripts=["scripts/speed_shoot", "scripts/yahi_all_in_one_maker"],
         license=open('LICENSE.txt').read(),
         description='Versatile parallel log parser',
         long_description=long_description, 

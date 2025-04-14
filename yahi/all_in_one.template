@@ -157,6 +157,10 @@ $(document).ready(function() {
 
        return false;
     });
+    if (data["by_country"] == undefined) {
+        console.log("geo is hidden since there is no by_country data")
+        $(".router.geo").hide()
+    }
     anchor = document.URL.match(/#[^\?]+/)
     console.log("nchor"+anchor)
     $(".router").click( (e) => {
@@ -211,7 +215,8 @@ $(document).ready(function() {
     route = query.get("route")
     if (route == undefined ) {
         console.log("default route")
-        $(".router.geo").click()
+        $(".router.top").click()
+        $("top > .selector")[0].click()
 
     } else {
         $(".router." + route).click()

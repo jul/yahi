@@ -4,7 +4,7 @@ import re
 log_pattern=dict( 
     apache_log_combined = re.compile(
 '''^(?P<ip>\S+?)\s            # ip
--\s                           # dunno
+(?P<userider>[^ ])\s             # RFC1413 user identifier
 (?P<user>[^ ]+)\s             # if authentified
 \[(?P<datetime>[^\]]+)\s      # apache format
 (?P<tz_offset>[+-]\d{4})\]\s  #

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import print_function
 import sys
 from warnings import warn
 from os import path
@@ -25,7 +24,11 @@ from .field import log_pattern, date_pattern
 from repoze.lru import lru_cache
 import argparse
 import locale
+
+DIR=path.dirname(__file__)
+
 locale.setlocale(locale.LC_ALL,"C")
+
 
 
 class ToxicSet(Copier,set):

@@ -1,0 +1,33 @@
+#!/usr/bin/env python
+"""
+All in one maker
+================
+
+Generates a all in one yahi output web page from the stats given in
+its json form as the first parameter.
+
+Outputs the result in the local file aio.html
+
+"""
+from sys import argv
+from yahi import DIR
+from os import path
+
+usage = lambda : print(__doc__) or exit(1)
+
+data_location="./data.js"
+try:
+    data_location = argv[1]
+except:
+    pass
+
+try:
+    with open(data_location) as f:
+        DATA=f.read()
+        with open(path.join(DIR, "all_in_one.template")) as g:
+            res = g.read().replace("{{DATA}}", DATA)
+            with open("aio.html", "w") as h:
+                h.write(res)
+except:
+    usage()
+
