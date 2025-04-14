@@ -48,7 +48,7 @@ And then::
 
     yahi_all_in_one_maker data.js
 
-To create a « all in one »© HTML page with all JS/CSS/data included that has a multi route view.
+To create a *all in one* HTML page with all JS/CSS/data included that has a multi route view.
 
 
 Screenshots
