@@ -18,24 +18,6 @@ And a script to generate the all in one view *yahi_all_in_one_maker*.
 
 The [demo being there](https://jul.github.io/cv/demo.html?route=chrono#hour_hit)
 
-# Screenshots
-
-## Time serie
-<image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/chrono.png">
-
-## Histograms
-
-<image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/histo.png">
-
-## Geographic map
-
-<image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/geo.png">
-
-## Raw data
-
-<image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/raw.png">
-
-
 # Installation
 
 
@@ -67,6 +49,24 @@ And then:
 
 To create a *all in one* HTML page with all JS/CSS/data included that has a multi route view.
 It includes various external libraries to work : D3js (charting), jquery, google js api (geo chart).
+
+# Screenshots
+
+## Time serie
+<image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/chrono.png">
+
+## Histograms
+
+<image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/histo.png">
+
+## Geographic map
+
+<image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/geo.png">
+
+## Raw data
+
+<image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/raw.png">
+
 
 
 # Use as a script
@@ -120,6 +120,13 @@ Archery is a pun on trait.
 [Yahi](https://en.wikipedia.org/wiki/Ishi) is a remembrance of a native american tribes that was versed in
 archery so that somewhere on the net we remember the genocides committed in the
 name of civilisation.
+
+Yahi is thus a concrete application of archery for aggregation based on 2
+functions : 
+
+- notch to prepare your log aggregations
+- shoot to actually aggregate
+
 
 Let's have a thought for the native americans that are still second ranks
 citizens in their own lands. 
