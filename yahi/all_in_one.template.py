@@ -119,7 +119,7 @@ function _values(arr) {
     return arrr;
 
 }
-data = JSON.parse($("pre").html())
+data = JSON.parse($("pre").text())
 
 $(document).ready(function() {
     const max_ticks=40;
