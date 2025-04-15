@@ -257,13 +257,11 @@ and output a json of various aggregatted metrics of frequentation :
 Example :
 =========
 
-from stdin (useful for using zcat)
-**********************************
-zcat /var/log/apache.log.1.gz | parse_log.py  > dat1.json
 
 excluding IPs 192.168/16 and user agent containing Mozilla
 **********************************************************
-parse_log -o dat2.json -x '{ "ip" : "^192.168", "agent": "Mozill" }'  /var/log/apache*.log 
+
+speed_shoot -o dat2.json -x '{ "ip" : "^192.168", "agent": "Mozill" }'  /var/log/apache*.log*
 
 Since archery is cool here is a tip for aggregating data
 >>> from archery.barrack import bowyer
