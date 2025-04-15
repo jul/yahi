@@ -53,7 +53,8 @@ class ToxicSet(Copier,set):
         return repr(list(self))
 
 ####################### STATIC DATA ################################
-HARDCODED_GEOIP_FILE = "data/GeoIP.dat"
+HARDCODED_GEOIP_FILE = "~/.yahi/GeoIP.dat"
+HARDCODED_GEOIP_FILE6 = "~/.yahi/GeoIPv6.dat"
 ### GLOBAL CACHE prettu multiprocessing unfirendly
 
 
@@ -147,8 +148,10 @@ def shoot( context, group_by,):
 
     if "geo_ip" in context.skill:
         from pygeoip import GeoIP
-        gi = GeoIP(context.geoip)
+        gi = GeoIP(path.expanduser(context.geoip))
         country_by_ip = lru_cache(context.cache_size)(gi.country_code_by_addr)
+        gi6 = GeoIP(path.expanduser(context.geoip6))
+        country_by_ip6 = lru_cache(context.cache_size)(gi6.country_code_by_addr)
     _input = fileinput.input(context.files, openhook=fileinput.hook_compressed)
     if not context.silent:
         sys.stderr.write("parsing:\n %s\n" % "\n-" . join(context.files))
@@ -166,11 +169,12 @@ def shoot( context, group_by,):
                     data['_month'] = dt.hour
                     data['_date'] = dt.date()
 
-
-                    
-
                 if 'geo_ip' in context.skill:
-                    data.update( {"_country":country_by_ip(data["ip"])})
+                    try:
+                        data.update( {"_country":country_by_ip(data["ip"])})
+                    except:
+                        data.update( {"_country":country_by_ip6(data["ip"])})
+
                 if 'user_agent' in context.skill:
                     data.update(
                         parse_user_agent(data["agent"])
@@ -277,9 +281,16 @@ Hence a usefull trick to merge your old stats with your new one
         metavar="FILE",
         default=None
         )
+    parser.add_argument("-g6",
+        "--geoip6",
+        help="""specify a path to a geoip.dat file for IPv6 address
+        default : %s""" % HARDCODED_GEOIP_FILE6,
+        default=HARDCODED_GEOIP_FILE6
+    )
     parser.add_argument("-g",
         "--geoip",
-        help="specify a path to a geoip.dat file",
+        help="""specify a path to a geoip.dat file
+        default : %s""" % HARDCODED_GEOIP_FILE,
         default=HARDCODED_GEOIP_FILE
     )
     parser.add_argument("-q",
@@ -292,12 +303,9 @@ Hence a usefull trick to merge your old stats with your new one
         help="in conjonction with cp=fixed chooses dict size",
         default="10000"
     )
-
-
     parser.add_argument("-d",
         "--diagnose",
         help="""diagnose 
-            list of space separated arguments :
                 **rejected** : will print on STDERR rejected parsed line,
                 **match** : will print on stderr data filtered out
         """,
