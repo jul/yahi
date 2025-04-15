@@ -158,8 +158,6 @@ def shoot( context, group_by,):
     try:
         for line in _input:
             match = look_for(line)
-            if not context.silent and not _input.lineno() % 1000:
-                sys.stderr.write(".")
                 
             if match:
                 data = match.groupdict()
@@ -190,6 +188,10 @@ def shoot( context, group_by,):
                             sys.stderr.write("REJECTED:{0}\n".format(data))
                 else:
                     aggregator += group_by(data)
+                    if not context.silent and not _input.lineno() % 1000:
+                        sys.stderr.write(".")
+                        sys.stderr.flush()
+
             elif "match" in context.diagnose:
                 if context.silent:
                     context.log["warning"]+=[
