@@ -305,8 +305,8 @@ $(document).ready(function() {
         if (!top) {
             console.log("too much ticks")
             console.log(k.length)
-            if (k.length > (max_ticks/2)) {
-                every= Math.floor(k.length/(max_ticks/2))
+            if (k.length > (max_ticks)) {
+                every= Math.floor(k.length/(max_ticks))
                 var ticks = d3.selectAll(".tick text");
                 ticks.each(function(_,i){
                     if(i%every !== 0) d3.select(this).remove();

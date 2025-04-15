@@ -137,6 +137,9 @@ citizens in their own lands.
 
 # Changelog
 
+## 0.1.19-0.1.20
+
+* wording in README
 
 ## 0.1.8
 

@@ -99,4 +99,5 @@ speed shoot is in fact a template of how to use yahi as a module::
 Changelog
 =========
 
-.. include:: ../../changelog.txt
+See `there for changelog <https://github.com/jul/yahi/blob/master/README.md>`_
+
