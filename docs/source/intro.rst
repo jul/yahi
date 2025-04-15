@@ -33,8 +33,12 @@ Quickstart
 
 First you need a geoIP database in legacy format::
 
-    mkdir data
-    wget -O- https://mailfud.org/geoip-legacy/GeoIP.dat.gz | zcat > data/GeoIP.dat
+    mkdir ~/.yahi
+    wget -O- https://mailfud.org/geoip-legacy/GeoIP.dat.gz | \
+        zcat > ~/.yahi/GeoIP.dat
+    wget -O- https://mailfud.org/geoip-legacy/GeoIPv6.dat.gz | \
+        zcat > data/GeoIPv6.dat
+
 
 And thanks to `mailfud <http://mailfud.org>`_ for keeping these legacy databases.
 
