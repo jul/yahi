@@ -96,44 +96,7 @@ speed shoot is in fact a template of how to use yahi as a module::
         ),
     )
 
-
-
 Changelog
 =========
 
-0.1.8
------
-
-* adding tests in the package so package does not install if tests dont pass
-
-0.1.7
------
-
-* oopsies removed needless pictures of the package
-
-0.1.6
------
-
-* adding yahi_all_in_one_maker to generate the all in one HTML file with vizualation from speed_shoot
-
-0.1.5
------
-
-* preparing a new release that generates all in one html static pages
-
-0.1.1
------
-
-* bad url for the demo  
-
-0.1.0
------
-
-* it is NEW, seen on TV, and is guaranteed to make you tenfolds more desirable. 
-
-
-0.1.3
------
-
-Adding varnish incomplete regexp for log parsing (I miss 2 fields)
-
+.. include:: ../../changelog.txt

@@ -18,11 +18,11 @@ if "sdist" in sys.argv or "bdist_egg" in sys.argv:
  
     test()
 
-long_description = open("README.rst").read()
+long_description = open("README.md").read()
 
 setup(
         name='yahi',
-        version='0.1.8',
+        version='0.1.9',
         author='Julien Tayon, Stephane Bard',
         author_email='julien@tayon.net',
         packages=['yahi'],
@@ -32,6 +32,7 @@ setup(
         scripts=["scripts/speed_shoot", "scripts/yahi_all_in_one_maker"],
         license=open('LICENSE.txt').read(),
         description='Versatile log parser',
+        long_description_content_type='text/markdown',
         long_description=long_description, 
         classifiers=[
           'License :: OSI Approved :: Python Software Foundation License',

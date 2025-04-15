@@ -14,7 +14,7 @@ Contents:
     logic.rst
     misusing.rst
 
-.. include:: ../../README.rst
+.. include:: intro.rst
 
 
 Indices and tables
