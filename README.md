@@ -29,8 +29,11 @@ The [demo being there](https://jul.github.io/cv/demo.html?route=chrono#hour_hit)
 
 First you need a geoIP database in legacy format::
 ```
-    mkdir data
-    wget -O- https://mailfud.org/geoip-legacy/GeoIP.dat.gz | zcat > data/GeoIP.dat
+    mkdir ~/.yahi
+    wget -O- https://mailfud.org/geoip-legacy/GeoIP.dat.gz | \
+        zcat > ~/.yahi/GeoIP.dat
+    wget -O- https://mailfud.org/geoip-legacy/GeoIPv6.dat.gz | \
+        zcat > data/GeoIPv6.dat
 ```
 And thanks to [mailfud](http://mailfud.org) for keeping these legacy databases.
 
@@ -136,6 +139,18 @@ citizens in their own lands.
 
 
 # Changelog
+
+## 0.1.22
+
+* fix #18 wrong date formatting resulting in bad date ordeer
+* fix #19 create ~/.yahi on startup if not exists
+* fixing the template issue the nice way
+
+
+## 0.1.21
+
+* fix #16 no templates in the package
+* fix #17 crashing of the HTML when JSON embedded is too big
 
 ## 0.1.19-0.1.20
 

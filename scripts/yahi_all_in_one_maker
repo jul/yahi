@@ -10,7 +10,7 @@ Outputs the result in the local file aio.html
 
 """
 from sys import argv
-from yahi import DIR
+from yahi.template import template
 from os import path
 
 usage = lambda : print(__doc__) or exit(1)
@@ -24,10 +24,10 @@ except:
 try:
     with open(data_location) as f:
         DATA=f.read()
-        with open(path.join(DIR, "all_in_one.template.py")) as g:
-            res = g.read().replace("{{DATA}}", DATA)
-            with open("aio.html", "w") as h:
-                h.write(res)
-except:
+        res = template.replace("{{DATA}}", DATA)
+        with open("aio.html", "w") as h:
+            h.write(res)
+except Exception as e:
+    print(e)
     usage()
 

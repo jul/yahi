@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import sys
 from warnings import warn
-from os import path
+from os import path, mkdir
 import re
 from datetime import datetime
 try:
@@ -25,7 +25,9 @@ from repoze.lru import lru_cache
 import argparse
 import locale
 
-DIR=path.dirname(__file__)
+
+if not path.exists(path.expanduser("~/.yahi")):
+    mkdir(path.expanduser("~/.yahi"))
 
 locale.setlocale(locale.LC_ALL,"C")
 
