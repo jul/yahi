@@ -140,6 +140,12 @@ citizens in their own lands.
 
 # Changelog
 
+## 0.2.0
+
+* adds a loader in the all in one web page for when JS is hogging parsing the JSON
+* -g options now applies to the DIRECTORY where both GeoIP.dat and GeoIPv6.dat
+ are
+
 ## 0.1.22
 
 * fix #18 wrong date formatting resulting in bad date ordeer

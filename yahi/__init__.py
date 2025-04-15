@@ -55,8 +55,7 @@ class ToxicSet(Copier,set):
         return repr(list(self))
 
 ####################### STATIC DATA ################################
-HARDCODED_GEOIP_FILE = "~/.yahi/GeoIP.dat"
-HARDCODED_GEOIP_FILE6 = "~/.yahi/GeoIPv6.dat"
+HARDCODED_GEOIP_DIR = "~/.yahi/"
 ### GLOBAL CACHE prettu multiprocessing unfirendly
 
 
@@ -150,9 +149,9 @@ def shoot( context, group_by,):
 
     if "geo_ip" in context.skill:
         from pygeoip import GeoIP
-        gi = GeoIP(path.expanduser(context.geoip))
+        gi = GeoIP(path.expanduser(path.join(context.geoip, "GeoIP.dat")))
         country_by_ip = lru_cache(context.cache_size)(gi.country_code_by_addr)
-        gi6 = GeoIP(path.expanduser(context.geoip6))
+        gi6 = GeoIP(path.expanduser(path.join(context.geoip, "GeoIPv6.dat")))
         country_by_ip6 = lru_cache(context.cache_size)(gi6.country_code_by_addr)
     _input = fileinput.input(context.files, openhook=fileinput.hook_compressed)
     if not context.silent:
@@ -285,17 +284,11 @@ Hence a usefull trick to merge your old stats with your new one
         metavar="FILE",
         default=None
         )
-    parser.add_argument("-g6",
-        "--geoip6",
-        help="""specify a path to a geoip.dat file for IPv6 address
-        default : %s""" % HARDCODED_GEOIP_FILE6,
-        default=HARDCODED_GEOIP_FILE6
-    )
     parser.add_argument("-g",
         "--geoip",
-        help="""specify a path to a geoip.dat file
-        default : %s""" % HARDCODED_GEOIP_FILE,
-        default=HARDCODED_GEOIP_FILE
+        help="""specify a path to a geoIP directory with geoIP.dat and geoIPv6.dat
+        default : %s""" % HARDCODED_GEOIP_DIR,
+        default=HARDCODED_GEOIP_DIR
     )
     parser.add_argument("-q",
         "--silent",

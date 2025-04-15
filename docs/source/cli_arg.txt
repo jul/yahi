@@ -1,7 +1,7 @@
-usage: speed_shoot [-h] [-c FILE] [-g6 GEOIP6] [-g GEOIP] [-q SILENT]
-                   [-cs CACHE_SIZE] [-d DIAGNOSE [DIAGNOSE ...]] [-i INCLUDE]
-                   [--off OFF] [-x EXCLUDE] [-f OUTPUT_FORMAT]
-                   [-lf LOG_FORMAT] [-lp LOG_PATTERN] [-lpn LOG_PATTERN_NAME]
+usage: speed_shoot [-h] [-c FILE] [-g GEOIP] [-q SILENT] [-cs CACHE_SIZE]
+                   [-d DIAGNOSE [DIAGNOSE ...]] [-i INCLUDE] [--off OFF]
+                   [-x EXCLUDE] [-f OUTPUT_FORMAT] [-lf LOG_FORMAT]
+                   [-lp LOG_PATTERN] [-lpn LOG_PATTERN_NAME]
                    [-dp DATE_PATTERN] [-o OUTPUT_FILE]
                    ...
 
@@ -50,12 +50,9 @@ options:
                         specify a config file in json format for the command
                         line arguments any command line arguments will disable
                         values in the config
-  -g6 GEOIP6, --geoip6 GEOIP6
-                        specify a path to a geoip.dat file for IPv6 address
-                        default : ~/.yahi/GeoIPv6.dat
   -g GEOIP, --geoip GEOIP
-                        specify a path to a geoip.dat file default :
-                        ~/.yahi/GeoIP.dat
+                        specify a path to a geoIP directory with geoIP.dat and
+                        geoIPv6.date default : ~/.yahi/
   -q SILENT, --silent SILENT
                         quietly discard errors
   -cs CACHE_SIZE, --cache-size CACHE_SIZE
