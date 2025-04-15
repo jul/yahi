@@ -24,7 +24,7 @@ except:
 try:
     with open(data_location) as f:
         DATA=f.read()
-        with open(path.join(DIR, "all_in_one.template")) as g:
+        with open(path.join(DIR, "all_in_one.template.py")) as g:
             res = g.read().replace("{{DATA}}", DATA)
             with open("aio.html", "w") as h:
                 h.write(res)
