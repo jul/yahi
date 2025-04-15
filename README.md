@@ -113,6 +113,21 @@ speed shoot is in fact a template of how to use yahi as a module::
     )
 ```
 
+# Naming
+
+Archery is a pun on trait.
+
+[Yahi](https://en.wikipedia.org/wiki/Ishi) is a remembrance of a native american tribes that was versed in
+archery so that somewhere on the net we remember the genocides committed in the
+name of civilisation.
+
+Let's have a thought for the native americans that are still second ranks
+citizens in their own lands. 
+
+
+
+
+
 # Changelog
 
 
