@@ -119,9 +119,9 @@ function _values(arr) {
     return arrr;
 
 }
-data = JSON.parse($("pre").text())
 
 $(document).ready(function() {
+    data = JSON.parse($("pre").text())
     const max_ticks=40;
     if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' ) {
          $(".footer").css("position", "static");
