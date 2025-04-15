@@ -165,7 +165,7 @@ def shoot( context, group_by,):
                     data['_datetime']=dt
                     data['_hour'] = dt.hour
                     data['_month'] = dt.hour
-                    data['_date'] = dt.date()
+                    data['_date'] = dt.date().isoformat()
 
                 if 'geo_ip' in context.skill:
                     try:

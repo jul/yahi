@@ -12,8 +12,8 @@ context.output(
         context,
         lambda data : mdict({
             'by_country': mdict({data['_country']: 1}),
-            'date_hit': mdict({date_formater(data['_datetime']): 1 }),
-            'date_bandwidth': mdict({date_formater(data['_datetime']): int(data["bytes"]) }),
+            'date_hit': mdict({data['_date']: 1 }),
+            'date_bandwidth': mdict({data['_date']: int(data["bytes"]) }),
             'hour_hit': mdict({data['_datetime'].hour: 1 }),
             'hour_bandwidth': mdict({data['_datetime'].hour: int(data["bytes"]) }),
             'by_os': mdict({data['_platform_name']: 1 }),
