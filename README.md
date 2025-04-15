@@ -32,7 +32,7 @@ First you need a geoIP database in legacy format::
     mkdir data
     wget -O- https://mailfud.org/geoip-legacy/GeoIP.dat.gz | zcat > data/GeoIP.dat
 ```
-And thanks to `mailfud <http://mailfud.org>`_ for keeping these legacy databases.
+And thanks to [mailfud](http://mailfud.org) for keeping these legacy databases.
 
 
 Simplest usage is:
