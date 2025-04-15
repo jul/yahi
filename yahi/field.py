@@ -3,14 +3,14 @@
 import re
 log_pattern=dict( 
     apache_log_combined = re.compile(
-'''^(?P<ip>\S+?)\s            # ip
-(?P<userider>[^ ])\s             # RFC1413 user identifier
+'''^(?P<ip>[^ ]+)\s           # ip
+(?P<userider>[^ ]+)\s         # RFC1413 user identifier
 (?P<user>[^ ]+)\s             # if authentified
 \[(?P<datetime>[^\]]+)\s      # apache format
 (?P<tz_offset>[+-]\d{4})\]\s  #
-"(?P<method>[A-Z]+)\          # GET/POST/....
-(?P<uri>[^ ]+)\               # add query it would be nice
-(?P<scheme>[A-Z]+(\/1)?).\d"\                   # whole scheme (catching FTP ... would be nicer)
+"(?P<method>[A-Z]+)\ ?         # GET/POST/....
+(?P<uri>[^ ]+)\ ?              # add query it would be nice
+(?P<scheme>[A-Z]+(\/.)?.\d)"\                   # whole scheme (catching FTP ... would be nicer)
 (?P<status>\d+)\              # 404 ...
 (?P<bytes>\d+)\               # bytes really bite me if you can
 "(?P<referer>[^"]+)"\         # where people come from
@@ -36,7 +36,7 @@ HTTP/1.\d"\                   # whole scheme (catching FTP ... would be nicer)
 (?P<tz_offset>[+-]\d{4})\]\s  #
 "(?P<method>[A-Z]+)\s          # GET/POST/....
 (?P<uri>[^ ]+)\s               # add query it would be nice
-(?P<scheme>[A-Z]+(\/1)?).?\d?"\                   # whole scheme (catching FTP ... would be nicer)
+(?P<scheme>[A-Z]+(\/.)?.\d)?"\                   # whole scheme (catching FTP ... would be nicer)
 (?P<status>\d+)\              # 404 ...
 (?P<bytes>\d+)\               # bytes really bite me if you can
 "(?P<referer>[^"]+)"\         # where people come from
