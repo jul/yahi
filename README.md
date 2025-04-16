@@ -140,9 +140,9 @@ citizens in their own lands.
 
 # Changelog
 
-## 0.2.1
+## 0.2.2
 
-* fix #20 html injections through ref and uri
+* fix #21 html injections through ref and uri
 
 ## 0.2.0
 

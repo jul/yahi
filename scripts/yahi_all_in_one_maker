@@ -12,6 +12,7 @@ Outputs the result in the local file aio.html
 from sys import argv
 from yahi.template import template
 from os import path
+from html import escape
 
 usage = lambda : print(__doc__) or exit(1)
 
@@ -24,7 +25,7 @@ except:
 try:
     with open(data_location) as f:
         DATA=f.read()
-        res = template.replace("{{DATA}}", DATA)
+        res = template.replace("{{DATA}}", escape(DATA))
         with open("aio.html", "w") as h:
             h.write(res)
 except Exception as e:
