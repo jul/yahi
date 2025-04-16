@@ -262,7 +262,7 @@ $(document).ready(function() {
                 a =  a[0];
                 b = b[0];
                 return a < b ? -1 : (a > b ? 1 : 0);
-            }).slice(0,max_ticks);
+            })
         }
         // X axis
         const x = d3.scaleBand()
