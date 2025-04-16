@@ -2,6 +2,7 @@
 from archery import mdict
 from yahi import notch, shoot
 from datetime import datetime
+from html import escape
 
 
 context=notch()
@@ -25,10 +26,10 @@ context.output(
             'by_ip': mdict({data['ip']: 1 }),
             'by_bandwidth_by_ip': mdict({data['ip']: int(data["bytes"]) }),
             'by_status': mdict({data['status']: 1 }),
-            'by_url': mdict({data['uri']: 1}),
+            'by_url': mdict({escape(data['uri']): 1}),
             'by_agent': mdict({data['agent']: 1}),
-            'by_referer': mdict({data['referer']: 1}),
-            'ip_by_url': mdict({data['uri']: mdict( {data['ip']: 1 })}),
+            'by_referer': mdict({escape(data['referer']): 1}),
+            'ip_by_url': mdict({escape(data['uri']): mdict( {data['ip']: 1 })}),
             'bytes_by_ip': mdict({data['ip']: int(data['bytes'])}),
             'date_dayofweek_hit' : mdict({data['_datetime'].weekday(): 1 }),
             'weekday_browser' : mdict({data['_datetime'].weekday():

@@ -140,6 +140,10 @@ citizens in their own lands.
 
 # Changelog
 
+## 0.2.1
+
+* fix #20 html injections through ref and uri
+
 ## 0.2.0
 
 * adds a loader in the all in one web page for when JS is hogging parsing the JSON

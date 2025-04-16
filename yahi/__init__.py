@@ -56,11 +56,9 @@ class ToxicSet(Copier,set):
 
 ####################### STATIC DATA ################################
 HARDCODED_GEOIP_DIR = "~/.yahi/"
-### GLOBAL CACHE prettu multiprocessing unfirendly
 
 
-####################" 
-
+####################################################################
 
 def build_filter_from_json(str_or_file, positive_logic):
     matcher = {}
