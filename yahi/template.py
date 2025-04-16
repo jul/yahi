@@ -153,7 +153,6 @@ $(document).ready(function() {
         e.preventDefault()
         history.pushState({} ,"", $(this).attr("href").replace(/\?.*/,""));
         update_for( ($(this).attr("href")).substring(1).replace(/\?.*/,""),max_ticks );
-        console.log($(this).attr("href"))
         $("#ctitle", ".top").text( $(this).text());
         return false;
     });
@@ -161,7 +160,6 @@ $(document).ready(function() {
         e.preventDefault()
         history.pushState({}, "",$(this).attr("href").replace(/\?.*/,"")  );
         update_for( ($(this).attr("href")).substring(1).replace(/\?.*/,"" ));
-        console.log("href:" + $(this).attr("href"))
         $("#ctitle.chrono" ).text( $(this).text());
 
        return false;
@@ -176,13 +174,9 @@ $(document).ready(function() {
         e.preventDefault()
         var href=$(e.target)[0].attributes.href
         var query = new URLSearchParams( $(e.target)[0].attributes.href.value )
-
-
         url = href.value
-
         var route = query.get("route")
             anchor = document.URL.match(/#[^\?]+/)
-
         if (anchor)
             url += anchor
         history.pushState({}, null,  url)
@@ -232,8 +226,6 @@ $(document).ready(function() {
     }
     console.log("anchor is " + anchor)
     if (anchor != undefined){
-        console.log( ".selector." +  anchor[0].substr(1))
-
         $(".selector." +  anchor[0].substr(1)).click()
     }
     console.log("ready")
@@ -260,24 +252,17 @@ $(document).ready(function() {
         k = serie.map(d => d[0])
 
         if (top) {
-            console.log("sorting")
             serie=serie.sort(function(a, b) {
                 a =  a[1];
                 b =  b[1];
                 return a < b ? -1 : (a > b ? 1 : 0);
             }).reverse().slice(0,max_ticks);
-            console.log(serie)
         } else {
-
-            console.log("sorting")
             serie=serie.sort(function(a, b) {
                 a =  a[0];
                 b = b[0];
                 return a < b ? -1 : (a > b ? 1 : 0);
             }).slice(0,max_ticks);
-            console.log(serie)
-
-
         }
         // X axis
         const x = d3.scaleBand()
@@ -300,8 +285,6 @@ $(document).ready(function() {
           .call(d3.axisLeft(y));
 
         // Bars
-        console.log("serie before making bars")
-        console.log(serie)
         svg.selectAll("mybar")
           .data(serie)
           .join("rect")
@@ -313,7 +296,6 @@ $(document).ready(function() {
             .attr("stroke", "#eef")
         if (!top) {
             console.log("too much ticks")
-            console.log(k.length)
             if (k.length > (max_ticks)) {
                 every= Math.floor(k.length/(max_ticks))
                 var ticks = d3.selectAll(".tick text");
