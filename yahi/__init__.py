@@ -146,7 +146,7 @@ def shoot( context, group_by,):
     parse_user_agent = lru_cache(context.cache_size)(normalize_user_agent)
 
     if "geo_ip" in context.skill:
-        from pygeoip import GeoIP
+        from pygeoip import GeoIP, GeoIPError
         gi = GeoIP(path.expanduser(path.join(context.geoip, "GeoIP.dat")))
         country_by_ip = lru_cache(context.cache_size)(gi.country_code_by_addr)
         gi6 = GeoIP(path.expanduser(path.join(context.geoip, "GeoIPv6.dat")))
@@ -167,10 +167,12 @@ def shoot( context, group_by,):
                     data['_date'] = dt.date().isoformat()
 
                 if 'geo_ip' in context.skill:
+                    country="unknown"
                     try:
-                        data.update( {"_country":country_by_ip(data["ip"])})
-                    except:
-                        data.update( {"_country":country_by_ip6(data["ip"])})
+                        country = country_by_ip(data["ip"])
+                    except GeoIPError:
+                        country = country_by_ip6(data["ip"])
+                    data.update({"_country":country})
 
                 if 'user_agent' in context.skill:
                     data.update(
