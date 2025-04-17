@@ -1,3 +1,7 @@
+#!/usr/bin/env/python
+
+# -*- coding: utf8 -*-
+
 template = """
 
 <!doctype html>
@@ -74,8 +78,6 @@ pre          { font-family: 'Consolas', 'Menlo', 'Deja Vu Sans Mono',
                background: #eee; }
 .footer      { position:fixed; bottom:0px; text-align: center;left:0;right:0  }
 </style>
-<script src="https://d3js.org/d3.v6.js"></script>
-<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 </head>
 <body>
 <div class="loading centered" >
@@ -343,12 +345,17 @@ function _keys(arr) {
     return arrr;
 
 }
+
 function _values(arr) {
     var arrr=[];
     $.each( arr, function(k,v) { arrr.push( v )});
     return arrr;
 
 }
+
+{{JQUERY}}
+
+{{D3}}
 
 $(document).ready(function() {
     $(".loading").hide()
