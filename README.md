@@ -140,6 +140,10 @@ citizens in their own lands.
 
 # Changelog
 
+## 0.2.6
+
+* now fully self in one file all dependencies are now in the file
+
 ## 0.2.5
 
 * bug when there is no undected geo localized IP in template
