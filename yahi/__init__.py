@@ -31,8 +31,6 @@ if not path.exists(path.expanduser("~/.yahi")):
 
 locale.setlocale(locale.LC_ALL,"C")
 
-DIR = path.dirname(__file__)
-
 class ToxicSet(Copier,set):
     """a set for wich add is a shortcut for union
     this way, I can now select all the distinct stuffs
