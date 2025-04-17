@@ -140,6 +140,10 @@ citizens in their own lands.
 
 # Changelog
 
+## 0.2.3
+
+* fix : missing dates
+
 ## 0.2.2
 
 * fix #21 html injections through ref and uri
