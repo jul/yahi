@@ -74,13 +74,8 @@ pre          { font-family: 'Consolas', 'Menlo', 'Deja Vu Sans Mono',
                background: #eee; }
 .footer      { position:fixed; bottom:0px; text-align: center;left:0;right:0  }
 </style>
-
-    <script src="https://d3js.org/d3.v6.js"></script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-
-
-
-
+<script src="https://d3js.org/d3.v6.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
 </head>
 <body>
 <div class="loading centered" >
@@ -365,16 +360,18 @@ $(document).ready(function() {
     };
     if (data.by_country) {
         var geo_data = data.by_country
-        geo_data.AQ = geo_data[""]
-        delete (geo_data[""])
-        var max = Object.values(geo_data).reduce((a,b) => Math.max(a,b))
+        if (geo_data[""]) {
+            geo_data.AQ = geo_data[""]
+            delete (geo_data[""])
+        }
+        max = Object.values(geo_data).reduce((a,b) => Math.max(a,b))
+        console.log("max :" + max)
         $(".max").html(max)
         Object.keys(geo_data).forEach( function(k) {
             svgkey = "#" + k
-            console.log(svgkey)
-            grad=( 256- Math.ceil( (geo_data[k] / max * 256) )).toString(16).padStart(2,"0").toUpperCase()
+            grad=( 256 - Math.ceil( (geo_data[k] / max * 256) )).toString(16).padStart(2,"0").toUpperCase()
+            console.log(grad)
             color = "#" + grad + grad + "FF" ;
-            console.log(color)
             $(svgkey).attr("fill",color)
             $(svgkey).attr("strike","black")
             $(svgkey).on("mouseenter",

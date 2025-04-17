@@ -140,6 +140,14 @@ citizens in their own lands.
 
 # Changelog
 
+## 0.2.5
+
+* bug when there is no undected geo localized IP in template
+
+## 0.2.4
+
+* removing google JS api because it is heavy as shit and google is evil #22
+
 ## 0.2.3
 
 * fix : missing dates
