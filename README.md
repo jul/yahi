@@ -140,6 +140,11 @@ citizens in their own lands.
 
 # Changelog
 
+## 0.2.8
+
+* removal of useless/duplicate stats in speed\_shoot
+* enhancing faq thanks to @armandoF
+
 ## 0.2.7
 
 * now fully self in one file all dependencies are now in the file
