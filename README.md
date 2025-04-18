@@ -135,43 +135,18 @@ Let's have a thought for the native americans that are still second ranks
 citizens in their own lands. 
 
 
-
-
-
 # Changelog
 
 ## 0.2.9
 
 * update README on pypi (et on github)
-
-## 0.2.8
-
 * removal of useless/duplicate stats in speed\_shoot
 * enhancing faq thanks to @armandoF
-
-## 0.2.7
-
 * now fully self in one file all dependencies are now in the file
-
-## 0.2.5
-
 * bug when there is no undected geo localized IP in template
-
-## 0.2.4
-
 * removing google JS api because it is heavy as shit and google is evil #22
-
-## 0.2.3
-
 * fix : missing dates
-
-## 0.2.2
-
 * fix #21 html injections through ref and uri
-
-## 0.2.0
-
-* adds a loader in the all in one web page for when JS is hogging parsing the JSON
 * -g options now applies to the DIRECTORY where both GeoIP.dat and GeoIPv6.dat
  are
 
@@ -180,45 +155,15 @@ citizens in their own lands.
 * fix #18 wrong date formatting resulting in bad date ordeer
 * fix #19 create ~/.yahi on startup if not exists
 * fixing the template issue the nice way
-
-
-## 0.1.21
-
 * fix #16 no templates in the package
 * fix #17 crashing of the HTML when JSON embedded is too big
-
-## 0.1.19-0.1.20
-
 * wording in README
-
-## 0.1.8
-
 * adding tests in the package so package does not install if tests dont pass
-
-## 0.1.7
-
 * oopsies removed needless pictures of the package
-
-## 0.1.6
-
 * adding yahii\_all\_in\_one\_maker to generate the all in one HTML file with
 visualization from speed\_shoot
-
-## 0.1.5
-
 * preparing a new release that generates all in one html static pages
-
-## 0.1.3
-
-Adding varnish incomplete regexp for log parsing (I miss 2 fields)
-
-## 0.1.1
-
-* bad url for the demo  
-
-## 0.1.0
-
-* it is NEW, seen on TV, and is guaranteed to make you tenfolds more desirable. 
+* Adding varnish incomplete regexp for log parsing (I miss 2 fields)
 
 
 
