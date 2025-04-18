@@ -45,7 +45,7 @@ And thanks to `mailfud <http://mailfud.org>`_ for keeping these legacy databases
 
 Simplest usage is::
 
-    speed_shoot /var/www/apache/access*log* > data.js
+    speed_shoot /var/log/apache/access*log* > data.js
 
 It reads gzipped file format automatically.
 
