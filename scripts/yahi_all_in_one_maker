@@ -11,7 +11,6 @@ Outputs the result in the local file aio.html
 
 """
 from sys import argv
-from yahi import DIR
 from yahi.template import template
 from os import path
 from html import escape

@@ -427,7 +427,7 @@ $(document).ready(function() {
         if (anchor)
             url += anchor
         history.pushState({}, null,  url)
-        var query = new URLSearchParams( url)
+        var query = new URLSearchParams( url);
         ({
             "chrono": () => { 
                 $(".content").hide(); $("." + route).show();

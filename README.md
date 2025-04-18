@@ -140,7 +140,7 @@ citizens in their own lands.
 
 # Changelog
 
-## 0.2.6
+## 0.2.7
 
 * now fully self in one file all dependencies are now in the file
 
