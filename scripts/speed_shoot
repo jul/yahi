@@ -28,8 +28,6 @@ context.output(
             'by_url': mdict({data['uri']: 1}),
             'by_agent': mdict({data['agent']: 1}),
             'by_referer': mdict({data['referer']: 1}),
-            'ip_by_url': mdict({data['uri']: mdict( {data['ip']: 1 })}),
-            'bytes_by_ip': mdict({data['ip']: int(data['bytes'])}),
             'date_dayofweek_hit' : mdict({data['_datetime'].weekday(): 1 }),
             'weekday_browser' : mdict({data['_datetime'].weekday():
                 mdict({data["_browser_name"] :1 })}),
