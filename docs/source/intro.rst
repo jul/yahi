@@ -37,7 +37,7 @@ First you need a geoIP database in legacy format::
     wget -O- https://mailfud.org/geoip-legacy/GeoIP.dat.gz | \
         zcat > ~/.yahi/GeoIP.dat
     wget -O- https://mailfud.org/geoip-legacy/GeoIPv6.dat.gz | \
-        zcat > data/GeoIPv6.dat
+        zcat > ~/.yahi/GeoIPv6.dat
 
 
 And thanks to `mailfud <http://mailfud.org>`_ for keeping these legacy databases.
@@ -45,7 +45,7 @@ And thanks to `mailfud <http://mailfud.org>`_ for keeping these legacy databases
 
 Simplest usage is::
 
-    speed_shoot -g /usr/local/data/geoIP.dat /var/www/apache/access*log* > data.js
+    speed_shoot /var/www/apache/access*log* > data.js
 
 It reads gzipped file format automatically.
 
