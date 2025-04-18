@@ -140,6 +140,10 @@ citizens in their own lands.
 
 # Changelog
 
+## 0.2.9
+
+* update README on pypi (et on github)
+
 ## 0.2.8
 
 * removal of useless/duplicate stats in speed\_shoot
