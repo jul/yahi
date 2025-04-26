@@ -137,8 +137,9 @@ citizens in their own lands.
 
 # Changelog
 
-## 0.2.9
+## 0.2.10
 
+* adding the number of lines matched at the end of the parsing cf #28/#27
 * update README on pypi (et on github)
 * removal of useless/duplicate stats in speed\_shoot
 * enhancing faq thanks to @armandoF

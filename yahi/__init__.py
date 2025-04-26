@@ -140,6 +140,8 @@ def shoot( context, group_by,):
     
     look_for = log_pattern[context.log_format].search
     match = None
+    matched = 0
+    parsed = 0
     dt_format = dt_formater_from_format(date_pattern[context.log_format])
     parse_user_agent = lru_cache(context.cache_size)(normalize_user_agent)
 
@@ -155,8 +157,9 @@ def shoot( context, group_by,):
     try:
         for line in _input:
             match = look_for(line)
-                
+            parsed += 1
             if match:
+                matched+=1
                 data = match.groupdict()
                 if dt := dt_format(data.get("datetime")):
                     data['_datetime']=dt
@@ -214,7 +217,8 @@ def shoot( context, group_by,):
         #_input.close()
         sys.stderr.write("\n")
         if not context.silent:
-            sys.stderr.write("\n%s lines parsed\n" % _input.lineno())
+            sys.stderr.write("\n%s lines parsed" % parsed)
+            sys.stderr.write("\n%d lines matched\n" % matched)
     return aggregator
 
 #################### CLI and DOC #################################
