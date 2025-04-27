@@ -1,0 +1,75 @@
+[build-system]
+build-backend = "flit_core.buildapi"
+requires = ["flit_core >=3.2,<4"]
+
+[project]
+name = "yahi"
+version = "0.2.11"
+description = "Versatile log parser"
+readme = "README.md"
+python = ">=3.11"
+wheel = "*"
+authors = [
+    { name = "julien tayon", email = "julien@tayon.net" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: Python Software Foundation License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+]
+dependencies = [
+                "repoze.lru",
+                "archery>=0.3.0",
+                "httpagentparser==1.9.5",
+                "pygeoip==0.2.3",
+               ]
+
+[project.urls]
+Homepage = "https://github.com/jul/yahi"
+Documentation = "https://yahi.readthedocs.io/en/latest/index.html"
+Repository = "https://github.com/jul/yahi"
+Issues = "https://github.com/jul/yahi/issues"
+Changelog = "https://github.com/jul/yahi/release-notes/"
+
+[project.scripts]
+speed_shoot = "yahi.scripts.speed_shoot:main"
+yahi_all_in_one_maker = "yahi.scripts.yahi_all_in_one_maker:main"
+
+
+[tool.pytest.ini_options]
+addopts = [
+  "--strict-config",
+  "--strict-markers",
+  "--ignore=docs",
+]
+
+[tool.coverage.run]
+parallel = true
+data_file = "coverage/.coverage"
+source = [
+    "docs",
+    "test",
+    "yahi"
+]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "W191",  # indentation contains tabs
+]
