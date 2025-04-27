@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+All in one maker
+================
+
+Generates a all in one yahi output web page from the stats given in
+its json form as the first parameter.
+
+Outputs the result in the local file aio.html
+
+"""
+from sys import argv
+from yahi.template import template
+from os import path
+from html import escape
+
+usage = lambda : print(__doc__) or exit(1)
+
+def main():
+    data_location="./data.js"
+    try:
+        data_location = argv[1]
+    except:
+        pass
+
+    try:
+        with open(data_location) as f:
+            DATA=f.read()
+            res = template.replace("{{DATA}}", escape(DATA))
+            with open("aio.html", "w", encoding='utf-8') as h:
+                h.write(res)
+    except Exception as e:
+        print(e)
+        usage()
+
+if __name__=="__main__":
+    main()

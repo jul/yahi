@@ -8,7 +8,7 @@ from datetime import datetime
 try:
     import pygeoip
 except ModuleNotFoundError:
-    warn("pygeoip required for full feartures" ,ImportWarning)
+    warn("pygeoip required for full features" ,ImportWarning)
 try:
     import httpagentparser
 except ModuleNotFoundError:
