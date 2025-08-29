@@ -1,7 +1,7 @@
 # Versatile log parser
 
 - source: https://github.com/jul/yahi
-- doc: http://yahi.readthedocs.org/
+- doc: https://yahi.readthedocs.io/en/latest/
 - ticketting: https://github.com/jul/yahi/issues
 
 
@@ -136,6 +136,10 @@ citizens in their own lands.
 
 
 # Changelog
+
+## 0.2.11
+
+* pointing to the correct URL for the doc
 
 ## 0.2.10
 
