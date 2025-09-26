@@ -5,6 +5,8 @@ from archery import mdict
 res=mdict()
 with open("/home/jul/Téléchargements/GEMESCAPEG.csv") as f:
     for l in DictReader(f):
-        res+=mdict(by_ref = mdict({l["Referent"]: 1}), by_prenom=mdict({l["Prenom"]:1}))
+        res+=mdict(by_ref = mdict({l["Referent"]: 1}), 
+            by_prenom=mdict({l["Prenom"]:1}),
+            by_civilite=mdict({l["Civilite"]:1}))
 
 dump(res, open("data.js", "w"), indent=4)
