@@ -22,7 +22,7 @@ The [demo being there](https://jul.github.io/cv/demo.html?route=chrono#hour_hit)
 
 
 ```
-    pip install yahi
+    python -m pip install yahi
 ```
 
 # Quickstart
@@ -136,6 +136,11 @@ citizens in their own lands.
 
 
 # Changelog
+
+## 0.3.0
+
+* NEW : date\_formater from shoot accepts "%s" as an input for timestamp
+* docs : adding a section on how to misuse yahi to parse CSV
 
 ## 0.2.11
 

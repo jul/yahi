@@ -25,7 +25,7 @@ Installation
 ============
 ::
 
-    pip install yahi
+    python -m pip install yahi
 
 
 Quickstart

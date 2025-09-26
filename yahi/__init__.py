@@ -87,6 +87,8 @@ def build_filter_from_json(str_or_file, positive_logic):
 def dt_formater_from_format(date_format):
     def cdt_format(dt):
         return datetime.strptime(dt,date_format)
+    if date_format == "%s":
+        cdt_format = lambda s :  datetime.fromtimestamp(float(s))
     return cdt_format
 
 

@@ -13,6 +13,7 @@ Contents:
     console.rst
     logic.rst
     misusing.rst
+    csv.rst
     faq.rst
 
 .. include:: intro.rst
