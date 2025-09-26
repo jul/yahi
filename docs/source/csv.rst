@@ -22,7 +22,9 @@ A line is made off a timestamp followed by various (int) counters.
 
 Then, all that remains to do is ::
 
-    yahi_all_in_one_maker && firefox aio.html
+    python test.py < ~/trollometre.csv
+    yahi_all_in_one_maker
+    firefox aio.html
 
 You click on time series and can see the either the chronological time serie 
 
