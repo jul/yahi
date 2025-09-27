@@ -360,7 +360,7 @@ $(document).ready(function() {
     $(".loading").hide()
     $(".ready").show()
     data = JSON.parse($("pre").text())
-    const max_ticks=40;
+    var max_ticks=40;
     if(navigator.platform == 'iPad' || navigator.platform == 'iPhone' ) {
          $(".footer").css("position", "static");
     };
@@ -530,12 +530,11 @@ $(document).ready(function() {
 
         // Add Y axis
         maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
-        const y = d3.scaleLinear()
+        var y = d3.scaleLinear()
           .domain([0, maxou])
           .range([ height, 0]);
         svg.append("g")
           .call(d3.axisLeft(y));
-
         // Bars
         svg.selectAll("mybar")
           .data(serie)
@@ -545,17 +544,25 @@ $(document).ready(function() {
             .attr("width", x.bandwidth())
             .attr("height", d => 1 * ( height - y(d[1])))
             .attr("fill", "#46A")
-            .attr("stroke", "#eef")
+            .attr("stroke", "#46A")
+        // HACK ONE MAX ticks (delete Y ticks in the process
         if (!top) {
+           max_ticks = 30
             if (k.length > (max_ticks)) {
                 every= Math.floor(k.length/(max_ticks))
-                var ticks = d3.selectAll(".tick text");
+                var ticks = d3.selectAll(".tick");
                 ticks.each(function(_,i){
                     if(i%every !== 0) d3.select(this).remove();
                 });
-
             }
         }
+        // DIRTY HACK REDRAWING Y TICK
+        maxou = Math.max.apply(null, _values(serie).map((e) => e[1]))
+        y = d3.scaleLinear()
+          .domain([0, maxou])
+          .range([ height, 0]);
+        svg.append("g")
+          .call(d3.axisLeft(y));
     }
 });
 
