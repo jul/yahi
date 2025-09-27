@@ -1,10 +1,11 @@
+#!/usr/bin/env python
 from archery import mdict
 from yahi import notch, shoot
 from json import dump
 import re
 
 
-context=notch(
+context=notch("/home/jul/trollometre.csv",
     off="user_agent,geo_ip",
     log_format="custom",
     output_format="json",
@@ -15,6 +16,7 @@ context=notch(
     $""")
 
 date_formater= lambda dt :"%s-%s-%s" % ( dt.year, dt.month, dt.day)
+
 res= shoot(
         context,
         lambda data: mdict({
