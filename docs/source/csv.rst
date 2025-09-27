@@ -22,7 +22,6 @@ A line is made off a timestamp followed by various (int) counters.
 
 Then, all that remains to do is ::
 
-    python test.py < ~/trollometre.csv
     yahi_all_in_one_maker
     firefox aio.html
 
