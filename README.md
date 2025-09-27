@@ -137,6 +137,11 @@ citizens in their own lands.
 
 # Changelog
 
+## 0.3.1
+
+* improved plotting for large series
+* hiding categories when no data for it are present
+
 ## 0.3.0
 
 * NEW : date\_formater from shoot accepts "%s" as an input for timestamp
