@@ -385,11 +385,17 @@ $(document).ready(function() {
         })
     }
     //create sub routes py parsing json
+    var has_by=false
+    var has_chrono=false
     $.each(_keys(data), (i,e) => {
-        if ( e.substring(0,3) == "by_" )
+        if ( e.substring(0,3) == "by_" ) {
             $('#menu_down.top').append("<li><a id="+e+" class=selector href=#" + e + "?route=top >" + e + "</a></li>")
-        if ( e.substring(0,5) == "date_" ||  e.substring(0,5) == "hour_" )
+            has_by=true
+        }
+        if ( e.substring(0,5) == "date_" ||  e.substring(0,5) == "hour_" ) {
             $('#menu_down.chrono').append("<li><a id="+e+" class=selector href=#" + e + "?route=chrono >" + e + "</a></li>")
+            has_chrono=true
+        }
     })
     $(".router").each( (i,e) => {
         var query = new URLSearchParams( e.attributes.href.value )
@@ -450,12 +456,24 @@ $(document).ready(function() {
 
     var query = new URLSearchParams(window.location.search )
     route = query.get("route")
+    if (!has_by) {
+        $(".top").hide()
+    }
+    if (!has_chrono) {
+        $(".chrono").hide()
+    }
     if (route == undefined ) {
         if (data.by_country) {
             $(".router.geo").click()
         } else {
-            $(".router.top").click()
-            $("top > .selector")[0].click()
+            if (has_by) {
+                $(".router.top").click()
+                $("top > .selector")[0].click()
+            } else {
+
+                $(".router.chrono").click()
+                $("top > .selector")[0].click()
+            }
         }
     } else {
         $(".router." + route).click()
