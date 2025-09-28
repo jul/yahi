@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from typing import IO, Pattern, AnyStr, Pattern
 import re
 log_pattern=dict( 
     apache_log_combined = re.compile(
@@ -50,3 +51,11 @@ date_pattern = dict(
     varnish = "%d/%b/%Y:%H:%M:%S",
     lighttpd = "%d/%b/%Y:%H:%M:%S",
 )
+
+def regexp_reader(file : IO, pattern_name_or_regexp : Pattern | str) :
+    if pattern_name_or_regexp not in log_pattern and type(pattern_name_or_regexp) != re.Pattern:
+        raise Exception("invalid input, expected string or valid log_pattern")
+    pattern = log_pattern.get(pattern_name_or_regexp, pattern_name_or_regexp)
+    for l in file:
+        if match := pattern.match(l):
+            yield match.groupdict()

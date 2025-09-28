@@ -64,16 +64,18 @@ given back by notch.
     for each lines of each input file
         - use a regexp to transform the parsed line in a dict
         - add to record datetime string in **_datetime** key
-        if **geoIP** in **context.skill**
+
+          if **geoIP** in **context.skill**
             add *_country* to the record bades on *ip*
-        if **user_agent** in **context.skill**
+          if **user_agent** in **context.skill**
             add *_dist_name*, *_browser_version*, *_browser_version* on *agent* 
-        if not filtered out by context.data_filter
+          if not filtered out by context.data_filter
             add actual transformed record to the previous one
 
 It is basically a way to **GROUP BY** like in mysql.
 As my dict supports addition we have the following logic for each line (given 
 you request an aggregation on country and useragent and you are at the 31st line::
+
     >>> { '_country' : { 'BE' : 10, 'FR' : 20  
     ... },  'user_agent' : { 'mozilla' : 13, 'unknown' : 17  } } + { 
     ... 'country' : { 'BE' : 1}, 'user_agent' : { 'safari': 1 } }

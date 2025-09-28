@@ -10,10 +10,10 @@ Contents:
     :maxdepth: 1
 
     cli_arg.rst
+    yaom.rst
     console.rst
     logic.rst
     misusing.rst
-    csv.rst
     faq.rst
 
 .. include:: intro.rst

@@ -8,6 +8,9 @@ It is pretty much a querying language in disguise.
 Initially I did not planned to use it in a console or as a standalone module
 so the API is not satisfying. 
 
+
+.. _notch:
+
 Notch: choose your input
 ========================
 
@@ -30,6 +33,7 @@ Here you parse two files, you want:
 (Since no output file is set, output is redirected to stdout (errors are directed 
 on stderr)). 
 
+.. _shoot:
 
 Shoot: choose and aggregate your data
 =====================================

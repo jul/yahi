@@ -56,11 +56,13 @@ It includes various external libraries to work : D3js (charting), jquery, google
 # Screenshots
 
 ## Time serie
-<image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/chrono.png">
+<image
+src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/sql3.png">
 
 ## Histograms
 
-<image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/histo.png">
+<image
+src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/csv_4.png">
 
 ## Geographic map
 
@@ -136,6 +138,13 @@ citizens in their own lands.
 
 
 # Changelog
+
+## 0.3.2
+
+* adding convenience function regexp\_reader that reads a file like
+  csv.DictReader
+* improving documentation
+
 
 ## 0.3.1
 
