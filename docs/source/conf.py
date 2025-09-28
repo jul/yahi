@@ -52,7 +52,7 @@ copyright = u'2012, julien tayon'
 # The short X.Y version.
 version = "0.3"
 # The full version, including alpha/beta/rc tags.
-release = '0.3.2b'
+release = '0.3.3'
 
 exclude_patterns = []
 
