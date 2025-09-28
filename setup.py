@@ -22,7 +22,7 @@ long_description = open("README.md").read()
 
 setup(
         name='yahi',
-        version='0.3.2',
+        version='0.3.2b',
         author='Julien Tayon, Stephane Bard',
         author_email='julien@tayon.net',
         packages=['yahi'],

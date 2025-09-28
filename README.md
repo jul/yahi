@@ -57,12 +57,12 @@ It includes various external libraries to work : D3js (charting), jquery, google
 
 ## Time serie
 <image
-src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/sql3.png">
+src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/sql3.png">
 
 ## Histograms
 
 <image
-src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/csv_4.png">
+src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/csv_4.png">
 
 ## Geographic map
 

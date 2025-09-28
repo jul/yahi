@@ -13,8 +13,8 @@ res="""digraph {
 for k,v in sum(
         mdict({(r["referer"], r["uri"]):1}) for r in
             regexp_reader(
-                open("/var/log/nginx/access.log"),
-                "apache_log_combined"
+                open("/var/log/nginx/access.log.1"),
+                "nginx"
             )
         ).items():
     if urlparse(k[0]).netloc == 'localhost' and k[0] != '-':

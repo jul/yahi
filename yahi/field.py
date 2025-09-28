@@ -45,12 +45,17 @@ HTTP/1.\d"\                   # whole scheme (catching FTP ... would be nicer)
 "(?P<cache_status>[^"]+)"\ 
 "(?P<protocol>[^"]+)"$           # well ugly chain''', re.VERBOSE),
 )
+log_pattern["nginx"] = log_pattern["apache_log_combined"]
+
 
 date_pattern = dict( 
-    apache_log_combined = "%d/%b/%Y:%H:%M:%S",
-    varnish = "%d/%b/%Y:%H:%M:%S",
-    lighttpd = "%d/%b/%Y:%H:%M:%S",
+    apache_log_combined="%d/%b/%Y:%H:%M:%S",
+    varnish="%d/%b/%Y:%H:%M:%S",
+    lighttpd="%d/%b/%Y:%H:%M:%S",
 )
+date_pattern["nginx"] = date_pattern["apache_log_combined"]
+
+
 
 def regexp_reader(file : IO, pattern_name_or_regexp : Pattern | str) :
     if pattern_name_or_regexp not in log_pattern and type(pattern_name_or_regexp) != re.Pattern:

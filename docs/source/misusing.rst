@@ -156,3 +156,30 @@ With the cumulated score per day as a time serie you can notice that in France
 the 10th and 17th of september 2025 had quite an echo.
 
 .. image:: sql3.png
+
+=====================================
+Making connection graph from web logs
+=====================================
+
+A connection graph tells the journey of visitors between web pages.
+
+Here I made a minimal web site with 5 web pages, *a*, *b* ... that can be clicked
+to visit one another.
+
+
+.. literalinclude:: test3.py
+
+This example illustrates how to simply use the library of regexp of logs.
+
+******
+Result
+******
+
+After executing ::
+
+    python docs/source/test3.py | dot  -T png  >  docs/source/dot.png
+
+We have got the following result:
+
+.. image:: dot.png
+
