@@ -96,6 +96,7 @@ Require javascript to be enabled to show data and information
 <li><a class=router href=?route=geo >geo chart</a></li>
 <li><a class=router href=?route=top >histograms</a></li>
 <li><a class=router href=?route=chrono >time series</a></li>
+<li><a class=router href=?route=heat >heatmap</a></li>
 <li><a class=router href=?route=raw >raw data</a></li>
 
 
@@ -305,9 +306,10 @@ Require javascript to be enabled to show data and information
 </div>
   <div id="chart_div" class="centered content" style="left:7%;right:7%;position:absolute;width: 80%;top:5em;bottom:2em;border:1px solid lightgrey"></div>
 
-<div id="plotbox" class="content centered top chrono" >
+<div id="plotbox" class="content centered top chrono heat" >
     <h2 class="content top">Top requests <span class=top id=ctitle > by status</span></h2>
     <h2 class="content chrono" >Chronologicial <span class=chrono id=ctitle > by status</span></h2>
+    <h2 class="content heat" >Heatmap <span class=heat id=ctitle > by status</span></h2>
     <div id=plot class=centered ></div>
 </div>
 </div>
@@ -327,6 +329,9 @@ Require javascript to be enabled to show data and information
 </ul>
 <ul id=menu_down class="content horizontal chrono">
     <li><em>Chronological series available  :</em> </li>
+</ul>
+<ul id=menu_down class="content horizontal heat">
+    <li><em>Heatmap available  :</em> </li>
 </ul>
 
 
@@ -387,6 +392,8 @@ $(document).ready(function() {
     //create sub routes py parsing json
     var has_by=false
     var has_chrono=false
+    var has_heat=false
+   
     $.each(_keys(data), (i,e) => {
         if ( e.substring(0,3) == "by_" ) {
             $('#menu_down.top').append("<li><a id="+e+" class=selector href=#" + e + "?route=top >" + e + "</a></li>")
@@ -396,12 +403,17 @@ $(document).ready(function() {
             $('#menu_down.chrono').append("<li><a id="+e+" class=selector href=#" + e + "?route=chrono >" + e + "</a></li>")
             has_chrono=true
         }
+        if ( e.substring(0,5) == "heat_") {
+            $('#menu_down.heat').append("<li><a id="+e+" class=selector href=#" + e + "?route=heat >" + e + "</a></li>")
+            has_heat=true
+        }
+        
     })
     $(".router").each( (i,e) => {
         var query = new URLSearchParams( e.attributes.href.value )
         $(e).addClass(query.get("route"))
     })
-        $(".selector").each( (i,e) => {
+    $(".selector").each( (i,e) => {
         $(e).addClass($(e).attr("href").substr(1).replace(/\?.*/,""))
     })
     $(".selector", ".top").click(function(e) {
@@ -417,6 +429,13 @@ $(document).ready(function() {
         update_for( ($(this).attr("href")).substring(1).replace(/\?.*/,"" ));
         $("#ctitle.chrono" ).text( $(this).text());
 
+       return false;
+    });
+    $(".selector", ".heat").click(function(e) {
+        e.preventDefault()
+        history.pushState({}, "",$(this).attr("href").replace(/\?.*/,"")  );
+        heat( ($(this).attr("href")).substring(1).replace(/\?.*/, ""));
+        $("#ctitle.heat" ).text( $(this).text());
        return false;
     });
     if (data["by_country"] == undefined) {
@@ -443,6 +462,10 @@ $(document).ready(function() {
                 $(".content").hide(); $("." + route).show() 
                 $(".selector",".top")[0].click()
             },
+            "heat": () => { 
+                $(".content").hide(); $("." + route).show() 
+                $(".selector",".heat")[0].click()
+            },
             "raw": () => { $(".content").hide(); $("." + route).show() 
             },
             "geo": () => { 
@@ -461,6 +484,9 @@ $(document).ready(function() {
     }
     if (!has_chrono) {
         $(".chrono").hide()
+    }
+    if (!has_heat) {
+        $(".heat").hide()
     }
     if (route == undefined ) {
         if (data.by_country) {
@@ -481,6 +507,84 @@ $(document).ready(function() {
     if (anchor != undefined){
         $(".selector." +  anchor[0].substr(1)).click()
     }
+    function heat(category) {
+        $("#plot > svg").remove()
+        console.log(category)
+        var margin = {top: 30, right: 30, bottom: 30, left: 90},
+          width = 800 - margin.left - margin.right,
+          height = 600 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#plot")
+        .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+        // Labels of row and columns
+        var myGroups = []
+        var myVars = []
+        var min = 0, max=0;
+        var first=true;
+        for (var key in data[category]) {
+            cur = data[category][key]
+            if (first) {
+                first = false;
+                min = max = cur
+            }
+            min = min < cur ? min : cur;
+            max = max > cur ? max : cur;
+            var e = key.split(":")
+            var group = e[0]
+            var vr = e[1]
+            if (myGroups.indexOf(group) == -1)
+                myGroups.push(group)
+            if (myVars.indexOf(vr) == -1)
+                myVars.push(vr)
+        }
+
+        console.log(myGroups)
+        console.log(myVars)
+        myGroups.sort()
+        myVars.sort()
+
+        // Build X scales and axis:
+        var x = d3.scaleBand()
+          .range([ 0, width ])
+          .domain(myGroups)
+          .padding(0.01);
+        svg.append("g")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x))
+
+        // Build X scales and axis:
+        var y = d3.scaleBand()
+          .range([ height, 0 ])
+          .domain(myVars)
+          .padding(0.01);
+        svg.append("g")
+          .call(d3.axisLeft(y));
+
+        // Build color scale
+        var myColor = d3.scaleLinear()
+          .range(["white", "#000030"])
+          .domain([min,max])
+
+        //Read the data
+          svg.selectAll()
+              .data(Object.keys(data[category]))
+              .enter()
+              .append("rect")
+              .attr("x", function(d) {  return x(d.split(":")[0]) })
+              .attr("y", function(d) { return y(d.split(":")[1]) })
+              .attr("width", x.bandwidth() )
+              .attr("height", y.bandwidth() )
+              .style("fill", function(d) { return myColor(data[category][d])} )
+
+    }
+
 
     function update_for(category, top){
 

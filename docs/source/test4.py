@@ -14,6 +14,10 @@ session = Session(engine)
 
 hr = lambda ts: "%02d-%02d" % (ts.hour, ts.minute - ts.minute % 10)
 date = lambda ts: ts.strftime("%Y-%m-%d")
+wW = lambda ts: ts.strftime("%w-%a:%Y-%U")
+dh = lambda ts: ts.strftime("%H:%Y-%j %m-%d")
+
+
 
 dump(
     sum(
@@ -31,6 +35,11 @@ dump(
                 0 if post.maybe_spam is None else not post.maybe_spam}),
             date_score = mdict({date(post.created_at) : post.score}),
             hour_score = mdict({hr(post.created_at) : post.score}),
+            heat_week_score = mdict({wW(post.created_at) : post.score}),
+            heat_week_all = mdict({wW(post.created_at) :1}),
+            heat_day_all = mdict({dh(post.created_at) :0 if post.maybe_spam is None else not post.maybe_spam}),
+            heat_day_score = mdict({dh(post.created_at) :post.score}),
+
         )
         for post in session.query(Posts).all()
     ),
