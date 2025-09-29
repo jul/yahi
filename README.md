@@ -64,6 +64,12 @@ src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/sq
 <image
 src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/csv_4.png">
 
+## Heat Map
+
+<image
+src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/heat_1.png">
+
+
 ## Geographic map
 
 <image src="https://raw.githubusercontent.com/jul/yahi/refs/heads/master/docs/source/img/geo.png">

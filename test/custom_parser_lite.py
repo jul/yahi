@@ -25,7 +25,9 @@ option.output_file.write(
                     }),
                 'date_hit': mdict({str(data['_datetime'].date()): 1 }),
                 'hour_hit': mdict({"%2d" % int(data['_hour']): 1 }),
-                'heat_test' : mdict({ data['_datetime'].strftime("%w:%W") : 1}),
+
+                'heat_by_day' : mdict({ data['_datetime'].strftime("%w:%Y %W") : 1}),
+                'heat_by_hour' : mdict({ data['_datetime'].strftime("%H:%Y/%j %m-%d") : 1}),
                 'hour_bandwidth': 
                     mdict({
                         "%2d" % int(data['_hour']):
