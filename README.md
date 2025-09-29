@@ -145,6 +145,10 @@ citizens in their own lands.
 
 # Changelog
 
+## 0.4.0
+
+* adding heatmap charts (documented but not integrated in speedshoot)
+
 ## 0.3.2
 
 * adding convenience function regexp\_reader that reads a file like
