@@ -20,10 +20,11 @@ Conventions
 
 The generated web page works with the following conventions:
 
-- if a *by_country* key exist it will expect counter in the form of the normalized country code and the counter ;
+- if a **by_country** key exist it will expect counter in the form of the normalized country code and the counter ;
 - else the geo chart will not be shown
-- if datas are named begining with *by_* it means you want to vizualize them in a sorted top form (defaults to 40 bins presented)
-- if datas have key *date_* *hour_* it means your data are in the form of something lexicographically sortalbe associated with the counter and the JS inside the view will graph them as time series.
+- if datas are named begining with **by_** it means you want to vizualize them in a sorted top form (defaults to 40 bins presented)
+- if datas have key **date_** **hour_** it means your data are in the form of something lexicographically sortalbe associated with the counter and the JS inside the view will graph them as time series.
+- if datas have key **heat_** it means you key will be in the form "*x*:"*y*" for the key and the value will be the amplitude of the heat map for given (*x*, *y*)
 
 The HTML view is litterally built from your data.
 

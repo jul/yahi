@@ -14,14 +14,13 @@ session = Session(engine)
 
 hr = lambda ts: "%02d-%02d" % (ts.hour, ts.minute - ts.minute % 10)
 date = lambda ts: ts.strftime("%Y-%m-%d")
-wW = lambda ts: ts.strftime("%w-%a:%Y-%U")
-dh = lambda ts: ts.strftime("%H:%Y-%j %m-%d")
+wW = lambda ts: ts.strftime("%Y-%U:%w-%a")
+dh = lambda ts: ts.strftime("%Y-%j %m-%d:%H")
 
 
-
-dump(
-    sum(
-        mdict(
+res = mdict()
+for post in session.query(Posts).all():
+    res += mdict(
             by_type=mdict({ post.maybe_spam and "spam" or "ham" : 1 }),
             date_all = mdict({date(post.created_at) : 1}),
             hour_all = mdict({hr(post.created_at) : 1}),
@@ -41,10 +40,7 @@ dump(
             heat_day_score = mdict({dh(post.created_at) :post.score}),
 
         )
-        for post in session.query(Posts).all()
-    ),
-    open("data.js", "w"),
-    indent=4
-)
+
+dump(res, open("data.js", "w"), indent=4)
 
 

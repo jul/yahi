@@ -393,7 +393,7 @@ $(document).ready(function() {
     var has_by=false
     var has_chrono=false
     var has_heat=false
-   
+
     $.each(_keys(data), (i,e) => {
         if ( e.substring(0,3) == "by_" ) {
             $('#menu_down.top').append("<li><a id="+e+" class=selector href=#" + e + "?route=top >" + e + "</a></li>")
@@ -407,7 +407,7 @@ $(document).ready(function() {
             $('#menu_down.heat').append("<li><a id="+e+" class=selector href=#" + e + "?route=heat >" + e + "</a></li>")
             has_heat=true
         }
-        
+
     })
     $(".router").each( (i,e) => {
         var query = new URLSearchParams( e.attributes.href.value )
@@ -509,8 +509,7 @@ $(document).ready(function() {
     }
     function heat(category) {
         $("#plot > svg").remove()
-        console.log(category)
-        var margin = {top: 30, right: 30, bottom: 30, left: 90},
+        var margin = {top: 30, right: 30, bottom: 90, left: 90},
           width = 800 - margin.left - margin.right,
           height = 600 - margin.top - margin.bottom;
 
@@ -524,8 +523,8 @@ $(document).ready(function() {
                 "translate(" + margin.left + "," + margin.top + ")");
 
         // Labels of row and columns
-        var myGroups = []
-        var myVars = []
+        var myX = []
+        var myY = []
         var min = 0, max=0;
         var first=true;
         for (var key in data[category]) {
@@ -537,32 +536,43 @@ $(document).ready(function() {
             min = min < cur ? min : cur;
             max = max > cur ? max : cur;
             var e = key.split(":")
-            var group = e[0]
-            var vr = e[1]
-            if (myGroups.indexOf(group) == -1)
-                myGroups.push(group)
-            if (myVars.indexOf(vr) == -1)
-                myVars.push(vr)
+            var x = e[0]
+            var y = e[1]
+            if (myX.indexOf(x) == -1)
+                myX.push(x)
+            if (myY.indexOf(y) == -1)
+                myY.push(y)
         }
 
-        console.log(myGroups)
-        console.log(myVars)
-        myGroups.sort()
-        myVars.sort()
+        myX.sort()
+        myY.sort()
 
         // Build X scales and axis:
         var x = d3.scaleBand()
           .range([ 0, width ])
-          .domain(myGroups)
-          .padding(0.01);
+          .domain(myX)
+          .padding(0.01)
         svg.append("g")
           .attr("transform", "translate(0," + height + ")")
           .call(d3.axisBottom(x))
+          .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
+        // HACK ONE MAX ticks (delete Y ticks in the process
+           max_ticks = 20
+            if (myX.length > (max_ticks)) {
+                every= Math.floor(myX.length/(max_ticks))
+                var ticks = d3.selectAll(".tick");
+                ticks.each(function(_,i){
+                    if(i%every !== 0) d3.select(this).remove();
+                });
+            }
+
 
         // Build X scales and axis:
         var y = d3.scaleBand()
           .range([ height, 0 ])
-          .domain(myVars)
+          .domain(myY)
           .padding(0.01);
         svg.append("g")
           .call(d3.axisLeft(y));
