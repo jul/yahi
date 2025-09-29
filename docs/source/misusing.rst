@@ -140,6 +140,14 @@ as long as you use something that is lexicographically sortable.
 
 .. image:: sql1.png
 
+*******
+Heatmap
+*******
+
+Heatmap generated for the scores by day of the year/hour of the day
+
+.. image:: heat_1.png
+
 ****************
 Simple histogram
 ****************
@@ -156,6 +164,7 @@ With the cumulated score per day as a time serie you can notice that in France
 the 10th and 17th of september 2025 had quite an echo.
 
 .. image:: sql3.png
+
 
 =====================================
 Making connection graph from web logs
