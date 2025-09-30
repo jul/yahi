@@ -495,9 +495,15 @@ $(document).ready(function() {
             if (has_by) {
                 $(".router.top").click()
                 $("top > .selector")[0].click()
-            } else {
+            } else
+            if (has_chrono){
 
                 $(".router.chrono").click()
+                $("top > .selector")[0].click()
+            } else 
+            if (has_heat) {
+
+                $(".router.heat").click()
                 $("top > .selector")[0].click()
             }
         }
@@ -661,7 +667,7 @@ $(document).ready(function() {
             .attr("stroke", "#46A")
         // HACK ONE MAX ticks (delete Y ticks in the process
         if (!top) {
-           max_ticks = 30
+           max_ticks = 20
             if (k.length > (max_ticks)) {
                 every= Math.floor(k.length/(max_ticks))
                 var ticks = d3.selectAll(".tick");
